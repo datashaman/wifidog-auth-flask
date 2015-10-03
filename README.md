@@ -1,4 +1,4 @@
 Wifidog Auth Flask
 ==================
 
-An auth server for Wifidog Captive Portal written in Python Flask. WIP.
+A time-based voucher authentication server for Wifidog Captive Portal written in Python Flask. WIP.

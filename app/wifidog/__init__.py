@@ -87,7 +87,8 @@ class Auth(db.Model):
         if self.stage == STAGE_LOGIN:
             if voucher.started_at is None:
                 if voucher.created_at + datetime.timedelta(minutes=app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow():
-                    return (AUTH_DENIED, 'Token has expired: %s' % token)
+                    db.session.delete(voucher)
+                    return (AUTH_DENIED, 'Token is unused but too old: %s' % token)
 
                 voucher.started_at = datetime.datetime.utcnow()
                 db.session.commit()
@@ -95,7 +96,11 @@ class Auth(db.Model):
                 return (AUTH_ALLOWED, None)
             else:
                 if voucher.gw_id == self.gw_id and voucher.mac == self.mac and voucher.ip == self.ip:
-                    return (AUTH_ALLOWED, 'Token is already in use but details match: %s' % self.token)
+                    if voucher.started_at + datetime.timedelta(minutes=voucher.minutes) < datetime.datetime.utcnow():
+                        db.session.delete(voucher)
+                        return (AUTH_DENIED, 'Token is in use but has expired: %s' % token)
+                    else:
+                        return (AUTH_ALLOWED, 'Token is already in use but details match: %s' % self.token)
                 else:
                     return (AUTH_DENIED, 'Token is already in use: %s' % self.token)
         elif self.stage in [ STAGE_LOGOUT, STAGE_COUNTERS ]:
