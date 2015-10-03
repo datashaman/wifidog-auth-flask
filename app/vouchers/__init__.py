@@ -59,8 +59,8 @@ class Voucher(db.Model):
     url = db.Column(db.String(255))
     email = db.Column(db.String(255))
     token = db.Column(db.String(255))
-    incoming = db.Column(db.BigInteger)
-    outgoing = db.Column(db.BigInteger)
+    incoming = db.Column(db.BigInteger, default=0)
+    outgoing = db.Column(db.BigInteger, default=0)
 
     def __init__(self, minutes):
         self.minutes = minutes

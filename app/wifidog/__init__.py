@@ -124,8 +124,12 @@ class Auth(db.Model):
             if self.stage == STAGE_LOGOUT:
                 db.session.delete(voucher)
                 messages += '| User is now logged out'
+            else:
+                if voucher.started_at + datetime.timedelta(minutes=voucher.minutes) < datetime.datetime.utcnow():
+                    db.session.delete(voucher)
+                    return (AUTH_DENIED, 'Token has expired: %s' % token)
 
-            return (None, messages)
+            return (AUTH_ALLOWED, messages)
         else:
             return (AUTH_ERROR, 'Unknown stage: %s' % self.stage)
 
