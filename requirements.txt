@@ -4,6 +4,7 @@ Flask-WTF
 Flask-Login==0.2.11
 Flask-Menu
 Flask-Bcrypt
+Flask-Restless
 Flask-Script
 Flask-Security
 marshmallow
