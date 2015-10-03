@@ -1,0 +1,23 @@
+{% extends 'layouts/base.html' %}
+
+{% from "helpers/form.html" import render_field %}
+
+{% block content %}
+{% include "security/_messages.html" %}
+<h1>Login</h1>
+<form action="{{ url_for_security('login') }}" method="POST" class="pure-form pure-form-stacked" name="login_user_form">
+    {{ login_user_form.next | safe }}
+    {{ login_user_form.hidden_tag() }}
+    <fieldset>
+        {{ render_field(login_user_form.email, class='pure-input-1', placeholder='Email') }}
+        {{ render_field(login_user_form.password, class='pure-input-1', placeholder='Password') }}
+        <label for="remember" class="pure-checkbox">
+            <input id="remember" type="checkbox" name="remember" value="y" />
+            Remember Me
+        </label>
+    </fieldset>
+
+    <button type="submit" class="pure-input-1-3 pure-button pure-button-primary">Login</button>
+</form>
+{% include "security/_menu.html" %}
+{% endblock %}

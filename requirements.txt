@@ -1,9 +1,10 @@
 Flask
 Flask-SQLAlchemy
 Flask-WTF
-Flask-Login
+Flask-Login==0.2.11
 Flask-Menu
 Flask-Bcrypt
 Flask-Script
+Flask-Security
 marshmallow
 uwsgi

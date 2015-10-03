@@ -4,7 +4,7 @@
     <div class="actions-collection">
         <form class="pure-form" onsubmit={ create }>
             <fieldset>
-                <input name="id" type="text" placeholder="User ID" required />
+                <input name="email" type="text" placeholder="Email" required />
                 <input name="password" type="text" placeholder="Password" required />
                 <button type="submit" class="pure-button pure-button-primary">
                     <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
@@ -21,7 +21,7 @@
     <table if={ users.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
         <thead>
             <tr>
-                <th>User ID</th>
+                <th>Email</th>
                 <th>Created</th>
                 <th class="actions">Actions</th>
             </tr>
@@ -29,7 +29,7 @@
 
         <tbody>
             <tr each={ row, i in users } data-id={ row.id } class={ pure-table-odd: i % 2 }>
-                <td>{ row.id }</td>
+                <td>{ row.email }</td>
                 <td>{ renderDateTime(row.created_at) }</td>
 
                 <td class="actions actions-row">
@@ -80,7 +80,7 @@
     }
 
     create(e) {
-        RiotControl.trigger('users.create', self.id.value, self.password.value);
+        RiotControl.trigger('users.create', self.email.value, self.password.value);
         return false;
     }
 

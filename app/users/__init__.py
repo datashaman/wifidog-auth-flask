@@ -5,9 +5,10 @@ import json
 from app import app, db, manager
 from app.utils import is_logged_in, is_logged_out
 from flask.ext.bcrypt import Bcrypt
-from flask.ext.login import LoginManager, login_user, logout_user, UserMixin, login_required
+from flask.ext.login import LoginManager, login_user, logout_user, login_required
 from flask.ext.menu import register_menu
 from flask.ext.script import prompt, prompt_pass
+from flask.ext.security import UserMixin, RoleMixin, SQLAlchemyUserDatastore, Security
 from marshmallow import Schema, fields
 from wtforms import Form, PasswordField, TextField, HiddenField, validators
 
@@ -23,46 +24,52 @@ def next_value():
     return flask.request.args.get('next')
 
 class LoginForm(Form):
-    id = TextField('User ID', [ validators.InputRequired() ])
+    email = TextField('Email', [ validators.InputRequired() ])
     password = PasswordField('Password', [ validators.InputRequired() ])
     next = HiddenField(default=next_value)
 
-    def validate_id(self, field):
-        user = User.query.get(field.data)
+    def validate_email(self, field):
+        user = User.query.filter_by(email=field.data).first()
 
         if user is None:
             raise validators.ValidationError('User does not exist')
 
-class User(db.Model, UserMixin):
-    __tablename__ = 'users'
+roles_users = db.Table('roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
 
-    id = db.Column(db.String(20), primary_key=True)
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    active = db.Column(db.Boolean, default=True)
+    confirmed_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
-    def __init__(self, id, password):
-        self.id = id
-        self.password = User.generate_password_hash(password)
+    roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
 
     def __repr__(self):
-        return '<User %r>' % self.id
+        return '<User %r>' % self.email
 
     def to_dict(self):
         return { c.name: getattr(self, c.name) for c in self.__table__.columns }
 
-    def check_password_hash(self, password):
-        return bcrypt.check_password_hash(self.password, password)
-
-    @staticmethod
-    def generate_password_hash(password):
-        return bcrypt.generate_password_hash(password)
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+security = Security(app, user_datastore)
 
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(id)
 
 class UserSchema(Schema):
-    id = fields.Str()
+    id = fields.Int()
+    email = fields.Str()
     password = fields.Str()
     created_at = fields.DateTime()
 
@@ -78,44 +85,36 @@ def index():
     else:
         return flask.render_template('users/index.html', users=users)
 
-def user_menu(*args, **kwargs):
-    print args, kwargs
-
-    return [
-            { 'url': '/', 'text': 'blah' }
-    ]
-
-@bp.route('/login', methods=[ 'GET', 'POST' ])
-def login():
-    form = LoginForm(flask.request.form)
-
-    if flask.request.method == 'POST' and form.validate():
-        user = User.query.get(form.id.data)
-
-        if user is None:
-            flask.flash('Invalid Credentials', 'warning')
-        else:
-            if user.check_password_hash(form.password.data):
-                login_user(user)
-                flask.flash('You logged in', 'success')
-                return flask.redirect(form.next.data or flask.url_for('home'))
-            else:
-                flask.flash('Invalid Credentials', 'warning')
-
-    return flask.render_template('users/login.html', form=form)
-
-@bp.route('/logout')
-@login_required
-@register_menu(bp, '.logout', 'Logout', order=99, visible_when=is_logged_in)
-def logout():
-    logout_user()
-    flask.flash('You logged out', 'success')
-    return flask.redirect(flask.url_for('home'))
-
+# @bp.route('/login', methods=[ 'GET', 'POST' ])
+# def login():
+#     form = LoginForm(flask.request.form)
+# 
+#     if flask.request.method == 'POST' and form.validate():
+#         user = User.query.filter_by(email=form.email.data).first()
+# 
+#         if user is None:
+#             flask.flash('Invalid Credentials', 'warning')
+#         else:
+#             if user.check_password_hash(form.password.data):
+#                 login_user(user)
+#                 flask.flash('You logged in', 'success')
+#                 return flask.redirect(form.next.data or flask.url_for('home'))
+#             else:
+#                 flask.flash('Invalid Credentials', 'warning')
+# 
+#     return flask.render_template('users/login.html', form=form)
+#
+#@bp.route('/logout')
+#@login_required
+#@register_menu(bp, '.logout', 'Logout', order=99, visible_when=is_logged_in)
+#def logout():
+#    logout_user()
+#    flask.flash('You logged out', 'success')
+#    return flask.redirect(flask.url_for('home'))
+#
 @bp.route('/', methods=[ 'POST' ])
 def users_create():
-    user = User(flask.request.form['id'], flask.request.form['password'])
-    db.session.add(user)
+    user_datastore.create_user(email=flask.request.form['id'], password=flask.request.form['password'])
     db.session.commit()
     return ('', 200)
 
@@ -132,17 +131,25 @@ def user_remove(id):
     return('', 200)
 
 @manager.command
-def create_user():
-    id = prompt('User ID')
+def create_admin():
+    email = prompt('Email')
     password = prompt_pass('Password')
     confirmation = prompt_pass('Confirm Password')
 
     if password == confirmation:
-        user = User(id, password)
-
-        db.session.add(user)
+        user = user_datastore.create_user(email=email, password=password)
+        admin = Role.query.filter_by(name='admin').first()
+        user.roles.append(admin)
         db.session.commit()
 
         print 'User created'
     else:
         print "Passwords don't match"
+
+@manager.command
+def seed_roles():
+    admin = Role()
+    admin.name = 'admin'
+    admin.description = 'Admin user'
+    db.session.add(admin)
+    db.session.commit()
