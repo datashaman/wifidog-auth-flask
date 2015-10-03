@@ -1,0 +1,23 @@
+{% extends 'layouts/base.html' %}
+
+{% block head %}
+<!--[if lt IE 9]>
+<script>html5.addElements('users')</script>
+<![endif]-->
+{% endblock %}
+
+{% block content %}
+<users></users>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='scripts/interactive.js') }}"></script>
+<script src="{{ url_for('users.static', filename='store.js') }}"></script>
+<script src="{{ url_for('users.static', filename='users.tag') }}" type="riot/tag"></script>
+
+<script>
+Zepto(function($) {
+    riot.mount('users', { users: {{ users|tojson }} });
+});
+</script>
+{% endblock %}

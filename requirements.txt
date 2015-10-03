@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+Flask-WTF
+Flask-Login
+Flask-Menu
+Flask-Bcrypt
+Flask-Script
+marshmallow
+uwsgi

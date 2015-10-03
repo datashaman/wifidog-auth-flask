@@ -1,0 +1,84 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin: 0 0 20px;
+}
+
+h1 {
+    font-size: x-large;
+}
+
+footer {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 20px;
+    width: 100%;
+}
+
+.container {
+    width: 1024px;
+    margin: 0 auto;
+}
+
+table .actions {
+    width: 30%;
+    text-align: right;
+}
+
+.flash {
+    padding: 0;
+    margin-bottom: 12px;
+}
+
+.flash li {
+    display: inline-block;
+    padding: 10px;
+    margin-left: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+}
+
+.flash .message {
+    color: #ffffff;
+    background-color: #4ea5cd;
+    border-color: #3b8eb5;
+}
+
+.flash .success {
+    color: #ffffff;
+    background-color: #00b900;
+    border-color: #55a12c;
+}
+
+.flash .warning {
+    color: #ffffff;
+    background-color: #eaaf51;
+    border-color: #d99a36;
+}
+
+.flash .error {
+    color: #ffffff;
+    background-color: #ff0000;
+    border-color: #c43d3d;
+}
+
+.state {
+    display: inline-block;
+    padding: 10px;
+    margin-left: 10px;
+    border-radius: 5px;
+}
+
+.state-invalid {
+    color: #ffffff;
+    background-color: #ff0000;
+}
+
+.state-valid {
+    color: #ffffff;
+    background-color: #00b900;
+}

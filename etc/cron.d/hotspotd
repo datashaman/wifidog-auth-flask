@@ -1,0 +1,1 @@
+*/5 * * * * ${USER} cd ${PATH} && flock -n /tmp/expire_vouchers.lock $HOME/.virtualenvs/hotspotd/python manage.py expire_vouchers

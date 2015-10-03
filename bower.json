@@ -1,0 +1,25 @@
+{
+  "name": "hotspotd",
+  "version": "0.0.0",
+  "homepage": "https://github.com/datashaman/hotspotd",
+  "authors": [
+    "datashaman <marlinf@datashaman.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "purecss": "~0.6.0",
+    "open-iconic": "~1.1.1",
+    "es5-shim": "~4.1.13",
+    "html5shiv": "~3.7.3",
+    "riot": "~2.2.4",
+    "riotcontrol": "*",
+    "zepto": "~1.1.6"
+  }
+}

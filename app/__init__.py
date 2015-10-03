@@ -1,0 +1,26 @@
+import flask
+
+from flask.ext.menu import Menu
+from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.script import Manager
+
+app = flask.Flask(__name__)
+app.config.from_object('config')
+
+menu = Menu(app)
+db = SQLAlchemy(app)
+manager = Manager(app)
+
+@app.route('/')
+def home():
+    return flask.render_template('home.html')
+
+import users
+import vouchers
+import wifidog
+
+app.register_blueprint(users.bp)
+app.register_blueprint(vouchers.bp)
+app.register_blueprint(wifidog.bp)
+
+db.create_all()

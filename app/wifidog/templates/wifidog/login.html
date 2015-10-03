@@ -1,0 +1,22 @@
+{% extends 'layouts/base.html' %}
+
+{% from 'helpers/form.html' import render_field %}
+
+{% block content %}
+<h1>Use Voucher</h1>
+
+<form method="post" action="{{ url_for('wifidog.login') }}" class="pure-form pure-form-stacked">
+    {{ form.gw_address | safe }}
+    {{ form.gw_port | safe }}
+    {{ form.gw_id | safe }}
+    {{ form.mac | safe }}
+    {{ form.url | safe }}
+
+    <fieldset>
+        {{ render_field(form.voucher, class='pure-input-1', placeholder='Voucher', required=True) }}
+        {{ render_field(form.email, class='pure-input-1', placeholder='Email Address', required=True) }}
+    </fieldset>
+
+    <button type="submit" class="pure-input-1-3 pure-button pure-button-primary">Login</button>
+</form>
+{% endblock %}

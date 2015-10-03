@@ -1,0 +1,27 @@
+{
+  "name": "hotspotd",
+  "version": "0.0.0",
+  "description": "*Hotspotd* is a small daemon to create a wifi hotspot on linux. It depends on *hostapd* for AP provisioning and *dnsmasq* to assign IP addresses to devices.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/datashaman/hotspotd.git"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/datashaman/hotspotd/issues"
+  },
+  "devDependencies": {
+    "gulp-load-plugins": "~1.0.0-rc.1",
+    "gulp": "~3.9.0",
+    "gulp-concat": "~2.6.0",
+    "gulp-rename": "~1.2.2",
+    "gulp-uglify": "~1.4.1",
+    "gulp-minify": "0.0.5",
+    "gulp-uglifycss": "~1.0.4",
+    "gulp-merge": "~0.1.1"
+  }
+}
