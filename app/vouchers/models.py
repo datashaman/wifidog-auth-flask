@@ -1,7 +1,8 @@
 import datetime
 import string
+import uuid
 
-from app import db
+from app import db, api_manager
 from marshmallow import Schema, fields
 from random import choice
 
@@ -14,7 +15,8 @@ def generate_id():
 class Voucher(db.Model):
     __tablename__ = 'vouchers'
 
-    id = db.Column(db.String(255), primary_key=True, default=generate_id)
+    id = db.Column(db.Integer, primary_key=True)
+    voucher = db.Column(db.String(255), default=generate_id)
     minutes = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     started_at = db.Column(db.DateTime)
@@ -56,3 +58,4 @@ class VoucherSchema(Schema):
     email = fields.Str()
     token = fields.Str()
 
+api_manager.create_api(Voucher, collection_name='vouchers', methods=[ 'GET', 'POST', 'DELETE' ], allow_delete_many=True)

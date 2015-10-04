@@ -1,6 +1,6 @@
 import datetime
 
-from app import app, db
+from app import app, db, login_manager, api_manager
 from flask.ext.security import UserMixin, RoleMixin, SQLAlchemyUserDatastore, Security
 from marshmallow import Schema, fields
 
@@ -30,6 +30,11 @@ class User(db.Model, UserMixin):
     def to_dict(self):
         return { c.name: getattr(self, c.name) for c in self.__table__.columns }
 
+
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(id)
+
 datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, datastore)
 
@@ -39,3 +44,4 @@ class UserSchema(Schema):
     password = fields.Str()
     created_at = fields.DateTime()
 
+api_manager.create_api(User, collection_name='users', methods=[ 'GET', 'POST', 'DELETE' ], allow_delete_many=True)

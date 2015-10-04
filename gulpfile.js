@@ -37,7 +37,7 @@ gulp.task('scripts', function() {
 
 gulp.task('fonts', function() {
     return gulp.src([
-        'bower_components/open-iconic/font/fonts/*'
+        'bower_components/open-iconic/font/fonts/**/*'
     ]).pipe(gulp.dest('./app/static/fonts'));
 });
 

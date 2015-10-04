@@ -34,7 +34,7 @@
 
         <tbody>
             <tr each={ row, i in vouchers } data-id={ row.id } class={ pure-table-odd: i % 2 }>
-                <td><a href="/wifidog/login?voucher={ row.id }">{ row.id }</a></td>
+                <td><a href="/wifidog/login?voucher={ row.voucher }">{ row.voucher }</a></td>
                 <td>{ row.minutes }</td>
                 <td>{ renderDateTime(row.created_at) }</td>
                 <td>{ row.ip_address }</td>
@@ -86,7 +86,7 @@
     }
 
     getVoucherId(e) {
-        return e.target.parentNode.parentNode.getAttribute('data-id');
+        return $(e.target).closest('tr[data-id]').data('id');
     }
 
     create(e) {

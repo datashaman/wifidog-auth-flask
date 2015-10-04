@@ -1,29 +1,31 @@
 function UserStore() {
-    var self = this;
+    var self = this,
+        base = '/api/users';
 
     riot.observable(self);
 
     triggerUpdate = function() {
-        $.getJSON('/users/', function(data) {
-            self.trigger('users.updated', data.users);
+        $.getJSON(base, function(data) {
+            self.trigger('users.updated', data.objects);
         });
     };
 
-    self.on('users.create', function(id, password) {
+    self.on('users.create', function(email, password) {
         $.ajax({
-            url: '/users/',
+            url: base,
             type: 'POST',
-            data: {
-                id,
+            contentType: 'application/json',
+            data: JSON.stringify({
+                email,
                 password
-            },
+            }),
             success: triggerUpdate
         });
     });
 
     self.on('user.remove', function(id) {
         $.ajax({
-            url: '/users/' + id,
+            url: base + '/' + id,
             type: 'DELETE',
             success: triggerUpdate
         });
@@ -31,7 +33,7 @@ function UserStore() {
 
     self.on('users.remove', function() {
         $.ajax({
-            url: '/users/',
+            url: base,
             type: 'DELETE',
             success: triggerUpdate
         });

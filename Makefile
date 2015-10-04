@@ -6,4 +6,11 @@ install:
 	cd bower_components/purecss && npm install && node_modules/.bin/grunt
 	gulp
 
-.PHONY: install
+bootstrap:
+	python manage.py seed_roles
+	python manage.py create_admin -e admin@example.com -p admin
+
+clean:
+	find . -name '*.pyc' -delete
+
+.PHONY: install bootstrap clean

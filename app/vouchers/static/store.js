@@ -1,28 +1,30 @@
 function VoucherStore() {
-    var self = this;
+    var self = this,
+        base = '/api/vouchers';
 
     riot.observable(self);
 
     triggerUpdate = function() {
-        $.getJSON('/vouchers/', function(data) {
-            self.trigger('vouchers.updated', data.vouchers);
+        $.getJSON(base, function(data) {
+            self.trigger('vouchers.updated', data.objects);
         });
     };
 
     self.on('vouchers.create', function(minutes) {
         $.ajax({
-            url: '/vouchers/',
+            url: base,
             type: 'POST',
-            data: {
+            contentType: 'application/json',
+            data: JSON.stringify({
                 minutes
-            },
+            }),
             success: triggerUpdate
         });
     });
 
     self.on('voucher.remove', function(id) {
         $.ajax({
-            url: '/vouchers/' + id,
+            url: base + '/' + id,
             type: 'DELETE',
             success: triggerUpdate
         });
@@ -30,7 +32,7 @@ function VoucherStore() {
 
     self.on('vouchers.remove', function() {
         $.ajax({
-            url: '/vouchers/',
+            url: base,
             type: 'DELETE',
             success: triggerUpdate
         });

@@ -4,6 +4,7 @@ from flask.ext.menu import Menu
 from flask.ext.restless import APIManager
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.script import Manager
+from flask.ext.login import LoginManager
 
 app = flask.Flask(__name__)
 app.config.from_object('config')
@@ -12,6 +13,7 @@ menu = Menu(app)
 db = SQLAlchemy(app)
 manager = Manager(app)
 api_manager = APIManager(app, flask_sqlalchemy_db=db)
+login_manager = LoginManager(app)
 
 import users
 import vouchers

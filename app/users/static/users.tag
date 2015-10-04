@@ -76,7 +76,7 @@
     }
 
     getUserId(e) {
-        return e.target.parentNode.parentNode.getAttribute('data-id');
+        return $(e.target).closest('tr[data-id]').data('id');
     }
 
     create(e) {
