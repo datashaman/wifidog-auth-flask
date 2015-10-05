@@ -46,6 +46,7 @@ class Voucher(db.Model):
 
 class VoucherSchema(Schema):
     id = fields.Str()
+    voucher = fields.Str()
     minutes = fields.Int()
     created_at = fields.DateTime()
     started_at = fields.DateTime()

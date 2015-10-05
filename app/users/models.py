@@ -44,4 +44,7 @@ class UserSchema(Schema):
     password = fields.Str()
     created_at = fields.DateTime()
 
+    def make_object(self, data):
+        return User(**data)
+
 api_manager.create_api(User, collection_name='users', methods=[ 'GET', 'POST', 'DELETE' ], allow_delete_many=True)

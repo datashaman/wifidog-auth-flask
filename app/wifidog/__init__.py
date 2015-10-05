@@ -1,6 +1,5 @@
 import datetime
 import flask
-import json
 
 from app import app, db, manager
 from app.vouchers import Voucher, VoucherForm
@@ -139,7 +138,7 @@ def login():
     form = VoucherForm(flask.request.form)
 
     if flask.request.method == 'POST' and form.validate():
-        voucher = Voucher.query.filter_by(id=form.voucher.data).first_or_404()
+        voucher = Voucher.query.filter_by(voucher=form.voucher.data).first_or_404()
 
         if voucher.started_at is None:
             voucher.gw_address = form.gw_address.data

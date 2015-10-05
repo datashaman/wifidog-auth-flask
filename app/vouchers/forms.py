@@ -1,6 +1,8 @@
 from app.utils import args_get
 from wtforms import Form, HiddenField, PasswordField, TextField, validators
 
+from app.vouchers.models import Voucher
+
 class VoucherForm(Form):
     voucher = TextField('Voucher', [ validators.InputRequired() ], default=args_get('voucher'))
     email = TextField('Email Address', [ validators.InputRequired(), validators.Email() ])
@@ -12,7 +14,7 @@ class VoucherForm(Form):
     url = HiddenField('URL', default=args_get('url'))
 
     def validate_voucher(form, field):
-        voucher = Voucher.query.get(field.data)
+        voucher = Voucher.query.filter_by(voucher=field.data).first()
 
         if voucher is None:
             raise validators.ValidationError('Voucher does not exist')
