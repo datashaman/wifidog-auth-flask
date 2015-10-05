@@ -1,7 +1,7 @@
 {
-  "name": "hotspotd",
+  "name": "wifidog-auth-flask",
   "version": "0.0.0",
-  "homepage": "https://github.com/datashaman/hotspotd",
+  "homepage": "https://github.com/datashaman/wifidog-auth-flask",
   "authors": [
     "datashaman <marlinf@datashaman.com>"
   ],

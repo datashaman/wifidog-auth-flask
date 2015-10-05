@@ -1,18 +1,18 @@
 {
-  "name": "hotspotd",
+  "name": "wifidog-auth-flask",
   "version": "0.0.0",
-  "description": "*Hotspotd* is a small daemon to create a wifi hotspot on linux. It depends on *hostapd* for AP provisioning and *dnsmasq* to assign IP addresses to devices.",
+  "description": "A Wifidog Auth server written in Python Flask",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/datashaman/hotspotd.git"
+    "url": "git://github.com/datashaman/wifidog-auth-flask.git"
   },
   "author": "",
   "license": "BSD-2-Clause",
   "bugs": {
-    "url": "https://github.com/datashaman/hotspotd/issues"
+    "url": "https://github.com/datashaman/wifidog-auth-flask/issues"
   },
   "devDependencies": {
     "gulp-load-plugins": "~1.0.0-rc.1",
