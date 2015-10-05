@@ -1,0 +1,23 @@
+{% extends 'layouts/admin.html' %}
+
+{% block head %}
+<!--[if lt IE 9]>
+<script>html5.addElements('gateways')</script>
+<![endif]-->
+{% endblock %}
+
+{% block content %}
+<gateways></gateways>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='scripts/interactive.js') }}"></script>
+<script src="{{ url_for('gateways.static', filename='store.js') }}"></script>
+<script src="{{ url_for('gateways.static', filename='gateways.tag') }}" type="riot/tag"></script>
+
+<script>
+Zepto(function($) {
+    riot.mount('gateways', { gateways: {{ gateways|tojson }} });
+});
+</script>
+{% endblock %}

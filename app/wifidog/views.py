@@ -1,6 +1,7 @@
 import flask
 
 from app import db
+from app.vouchers.forms import VoucherForm
 from app.wifidog.models import Auth, Ping
 
 bp = flask.Blueprint('wifidog', __name__, url_prefix='/wifidog', template_folder='templates', static_folder='static')
@@ -60,3 +61,8 @@ def auth():
     db.session.commit()
 
     return ("Auth: %s\nMessages: %s\n" % (auth.status, auth.messages), 200)
+
+@bp.route('/portal/')
+def portal():
+    gw_id = flask.request.args.get('gw_id')
+    return flask.render_template('wifidog/portal.html', gw_id=gw_id)

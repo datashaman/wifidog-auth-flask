@@ -19,8 +19,6 @@
     <div class="container">
         {% block menu %}
         <div class="pure-menu pure-menu-horizontal">
-            <a href="{{ url_for('home') }}" class="pure-menu-heading pure-menu-link">BRAND</a>
-
             <ul class="pure-menu-list">
                 {%- for item in current_menu.children recursive -%}
                 {%- if item.visible -%}
@@ -34,13 +32,16 @@
                 </li>
                 {%- endif -%}
                 {%- endfor -%}
+                <li class="pure-menu-item">
+                    <a href="/logout" class="pure-menu-link">Logout</a>
+                </li>
             </ul>
         </div>
         {% endblock %}
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <ul class="flash">
+        <ul class="flashes">
             {% for category, message in messages %}
             <li class="{{ category }}">{{ message }}</li>
             {% endfor %}

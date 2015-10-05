@@ -4,7 +4,7 @@
     <div class="actions-collection">
         <form class="pure-form" onsubmit={ create }>
             <fieldset>
-                <input name="create_minutes" type="text" value="60" required />
+                <input name="create_minutes" type="number" min="0" step="30" value="60" required />
                 <button type="submit" class="pure-button pure-button-primary">
                     <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
                     Create

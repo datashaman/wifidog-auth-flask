@@ -59,4 +59,10 @@ class VoucherSchema(Schema):
     email = fields.Str()
     token = fields.Str()
 
-api_manager.create_api(Voucher, collection_name='vouchers', methods=[ 'GET', 'POST', 'DELETE' ], allow_delete_many=True)
+    def make_object(self, data):
+        return Voucher(**data)
+
+api_manager.create_api(Voucher,
+        collection_name='vouchers',
+        methods=[ 'GET', 'POST', 'DELETE' ],
+        allow_delete_many=True)

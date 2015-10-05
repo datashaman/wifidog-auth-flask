@@ -2,15 +2,21 @@ var gulp = require('gulp'),
     plugins = require('gulp-load-plugins')();
 
 gulp.task('styles', function() {
-    return gulp.src([
-        'bower_components/purecss/build/pure.css',
-        'bower_components/open-iconic/font/css/open-iconic.css',
-        'app/assets/styles/site.css'
-    ]).pipe(plugins.concat('screen.css'))
-      .pipe(gulp.dest('./app/static/styles'))
-      .pipe(plugins.rename('screen.min.css'))
-      .pipe(plugins.uglifycss())
-      .pipe(gulp.dest('./app/static/styles'));
+    return plugins.merge(
+        gulp.src('app/assets/styles/site.scss')
+          .pipe(plugins.sass.sync())
+          .pipe(plugins.rename('site.css'))
+          .pipe(gulp.dest('./tmp')),
+        gulp.src([
+            'bower_components/purecss/build/pure.css',
+            'bower_components/open-iconic/font/css/open-iconic.css',
+            'tmp/site.css'
+        ]).pipe(plugins.concat('screen.css'))
+          .pipe(gulp.dest('./app/static/styles'))
+          .pipe(plugins.rename('screen.min.css'))
+          .pipe(plugins.uglifycss())
+          .pipe(gulp.dest('./app/static/styles'))
+    );
 });
 
 gulp.task('scripts', function() {
