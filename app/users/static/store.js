@@ -10,6 +10,8 @@ function UserStore() {
         });
     };
 
+    self.on('users.load', triggerUpdate);
+
     self.on('users.create', function(email, password) {
         $.ajax({
             url: base,
@@ -38,6 +40,8 @@ function UserStore() {
             success: triggerUpdate
         });
     });
+
+    triggerUpdate();
 }
 
 RiotControl.addStore(new UserStore());

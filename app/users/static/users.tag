@@ -21,6 +21,8 @@
     <table if={ users.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
         <thead>
             <tr>
+                <th>Network</th>
+                <th>Gateway</th>
                 <th>Email</th>
                 <th>Created</th>
                 <th class="actions">Actions</th>
@@ -29,6 +31,8 @@
 
         <tbody>
             <tr each={ row, i in users } data-id={ row.id } class={ pure-table-odd: i % 2 }>
+                <td>{ row.network_id }</td>
+                <td>{ row.gateway_id }</td>
                 <td>{ row.email }</td>
                 <td>{ renderDateTime(row.created_at) }</td>
 
@@ -44,12 +48,13 @@
 
     <script>
     var self = this;
-    self.users = opts.users;
 
     RiotControl.on('users.updated', function (users) {
         self.users = users;
         self.update();
     });
+
+    RiotControl.trigger('users.load');
 
     pad(number, length) {
         var str = '' + number;
@@ -64,7 +69,7 @@
     renderDateTime(dt) {
         if (dt) {
             dt = new Date(dt);
-            return self.pad(dt.getHours(), 2) + ':' + self.pad(dt.getMinutes(), 2);
+            return dt.toLocaleString();
         }
     }
 

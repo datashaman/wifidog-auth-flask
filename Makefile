@@ -11,7 +11,10 @@ install:
 
 bootstrap:
 	python manage.py seed_roles
-	python manage.py create_admin -e admin@example.com -p admin
+	python manage.py seed_networks
+	python manage.py create_user -e sa@example.com -p admin -r super-admin
+	python manage.py create_user -e na@example.com -p admin -r network-admin -n test
+	python manage.py create_user -e ga@example.com -p admin -r gateway-admin -n test -g test
 
 clean:
 	find . -name '*.pyc' -delete
