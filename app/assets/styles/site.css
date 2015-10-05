@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 html {
     position: relative;
     min-height: 100%;
@@ -19,9 +23,34 @@ footer {
     width: 100%;
 }
 
-.container {
+.layout-base .container {
     width: 1024px;
     margin: 0 auto;
+}
+
+body.layout-login {
+    background-color: #1f8dd6;
+}
+
+body.layout-login .panel {
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+body.layout-login footer {
+    color: #ffffff;
+    text-align: center;
+    padding: 20px;
+}
+
+body.layout-login .panel {
+    margin: 20px auto;
+    width: 300px;
+}
+
+body.layout-login .panel-title {
+    text-align: center;
 }
 
 table .actions {
