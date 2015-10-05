@@ -45,6 +45,7 @@ body.layout-login footer {
 }
 
 body.layout-login .panel {
+    box-shadow: 2px 2px 1px #333333;
     margin: 20px auto;
     width: 300px;
 }
