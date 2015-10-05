@@ -1,3 +1,6 @@
+serve:
+	python app.py
+
 install:
 	npm install
 	npm prune
@@ -13,4 +16,4 @@ bootstrap:
 clean:
 	find . -name '*.pyc' -delete
 
-.PHONY: install bootstrap clean
+.PHONY: serve install bootstrap clean

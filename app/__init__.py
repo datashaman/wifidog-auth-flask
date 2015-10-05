@@ -22,8 +22,8 @@ import wifidog
 
 app.register_blueprint(vouchers.bp)
 app.register_blueprint(users.bp)
-app.register_blueprint(wifidog.bp)
 app.register_blueprint(gateways.bp)
+app.register_blueprint(wifidog.bp)
 
 db.create_all()
 
