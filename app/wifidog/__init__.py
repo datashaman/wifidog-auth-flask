@@ -83,11 +83,15 @@ class Auth(db.Model):
         if voucher is None:
             return (AUTH_DENIED, 'Requested token not found: %s' % self.token)
 
+        if voucher.ip is None:
+            voucher.ip = flask.request.args.get('ip')
+            db.session.commmit()
+
         if self.stage == STAGE_LOGIN:
             if voucher.started_at is None:
                 if voucher.created_at + datetime.timedelta(minutes=app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow():
                     db.session.delete(voucher)
-                    return (AUTH_DENIED, 'Token is unused but too old: %s' % token)
+                    return (AUTH_DENIED, 'Token is unused but too old: %s' % self.token)
 
                 voucher.started_at = datetime.datetime.utcnow()
                 db.session.commit()
@@ -97,7 +101,7 @@ class Auth(db.Model):
                 if voucher.gw_id == self.gw_id and voucher.mac == self.mac and voucher.ip == self.ip:
                     if voucher.started_at + datetime.timedelta(minutes=voucher.minutes) < datetime.datetime.utcnow():
                         db.session.delete(voucher)
-                        return (AUTH_DENIED, 'Token is in use but has expired: %s' % token)
+                        return (AUTH_DENIED, 'Token is in use but has expired: %s' % self.token)
                     else:
                         return (AUTH_ALLOWED, 'Token is already in use but details match: %s' % self.token)
                 else:
@@ -126,7 +130,7 @@ class Auth(db.Model):
             else:
                 if voucher.started_at + datetime.timedelta(minutes=voucher.minutes) < datetime.datetime.utcnow():
                     db.session.delete(voucher)
-                    return (AUTH_DENIED, 'Token has expired: %s' % token)
+                    return (AUTH_DENIED, 'Token has expired: %s' % self.token)
 
             return (AUTH_ALLOWED, messages)
         else:
@@ -144,7 +148,7 @@ def login():
             voucher.gw_address = form.gw_address.data
             voucher.gw_port = form.gw_port.data
             voucher.gw_id = form.gw_id.data
-            voucher.ip = flask.request.remote_addr
+            voucher.ip = form.ip.data
             voucher.mac = form.mac.data
             voucher.url = form.url.data
             voucher.email = form.email.data

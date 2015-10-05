@@ -24,6 +24,7 @@
                 <th>Minutes</th>
                 <th>Created</th>
                 <th>IP</th>
+                <th>MAC</th>
                 <th>Email</th>
                 <th>Started</th>
                 <th>Ends</th>
@@ -37,7 +38,8 @@
                 <td><a href="/wifidog/login?voucher={ row.voucher }">{ row.voucher }</a></td>
                 <td>{ row.minutes }</td>
                 <td>{ renderDateTime(row.created_at) }</td>
-                <td>{ row.ip_address }</td>
+                <td>{ row.ip }</td>
+                <td>{ row.mac }</td>
                 <td>{ row.email }</td>
                 <td>{ renderDateTime(row.started_at) }</td>
                 <td>{ renderDateTime(calculateEndAt(row)) }</td>
