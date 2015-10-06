@@ -1,4 +1,6 @@
+import base64
 import datetime
+import re
 import string
 import uuid
 
@@ -7,10 +9,12 @@ from marshmallow import Schema, fields
 from random import choice
 
 chars = string.letters + string.digits
-length = 8
 
 def generate_id():
-    return ''.join(choice(chars) for _ in range(length))
+    source = ''.join(choice(chars) for _ in range(4))
+    encoded = base64.b32encode(source)
+    result = re.sub(r'=*$', '', encoded)
+    return result
 
 class Voucher(db.Model):
     __tablename__ = 'vouchers'
