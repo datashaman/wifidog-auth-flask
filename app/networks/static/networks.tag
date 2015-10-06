@@ -2,14 +2,11 @@
     <h1>Networks</h1>
 
     <div class="actions-collection">
-        <form class="pure-form" onsubmit={ create }>
+        <form class="pure-form" onsubmit={ doNothing }>
             <fieldset>
-                <input name="id" type="text" placeholder="NetworkID" required />
-                <input name="title" type="text" placeholder="Title" required />
-                <input name="description" type="text" placeholder="Description" required />
-                <button type="submit" class="pure-button pure-button-primary">
-                    <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
-                    Create
+                <button type="button" class="pure-button pure-button-primary" onclick={ showNewForm }>
+                    <span class="oi" data-glyph="file" title="New" aria-hidden="true"></span>
+                    New
                 </button>
             </fieldset>
         </form>
@@ -29,7 +26,7 @@
 
         <tbody>
             <tr each={ row, i in networks } data-id={ row.id } class={ pure-table-odd: i % 2 }>
-                <td>{ row.id }</td>
+                <td><a href="/networks/{ row.id }">{ row.id }</a></td>
                 <td>{ row.title }</td>
                 <td>{ row.description }</td>
                 <td>{ renderDateTime(row.created_at) }</td>
@@ -46,7 +43,17 @@
 
     <script>
     var self = this;
-    self.networks = opts.networks;
+
+    self.form.visible = true;
+
+    self.form.buttons = [
+      { action: function () {}, text: 'Save' },
+      { action: function () {}, text: 'Cancel', style: 'color: cornflowerblue;' }
+    ]
+
+    self.form.onclose = function () {
+        self.visible = false;
+    }
 
     RiotControl.on('networks.updated', function (networks) {
         self.networks = networks;
@@ -75,6 +82,15 @@
         if(confirm('Are you sure?')) {
             RiotControl.trigger('network.remove', self.getId(e));
         }
+    }
+
+    doNothing(e) {
+        return false;
+    }
+
+    showNewForm(e) {
+        self.formVisible = true;
+        self.update();
     }
     </script>
 </networks>

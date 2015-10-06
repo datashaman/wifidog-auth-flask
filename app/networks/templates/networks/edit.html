@@ -1,0 +1,20 @@
+{% extends 'layouts/admin.html' %}
+{% from 'helpers/form.html' import render_group %}
+
+{% block content %}
+<h1>{{ network.title }}</h1>
+
+<form method="post" class="pure-form pure-form-stacked">
+    {{ form.csrf_token }}
+
+    <fieldset>
+        {{ render_group(form.id, label='ID') }}
+        {{ render_group(form.title) }}
+        {{ render_group(form.description) }}
+
+        <div class="pure-controls">
+            <button type="submit" class="pure-button pure-button-primary">Update</button>
+        </div>
+    </fieldset>
+</form>
+{% endblock %}

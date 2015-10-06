@@ -32,7 +32,8 @@ gulp.task('scripts', function() {
         gulp.src([
             'bower_components/zepto/zepto.js',
             'bower_components/riot/riot+compiler.js',
-            'bower_components/riotcontrol/riotcontrol.js'
+            'bower_components/riotcontrol/riotcontrol.js',
+            'node_modules/riotgear/dist/rg.js'
         ]).pipe(plugins.concat('interactive.js'))
           .pipe(gulp.dest('./app/static/scripts'))
           .pipe(plugins.rename('interactive.min.js'))

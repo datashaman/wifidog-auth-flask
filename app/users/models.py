@@ -58,7 +58,7 @@ class UserSchema(Schema):
     def make_object(self, data):
         return User(**data)
 
-def preprocess_many(search_params=None, **kwargs):
+def filter_many(search_params=None, **kwargs):
     if search_params is None:
         search_params = {}
 
@@ -72,7 +72,7 @@ def preprocess_many(search_params=None, **kwargs):
         search_params['filters'].append(dict(name='network_id', op='eq', val=current_user.network_id))
         search_params['filters'].append(dict(name='gateway_id', op='eq', val=current_user.gateway_id))
 
-def preprocess_single(instance_id=None, **kwargs):
+def check_existing(instance_id=None, **kwargs):
     if instance_id is None:
         return
 
@@ -92,13 +92,34 @@ def preprocess_single(instance_id=None, **kwargs):
 
     raise ProcessingException(description='Not Authorized', code=401)
 
+def check_new(data=None, **kwargs):
+    if current_user.has_role('super-admin'):
+        return
+
+    if current_user.has_role('network-admin') or current_user.has_role('gateway-admin'):
+        if 'network_id' in data:
+            if data['network_id'] != current_user.network_id:
+                raise ProcessingException(description='Not Authorized', code=401)
+        else:
+            data['network_id'] = current_user.network_id
+    else:
+        raise ProcessingException(description='Not Authorized', code=401)
+
+    if current_user.has_role('gateway-admin'):
+        if 'gateway_id' in data:
+            if data['gateway_id'] != current_user.gateway_id:
+                raise ProcessingException(description='Not Authorized', code=401)
+        else:
+            data['gateway_id'] = current_user.gateway_id
+
 api_manager.create_api(User,
         collection_name='users',
         methods=[ 'GET', 'POST', 'DELETE' ],
         allow_delete_many=True,
         preprocessors=dict(
-            GET_SINGLE=[preprocess_single],
-            GET_MANY=[preprocess_many],
-            POST=[preprocess_single],
-            DELETE_SINGLE=[preprocess_single],
+            GET_SINGLE=[check_existing],
+            GET_MANY=[filter_many],
+            POST=[check_new],
+            DELETE_SINGLE=[check_existing],
+            DELETE_MANY=[filter_many],
         ))

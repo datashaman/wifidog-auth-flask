@@ -1,8 +1,8 @@
 import flask
 
 from flask.ext.menu import Menu
-from flask.ext.restless import APIManager
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.restless import APIManager, ProcessingException
+from flask.ext.sqlalchemy import SQLAlchemy, models_committed, before_models_committed
 from flask.ext.script import Manager
 from flask.ext.login import LoginManager
 

@@ -1,5 +1,6 @@
 from app.utils import args_get
-from wtforms import Form, HiddenField, PasswordField, TextField, validators
+from flask.ext.wtf import Form
+from wtforms import HiddenField, PasswordField, TextField, validators
 
 from app.vouchers.models import Voucher
 

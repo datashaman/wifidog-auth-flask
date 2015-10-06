@@ -18,8 +18,8 @@
     <table if={ gateways.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Network</th>
+                <th>ID</th>
                 <th>Title</th>
                 <th>Description</th>
                 <th>Created At</th>
