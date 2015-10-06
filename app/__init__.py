@@ -17,8 +17,15 @@ login_manager = LoginManager(app)
 
 import vouchers
 import users
-import gateways
-import networks
+
+from gateways import Gateway
+
+Gateway.vouchers = db.relationship('Voucher', backref='gateway')
+Gateway.users = db.relationship('User', backref='gateway')
+
+from networks import Network
+Network.gateways = db.relationship('Gateway', backref='network')
+
 import wifidog
 
 app.register_blueprint(vouchers.bp)

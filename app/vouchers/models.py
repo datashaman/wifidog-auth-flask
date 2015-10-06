@@ -28,7 +28,7 @@ class Voucher(db.Model):
     started_at = db.Column(db.DateTime)
     gw_address = db.Column(db.String(15))
     gw_port = db.Column(db.Integer)
-    gateway_id = db.Column(db.Unicode)
+    gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'))
     mac = db.Column(db.String(20))
     ip = db.Column(db.String(15))
     url = db.Column(db.String(255))
