@@ -1,6 +1,7 @@
 import flask
 
 from app import db
+from app.gateways import Gateway
 from app.vouchers import Voucher, VoucherForm, generate_token
 from app.wifidog.models import Auth, Ping
 
@@ -26,7 +27,16 @@ def login():
             url = 'http://%s:%s/wifidog/auth?token=%s' % (voucher.gw_address, voucher.gw_port, voucher.token)
             return flask.redirect(url)
 
-    return flask.render_template('wifidog/login.html', form=form)
+    if flask.request.method == 'GET':
+        gateway_id = flask.request.args.get('gw_id')
+    else:
+        gateway_id = form.gateway_id.data
+
+    if gateway_id is None:
+        flask.abort(404)
+
+    gateway = Gateway.query.filter_by(id=gateway_id).first_or_404()
+    return flask.render_template('wifidog/login.html', form=form, gateway=gateway)
 
 @bp.route('/ping/')
 def ping():
@@ -44,6 +54,8 @@ def ping():
 
 @bp.route('/auth/')
 def auth():
+    voucher = Voucher.query.filter_by(token=flask.request.args.get('token')).first_or_404()
+
     auth = Auth(
         user_agent=flask.request.user_agent.string,
         stage=flask.request.args.get('stage'),
@@ -51,7 +63,8 @@ def auth():
         mac=flask.request.args.get('mac'),
         token=flask.request.args.get('token'),
         incoming=flask.request.args.get('incoming'),
-        outgoing=flask.request.args.get('outgoing')
+        outgoing=flask.request.args.get('outgoing'),
+        voucher_id=voucher.id
     )
 
     (auth.status, auth.messages) = auth.process_request()
@@ -63,5 +76,5 @@ def auth():
 
 @bp.route('/portal/')
 def portal():
-    gateway_id = flask.request.args.get('gw_id')
-    return flask.render_template('wifidog/portal.html', gateway_id=gateway_id)
+    gateway = Gateway.query.filter_by(id=flask.request.args.get('gw_id')).first_or_404()
+    return flask.render_template('wifidog/portal.html', gateway=gateway)
