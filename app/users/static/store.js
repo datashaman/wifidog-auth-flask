@@ -40,8 +40,6 @@ function UserStore() {
             success: triggerUpdate
         });
     });
-
-    triggerUpdate();
 }
 
 RiotControl.addStore(new UserStore());

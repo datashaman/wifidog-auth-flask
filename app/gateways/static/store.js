@@ -10,6 +10,8 @@ function GatewayStore() {
         });
     };
 
+    self.on('gateways.load', triggerUpdate);
+
     self.on('gateways.create', function(id, title, description) {
         $.ajax({
             url: base,

@@ -10,6 +10,8 @@ function VoucherStore() {
         });
     };
 
+    self.on('vouchers.load', triggerUpdate);
+
     self.on('vouchers.create', function(minutes) {
         $.ajax({
             url: base,

@@ -63,6 +63,8 @@
         self.update();
     });
 
+    RiotControl.trigger('vouchers.load');
+
     pad(number, length) {
         var str = '' + number;
 

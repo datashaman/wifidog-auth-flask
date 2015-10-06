@@ -55,6 +55,8 @@
         self.update();
     });
 
+    RiotControl.trigger('gateways.load');
+
     renderDateTime(dt) {
         if (dt) {
             dt = new Date(dt);

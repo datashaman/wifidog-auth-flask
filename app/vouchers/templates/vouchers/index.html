@@ -12,12 +12,12 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='scripts/interactive.js') }}"></script>
-<script src="{{ url_for('vouchers.static', filename='store.js') }}"></script>
 <script src="{{ url_for('vouchers.static', filename='vouchers.tag') }}" type="riot/tag"></script>
+<script src="{{ url_for('vouchers.static', filename='store.js') }}"></script>
 
 <script>
 Zepto(function($) {
-    riot.mount('vouchers', { vouchers: {{ vouchers|tojson }} });
+    riot.mount('vouchers');
 });
 </script>
 {% endblock %}

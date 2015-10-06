@@ -53,6 +53,8 @@
         self.update();
     });
 
+    RiotControl.trigger('networks.load');
+
     renderDateTime(dt) {
         if (dt) {
             dt = new Date(dt);

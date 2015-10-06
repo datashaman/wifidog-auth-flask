@@ -10,6 +10,8 @@ function NetworkStore() {
         });
     };
 
+    self.on('networks.load', triggerUpdate);
+
     self.on('networks.create', function(id, title, description) {
         $.ajax({
             url: base,
