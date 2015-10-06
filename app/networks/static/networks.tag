@@ -44,17 +44,6 @@
     <script>
     var self = this;
 
-    self.form.visible = true;
-
-    self.form.buttons = [
-      { action: function () {}, text: 'Save' },
-      { action: function () {}, text: 'Cancel', style: 'color: cornflowerblue;' }
-    ]
-
-    self.form.onclose = function () {
-        self.visible = false;
-    }
-
     RiotControl.on('networks.updated', function (networks) {
         self.networks = networks;
         self.update();
