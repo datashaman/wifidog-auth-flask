@@ -15,7 +15,7 @@ class Auth(db.Model):
     token = db.Column(db.String)
     incoming = db.Column(db.BigInteger)
     outgoing = db.Column(db.BigInteger)
-    gw_id = db.Column(db.String(20))
+    gateway_id = db.Column(db.Unicode)
     status = db.Column(db.Integer)
     messages = db.Column(db.Text)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
@@ -50,7 +50,7 @@ class Auth(db.Model):
 
                 return (constants.AUTH_ALLOWED, None)
             else:
-                if voucher.gw_id == self.gw_id and voucher.mac == self.mac and voucher.ip == self.ip:
+                if voucher.gateway_id == self.gateway_id and voucher.mac == self.mac and voucher.ip == self.ip:
                     if voucher.started_at + datetime.timedelta(minutes=voucher.minutes) < datetime.datetime.utcnow():
                         db.session.delete(voucher)
                         return (constants.AUTH_DENIED, 'Token is in use but has expired: %s' % self.token)
@@ -93,7 +93,7 @@ class Ping(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_agent = db.Column(db.String(255))
-    gw_id = db.Column(db.String(12))
+    gateway_id = db.Column(db.Unicode)
     sys_uptime = db.Column(db.BigInteger)
     sys_memfree = db.Column(db.BigInteger)
     sys_load = db.Column(db.Numeric(5, 2))

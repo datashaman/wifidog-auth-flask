@@ -9,12 +9,12 @@ class VoucherForm(Form):
 
     gw_address = HiddenField('Gateway Address', default=args_get('gw_address'))
     gw_port = HiddenField('Gateway Port', default=args_get('gw_port'))
-    gw_id = HiddenField('Gateway ID', default=args_get('gw_id'))
+    gateway_id = HiddenField('Gateway ID', default=args_get('gw_id'))
     mac = HiddenField('MAC', default=args_get('mac'))
     url = HiddenField('URL', default=args_get('url'))
 
     def validate_voucher(form, field):
-        voucher = Voucher.query.filter_by(voucher=field.data).first()
+        voucher = Voucher.query.get(field.data)
 
         if voucher is None:
             raise validators.ValidationError('Voucher does not exist')

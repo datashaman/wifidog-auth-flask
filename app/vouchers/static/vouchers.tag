@@ -20,7 +20,7 @@
     <table if={ vouchers.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
         <thead>
             <tr>
-                <th>Code</th>
+                <th>ID</th>
                 <th>Minutes</th>
                 <th>Created</th>
                 <th>IP</th>
@@ -35,7 +35,7 @@
 
         <tbody>
             <tr each={ row, i in vouchers } data-id={ row.id } class={ pure-table-odd: i % 2 }>
-                <td><a href="/wifidog/login?voucher={ row.voucher }">{ row.voucher }</a></td>
+                <td><a href="/wifidog/login?voucher={ row.id }">{ row.id }</a></td>
                 <td>{ row.minutes }</td>
                 <td>{ renderDateTime(row.created_at) }</td>
                 <td>{ row.ip }</td>

@@ -1,7 +1,7 @@
 import flask
 
 from app import db
-from app.vouchers.forms import VoucherForm
+from app.vouchers import Voucher, VoucherForm, generate_token
 from app.wifidog.models import Auth, Ping
 
 bp = flask.Blueprint('wifidog', __name__, url_prefix='/wifidog', template_folder='templates', static_folder='static')
@@ -11,17 +11,16 @@ def login():
     form = VoucherForm(flask.request.form)
 
     if flask.request.method == 'POST' and form.validate():
-        voucher = Voucher.query.filter_by(voucher=form.voucher.data).first_or_404()
+        voucher = Voucher.query.filter_by(id=form.voucher.data).first_or_404()
 
         if voucher.started_at is None:
             voucher.gw_address = form.gw_address.data
             voucher.gw_port = form.gw_port.data
-            voucher.gw_id = form.gw_id.data
-            voucher.ip = form.ip.data
+            voucher.gateway_id = form.gateway_id.data
             voucher.mac = form.mac.data
             voucher.url = form.url.data
             voucher.email = form.email.data
-            voucher.token = Voucher.generate_token()
+            voucher.token = generate_token()
             db.session.commit()
 
             url = 'http://%s:%s/wifidog/auth?token=%s' % (voucher.gw_address, voucher.gw_port, voucher.token)
@@ -33,7 +32,7 @@ def login():
 def ping():
     ping = Ping(
         user_agent=flask.request.user_agent.string,
-        gw_id=flask.request.args.get('gw_id'),
+        gateway_id=flask.request.args.get('gw_id'),
         sys_uptime=flask.request.args.get('sys_uptime'),
         sys_memfree=flask.request.args.get('sys_memfree'),
         sys_load=flask.request.args.get('sys_load'),
@@ -64,5 +63,5 @@ def auth():
 
 @bp.route('/portal/')
 def portal():
-    gw_id = flask.request.args.get('gw_id')
-    return flask.render_template('wifidog/portal.html', gw_id=gw_id)
+    gateway_id = flask.request.args.get('gw_id')
+    return flask.render_template('wifidog/portal.html', gateway_id=gateway_id)
