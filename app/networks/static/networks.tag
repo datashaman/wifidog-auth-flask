@@ -10,9 +10,7 @@
             <input type="text" id="title" name="title" value={ parent.network.title } />
 
             <label for="description">Description<label>
-            <textarea id="description" name="description">
-                { parent.network.description }
-            </textarea>
+            <textarea id="description" name="description">{ parent.network.description }</textarea>
 
             <div class="actions">
                 <button type="button" class="pure-button" onclick={ parent.cancel }>Cancel</button>

@@ -1,5 +1,6 @@
 <modal>
     <div class="overlay { hidden, ghost, dismissable }" onclick="{ onclose }"></div>
+
     <div class="modal { hidden, ghost, dismissable }">
         <div class="header">
             <button if="{ dismissable }" type="button" class="close" aria-label="Close" onclick="{ onclose }">
