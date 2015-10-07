@@ -9,6 +9,6 @@ bp = flask.Blueprint('gateways', __name__, url_prefix='/gateways', template_fold
 @bp.route('/')
 @login_required
 @roles_accepted('super-admin', 'network-admin')
-@register_menu(bp, '.gateways', 'Gateways', visible_when=has_a_role('super-admin', 'network-admin'))
+@register_menu(bp, '.gateways', 'Gateways', visible_when=has_a_role('super-admin', 'network-admin'), order=20)
 def index():
     return flask.render_template('gateways/index.html')

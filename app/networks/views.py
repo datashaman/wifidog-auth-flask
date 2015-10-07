@@ -13,7 +13,7 @@ bp = flask.Blueprint('networks', __name__, url_prefix='/networks', template_fold
 @bp.route('/')
 @login_required
 @roles_required('super-admin')
-@register_menu(bp, '.networks', 'Networks', visible_when=has_role('super-admin'))
+@register_menu(bp, '.networks', 'Networks', visible_when=has_role('super-admin'), order=10)
 def index():
     return flask.render_template('networks/index.html')
 

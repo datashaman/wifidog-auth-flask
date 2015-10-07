@@ -73,14 +73,7 @@
         }
     }
 
-    calculateEndAt(row) {
-        if (row.started_at) {
-            var dt = new Date(row.started_at);
-            return new Date(dt.getTime() + row.minutes * 60000);
-        }
-    }
-
-    getUserId(e) {
+    getId(e) {
         return $(e.target).closest('tr[data-id]').data('id');
     }
 
@@ -97,7 +90,7 @@
 
     remove(e) {
         if(confirm('Are you sure?')) {
-            RiotControl.trigger('user.remove', self.getUserId(e));
+            RiotControl.trigger('user.remove', self.getId(e));
         }
     }
     </script>

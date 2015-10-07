@@ -10,6 +10,6 @@ bp = flask.Blueprint('users', __name__, url_prefix='/users', template_folder='te
 @bp.route('/')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(bp, '.users', 'Users', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'))
+@register_menu(bp, '.users', 'Users', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=40)
 def index():
     return flask.render_template('users/index.html')

@@ -1,10 +1,32 @@
 <networks>
+    <modal heading={ modal.heading } hidden={ modal.hidden } dismissable="true" onclose={ cancel }>
+        <form class="pure-form pure-form-stacked" onsubmit={ doNothing }>
+            <input type="hidden" id="original_id" value={ parent.network.id } />
+
+            <label for="id">ID<label>
+            <input type="text" id="id" name="id" value="{ parent.network.id }" />
+
+            <label for="title">Title<label>
+            <input type="text" id="title" name="title" value={ parent.network.title } />
+
+            <label for="description">Description<label>
+            <textarea id="description" name="description">
+                { parent.network.description }
+            </textarea>
+
+            <div class="actions">
+                <button type="button" class="pure-button" onclick={ parent.cancel }>Cancel</button>
+                <button type="submit" class="pure-button pure-button-primary" onclick={ parent.save }>Save</button>
+            </div>
+        </form>
+    </modal>
+
     <h1>Networks</h1>
 
     <div class="actions-collection">
-        <form class="pure-form" onsubmit={ doNothing }>
+        <form class="pure-form">
             <fieldset>
-                <button type="button" class="pure-button pure-button-primary" onclick={ showNewForm }>
+                <button type="button" class="pure-button pure-button-primary" onclick="{ showNewForm }">
                     <span class="oi" data-glyph="file" title="New" aria-hidden="true"></span>
                     New
                 </button>
@@ -26,7 +48,7 @@
 
         <tbody>
             <tr each={ row, i in networks } data-id={ row.id } class={ pure-table-odd: i % 2 }>
-                <td><a href="/networks/{ row.id }">{ row.id }</a></td>
+                <td><a href="#" onclick={ showEditForm }>{ row.id }</a></td>
                 <td>{ row.title }</td>
                 <td>{ row.description }</td>
                 <td>{ renderDateTime(row.created_at) }</td>
@@ -41,11 +63,33 @@
         </tbody>
     </table>
 
-    <script>
-    var self = this;
+    var self = this,
+        defaultNetwork = {
+            id: '',
+            title: '',
+            description: ''
+        };
 
-    RiotControl.on('networks.updated', function (networks) {
-        self.networks = networks;
+    self.modal = {
+        heading: 'Heading',
+        hidden: true
+    };
+
+    RiotControl.on('networks.loaded', function (networks) {
+        self.update({
+            networks
+        });
+    });
+
+    RiotControl.on('network.loaded', function (network) {
+        self.network = network;
+        self.modal.hidden = false;
+        self.update();
+    });
+
+
+    RiotControl.on('network.saved', function () {
+        self.modal.hidden = true;
         self.update();
     });
 
@@ -62,8 +106,30 @@
         return $(e.target).closest('tr[data-id]').data('id');
     }
 
+    cancel(e) {
+        self.modal.hidden = true;
+        self.update();
+    }
+
     create(e) {
-        RiotControl.trigger('networks.create', self.id.value, self.title.value, self.description.value);
+        var modal = self.tags.modal;
+        return false;
+    }
+
+    save(e) {
+        var modal = self.tags.modal,
+            data = {
+                id: modal.id.value,
+                title: modal.title.value,
+                description: modal.description.value
+            };
+
+        if (modal.original_id.value) {
+            RiotControl.trigger('network.save', modal.original_id.value, data);
+        } else {
+            RiotControl.trigger('networks.create', data);
+        }
+
         return false;
     }
 
@@ -73,13 +139,12 @@
         }
     }
 
-    doNothing(e) {
-        return false;
+    showEditForm(e) {
+        RiotControl.trigger('network.load', self.getId(e));
     }
 
     showNewForm(e) {
-        self.formVisible = true;
-        self.update();
+        self.network = defaultNetwork;
+        self.modal.hidden = false;
     }
-    </script>
 </networks>

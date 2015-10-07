@@ -4,25 +4,44 @@ function NetworkStore() {
 
     riot.observable(self);
 
-    triggerUpdate = function() {
-        $.getJSON(base, function(data) {
-            self.trigger('networks.updated', data.objects);
+    load_one = function(id) {
+        $.getJSON(base + '/' + id, function(data) {
+            self.trigger('network.loaded', data);
         });
     };
 
-    self.on('networks.load', triggerUpdate);
+    load_many = function() {
+        $.getJSON(base, function(data) {
+            self.trigger('networks.loaded', data.objects);
+        });
+    };
 
-    self.on('networks.create', function(id, title, description) {
+    self.on('network.load', load_one);
+    self.on('networks.load', load_many);
+
+    self.on('networks.create', function(attributes) {
         $.ajax({
             url: base,
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({
-                id,
-                title,
-                description
-            }),
-            success: triggerUpdate
+            data: JSON.stringify(attributes),
+            success: function(data) {
+                self.trigger('network.saved', data);
+                load_many();
+            }
+        });
+    });
+
+    self.on('network.save', function(id, attributes) {
+        $.ajax({
+            url: base + '/' + id,
+            type: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify(attributes),
+            success: function(data) {
+                self.trigger('network.saved', data);
+                load_many();
+            }
         });
     });
 
@@ -30,7 +49,7 @@ function NetworkStore() {
         $.ajax({
             url: base + '/' + id,
             type: 'DELETE',
-            success: triggerUpdate
+            success: load_many
         });
     });
 }

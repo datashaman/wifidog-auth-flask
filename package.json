@@ -24,6 +24,7 @@
     "gulp-uglifycss": "~1.0.4",
     "gulp-merge": "~0.1.1",
     "gulp-sass": "~2.0.4",
-    "riotgear": "~2.0.0-beta"
+    "riotgear": "~2.0.0-beta",
+    "riotgear-modal": "~1.1.4"
   }
 }

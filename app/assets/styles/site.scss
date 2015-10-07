@@ -9,18 +9,18 @@ html {
 
 body {
     margin: 0 0 20px;
+
+    & > footer {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 20px;
+        width: 100%;
+    }
 }
 
 h1 {
     font-size: x-large;
-}
-
-footer {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 20px;
-    width: 100%;
 }
 
 .layout-base {
@@ -46,7 +46,7 @@ footer {
         }
     }
 
-    footer {
+    & > footer {
         color: #ffffff;
         text-align: center;
         padding: 20px;

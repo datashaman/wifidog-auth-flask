@@ -43,10 +43,11 @@ def preprocess_single(instance_id=None, **kwargs):
 
 api_manager.create_api(Network,
         collection_name='networks',
-        methods=[ 'GET', 'POST', 'DELETE' ],
+        methods=[ 'GET', 'POST', 'DELETE', 'PATCH' ],
         preprocessors=dict(
             GET_SINGLE=[preprocess_single],
             GET_MANY=[preprocess_many],
             POST=[preprocess_single],
+            PATCH=[preprocess_single],
             DELETE_SINGLE=[preprocess_single],
         ))

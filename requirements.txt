@@ -4,7 +4,7 @@ Flask-WTF
 Flask-Login==0.2.11
 Flask-Menu
 Flask-Bcrypt
-Flask-Restless
+git+file:///home/marlinf/Projects/flask-restless@master#egg=Flask-Restless
 Flask-Script
 Flask-Security
 marshmallow

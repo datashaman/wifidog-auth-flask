@@ -12,12 +12,13 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='scripts/interactive.js') }}"></script>
+<script src="{{ url_for('static', filename='tags/modal.tag') }}" type="riot/tag"></script>
 <script src="{{ url_for('networks.static', filename='networks.tag') }}" type="riot/tag"></script>
 <script src="{{ url_for('networks.static', filename='store.js') }}"></script>
 
 <script>
 Zepto(function($) {
-    riot.mount('networks');
+    riot.mount('*');
 });
 </script>
 {% endblock %}
