@@ -6,7 +6,7 @@ function UserStore() {
 
     triggerUpdate = function() {
         $.getJSON(base, function(data) {
-            self.trigger('users.updated', data.objects);
+            self.trigger('users.updated', data);
         });
     };
 

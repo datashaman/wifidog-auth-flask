@@ -2,7 +2,7 @@ from app import db, manager
 from flask.ext.script import prompt, prompt_pass
 
 from .config import ROLES
-from .models import Role, datastore
+from .models import datastore, Role
 
 @manager.command
 def create_user(email=None, password=None, role=None, network=None, gateway=None):

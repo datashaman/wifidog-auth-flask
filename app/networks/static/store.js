@@ -12,7 +12,7 @@ function NetworkStore() {
 
     load_many = function() {
         $.getJSON(base, function(data) {
-            self.trigger('networks.loaded', data.objects);
+            self.trigger('networks.loaded', data);
         });
     };
 

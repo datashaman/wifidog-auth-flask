@@ -30,7 +30,7 @@
         </thead>
 
         <tbody>
-            <tr each={ row, i in users } data-id={ row.id } class={ pure-table-odd: i % 2 }>
+            <tr each={ row, i in users } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
                 <td>{ row.network_id }</td>
                 <td>{ row.gateway_id }</td>
                 <td>{ row.email }</td>
@@ -68,7 +68,7 @@
 
     renderDateTime(dt) {
         if (dt) {
-            dt = new Date(dt);
+            dt = new Date(dt.$date);
             return dt.toLocaleString();
         }
     }

@@ -6,7 +6,7 @@ function VoucherStore() {
 
     triggerUpdate = function() {
         $.getJSON(base, function(data) {
-            self.trigger('vouchers.updated', data.objects);
+            self.trigger('vouchers.updated', data);
         });
     };
 
@@ -18,7 +18,7 @@ function VoucherStore() {
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
-                minutes
+                minutes: parseInt(minutes)
             }),
             success: triggerUpdate
         });

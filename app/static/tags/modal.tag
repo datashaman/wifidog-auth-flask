@@ -1,9 +1,9 @@
 <modal>
-    <div class="overlay { hidden, ghost, dismissable }" onclick="{ onclose }"></div>
+    <div class="overlay { hidden, ghost, dismissable }" onclick={ onclose }></div>
 
     <div class="modal { hidden, ghost, dismissable }">
         <div class="header">
-            <button if="{ dismissable }" type="button" class="close" aria-label="Close" onclick="{ onclose }">
+            <button if={ dismissable } type="button" class="close" aria-label="Close" onclick={ onclose }>
                 <span aria-hidden="true">&times;</span>
             </button>
 
@@ -114,8 +114,8 @@
     </style>
 
     this.hidden = opts.hidden;
+    this.heading = opts.heading;
     this.ghost = opts.ghost;
     this.dismissable = opts.dismissable;
-    this.heading = opts.heading;
     this.onclose = opts.onclose;
 </modal>

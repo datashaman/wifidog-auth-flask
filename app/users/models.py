@@ -1,10 +1,10 @@
 import datetime
 
-from app import app, db, login_manager, api_manager
+from app import app, db, login_manager, api
 from app.gateways import Gateway
-from flask.ext.restless import ProcessingException
-from flask.ext.security import UserMixin, RoleMixin, SQLAlchemyUserDatastore, Security, current_user
-from marshmallow import Schema, fields
+from flask.ext.principal import Principal, Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed
+from flask.ext.potion.contrib.principals import PrincipalResource
+from flask.ext.security import Security, UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore
 
 roles_users = db.Table('roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
@@ -40,86 +40,49 @@ class User(db.Model, UserMixin):
     def to_dict(self):
         return { c.name: getattr(self, c.name) for c in self.__table__.columns }
 
+@login_manager.request_loader
+def load_user_from_request(request):
+    if request.authorization:
+        username, password = request.authorization.username, request.authorization.password
+        user = User.query.filter_by(email=username).first()
+
+        if user is not None and verify_and_update_password(password, user):
+            return user
+
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(id)
 
 datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, datastore)
+principals = Principal(app)
 
-class UserSchema(Schema):
-    id = fields.Int()
-    email = fields.Str()
-    password = fields.Str()
-    network_id = fields.Str()
-    gateway_id = fields.Str()
-    created_at = fields.DateTime()
+@principals.identity_loader
+def read_identity_from_flask_login():
+    if current_user.is_authenticated():
+        return Identity(current_user.id)
+    return AnonymousIdentity()
 
-    def make_object(self, data):
-        return User(**data)
+@identity_loaded.connect_via(app)
+def on_identity_loaded(sender, identity):
+    if not isinstance(identity, AnonymousIdentity):
+        identity.provides.add(UserNeed(identity.id))
 
-def filter_many(search_params=None, **kwargs):
-    if search_params is None:
-        search_params = {}
+        for role in current_user.roles:
+            identity.provides.add(RoleNeed(role.name))
 
-    if 'filters' not in search_params:
-        search_params['filters'] = []
+admin_roles = [ 'super-admin', 'network-admin', 'gateway-admin' ]
 
-    if current_user.has_role('network-admin'):
-        search_params['filters'].append(dict(name='network_id', op='eq', val=current_user.network_id))
+class UserResource(PrincipalResource):
+    class Meta:
+        model = User
+        include_id = True
+        permissions = {
+            'read': admin_roles,
+            'create': admin_roles,
+            'update': admin_roles,
+            'delete': admin_roles,
+        }
+        read_only_fields = [ 'created_at' ]
 
-    if current_user.has_role('gateway-admin'):
-        search_params['filters'].append(dict(name='network_id', op='eq', val=current_user.network_id))
-        search_params['filters'].append(dict(name='gateway_id', op='eq', val=current_user.gateway_id))
-
-def check_existing(instance_id=None, **kwargs):
-    if instance_id is None:
-        return
-
-    if current_user.has_role('super-admin'):
-        return
-
-    user = User.query.get(instance_id)
-
-    if (current_user.has_role('network-admin')
-            and user.network_id == current_user.network_id):
-        return
-
-    if (current_user.has_role('gateway-admin')
-            and current_user.network_id == user.network_id
-            and current_user.gateway_id == user.gateway_id):
-        return
-
-    raise ProcessingException(description='Not Authorized', code=401)
-
-def check_new(data=None, **kwargs):
-    if current_user.has_role('super-admin'):
-        return
-
-    if current_user.has_role('network-admin') or current_user.has_role('gateway-admin'):
-        if 'network_id' in data:
-            if data['network_id'] != current_user.network_id:
-                raise ProcessingException(description='Not Authorized', code=401)
-        else:
-            data['network_id'] = current_user.network_id
-    else:
-        raise ProcessingException(description='Not Authorized', code=401)
-
-    if current_user.has_role('gateway-admin'):
-        if 'gateway_id' in data:
-            if data['gateway_id'] != current_user.gateway_id:
-                raise ProcessingException(description='Not Authorized', code=401)
-        else:
-            data['gateway_id'] = current_user.gateway_id
-
-api_manager.create_api(User,
-        collection_name='users',
-        methods=[ 'GET', 'POST', 'DELETE' ],
-        allow_delete_many=True,
-        preprocessors=dict(
-            GET_SINGLE=[check_existing],
-            GET_MANY=[filter_many],
-            POST=[check_new],
-            DELETE_SINGLE=[check_existing],
-            DELETE_MANY=[filter_many],
-        ))
+api.add_resource(UserResource)

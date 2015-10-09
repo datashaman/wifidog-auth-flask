@@ -4,8 +4,9 @@ import re
 import string
 import uuid
 
-from app import db, api_manager
-from marshmallow import Schema, fields
+from app import db, api
+from flask.ext.potion import fields
+from flask.ext.potion.contrib.principals import PrincipalResource
 from random import choice
 
 chars = string.letters + string.digits
@@ -37,34 +38,26 @@ class Voucher(db.Model):
     incoming = db.Column(db.BigInteger, default=0)
     outgoing = db.Column(db.BigInteger, default=0)
 
-    def __init__(self, minutes):
-        self.minutes = minutes
-
     def __repr__(self):
         return '<Voucher %r>' % self.id
 
     def to_dict(self):
         return { c.name: getattr(self, c.name) for c in self.__table__.columns }
 
-class VoucherSchema(Schema):
-    id = fields.Str()
-    voucher = fields.Str()
-    minutes = fields.Int()
-    created_at = fields.DateTime()
-    started_at = fields.DateTime()
-    gw_address = fields.Str()
-    gw_port = fields.Int()
-    gateway_id = fields.Str()
-    mac = fields.Str()
-    ip = fields.Str()
-    url = fields.Str()
-    email = fields.Str()
-    token = fields.Str()
+admin_roles = [ 'super-admin', 'network-admin', 'gateway-admin' ]
 
-    def make_object(self, data):
-        return Voucher(**data)
+class VoucherResource(PrincipalResource):
+    class Meta:
+        model = Voucher
+        include_id = True
+        id_converter = 'string'
+        id_field_class = fields.String
+        permissions = {
+            'read': admin_roles,
+            'create': admin_roles,
+            'update': admin_roles,
+            'delete': admin_roles,
+        }
+        read_only_fields = [ 'created_at' ]
 
-api_manager.create_api(Voucher,
-        collection_name='vouchers',
-        methods=[ 'GET', 'POST', 'DELETE' ],
-        allow_delete_many=True)
+api.add_resource(VoucherResource)

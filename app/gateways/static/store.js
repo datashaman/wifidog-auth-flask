@@ -6,7 +6,7 @@ function GatewayStore() {
 
     triggerUpdate = function() {
         $.getJSON(base, function(data) {
-            self.trigger('gateways.updated', data.objects);
+            self.trigger('gateways.updated', data);
         });
     };
 

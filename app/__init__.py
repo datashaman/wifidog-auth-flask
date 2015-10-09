@@ -1,10 +1,10 @@
 import flask
 
 from flask.ext.menu import Menu
-from flask.ext.restless import APIManager, ProcessingException
+from flask.ext.potion import Api
 from flask.ext.sqlalchemy import SQLAlchemy, models_committed, before_models_committed
 from flask.ext.script import Manager
-from flask.ext.login import LoginManager
+from flask.ext.login import LoginManager, login_required
 
 app = flask.Flask(__name__)
 app.config.from_object('config')
@@ -12,8 +12,8 @@ app.config.from_object('config')
 menu = Menu(app)
 db = SQLAlchemy(app)
 manager = Manager(app)
-api_manager = APIManager(app, flask_sqlalchemy_db=db)
 login_manager = LoginManager(app)
+api = Api(app, prefix='/api', decorators=[login_required])
 
 import vouchers
 import users

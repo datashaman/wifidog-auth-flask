@@ -1,15 +1,15 @@
 <networks>
     <modal heading={ modal.heading } hidden={ modal.hidden } dismissable="true" onclose={ cancel }>
         <form class="pure-form pure-form-stacked" onsubmit={ doNothing }>
-            <input type="hidden" id="original_id" value={ parent.network.id } />
+            <input type="hidden" id="original_id" value={ parent.network['$id'] } />
 
-            <label for="id">ID<label>
-            <input type="text" id="id" name="id" value="{ parent.network.id }" />
+            <label for="id">ID</label>
+            <input type="text" id="id" name="id" value="{ parent.network['$id'] }" />
 
-            <label for="title">Title<label>
+            <label for="title">Title</label>
             <input type="text" id="title" name="title" value={ parent.network.title } />
 
-            <label for="description">Description<label>
+            <label for="description">Description</label>
             <textarea id="description" name="description">{ parent.network.description }</textarea>
 
             <div class="actions">
@@ -45,8 +45,8 @@
         </thead>
 
         <tbody>
-            <tr each={ row, i in networks } data-id={ row.id } class={ pure-table-odd: i % 2 }>
-                <td><a href="#" onclick={ showEditForm }>{ row.id }</a></td>
+            <tr each={ row, i in networks } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
+                <td><a href="#" onclick={ showEditForm }>{ row['$id'] }</a></td>
                 <td>{ row.title }</td>
                 <td>{ row.description }</td>
                 <td>{ renderDateTime(row.created_at) }</td>
@@ -69,7 +69,7 @@
         };
 
     self.modal = {
-        heading: 'Heading',
+        heading: '',
         hidden: true
     };
 
@@ -81,6 +81,7 @@
 
     RiotControl.on('network.loaded', function (network) {
         self.network = network;
+        self.modal.heading = network.title;
         self.modal.hidden = false;
         self.update();
     });
@@ -95,7 +96,7 @@
 
     renderDateTime(dt) {
         if (dt) {
-            dt = new Date(dt);
+            dt = new Date(dt.$date);
             return dt.toLocaleString();
         }
     }
@@ -107,11 +108,6 @@
     cancel(e) {
         self.modal.hidden = true;
         self.update();
-    }
-
-    create(e) {
-        var modal = self.tags.modal;
-        return false;
     }
 
     save(e) {
@@ -143,6 +139,7 @@
 
     showNewForm(e) {
         self.network = defaultNetwork;
+        self.modal.heading = 'New Network';
         self.modal.hidden = false;
     }
 </networks>

@@ -59,7 +59,7 @@
 
     renderDateTime(dt) {
         if (dt) {
-            dt = new Date(dt);
+            dt = new Date(dt.$date);
             return dt.toLocaleString();
         }
     }

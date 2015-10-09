@@ -34,8 +34,8 @@
         </thead>
 
         <tbody>
-            <tr each={ row, i in vouchers } data-id={ row.id } class={ pure-table-odd: i % 2 }>
-                <td><a href="/wifidog/login?voucher={ row.id }">{ row.id }</a></td>
+            <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
+                <td><a href="/wifidog/login?voucher={ row['$id'] }">{ row['$id'] }</a></td>
                 <td>{ row.minutes }</td>
                 <td>{ renderDateTime(row.created_at) }</td>
                 <td>{ row.ip }</td>
@@ -77,14 +77,14 @@
 
     renderDateTime(dt) {
         if (dt) {
-            dt = new Date(dt);
+            dt = new Date(dt.$date);
             return self.pad(dt.getHours(), 2) + ':' + self.pad(dt.getMinutes(), 2);
         }
     }
 
     calculateEndAt(row) {
         if (row.started_at) {
-            var dt = new Date(row.started_at);
+            var dt = new Date(row.started_at.$date);
             return new Date(dt.getTime() + row.minutes * 60000);
         }
     }
