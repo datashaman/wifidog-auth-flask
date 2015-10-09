@@ -29,5 +29,9 @@ class GatewayResource(PrincipalResource):
             'update': admin_roles,
             'delete': admin_roles,
         }
+        read_only_fields = [ 'created_at' ]
+
+    class Schema:
+        id = fields.String()
 
 api.add_resource(GatewayResource)

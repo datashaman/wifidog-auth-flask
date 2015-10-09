@@ -84,5 +84,6 @@ class UserResource(PrincipalResource):
             'delete': admin_roles,
         }
         read_only_fields = [ 'created_at' ]
+        write_only_fields = [ 'password' ]
 
 api.add_resource(UserResource)

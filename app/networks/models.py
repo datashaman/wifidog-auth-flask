@@ -27,4 +27,7 @@ class NetworkResource(PrincipalResource):
             'delete': admin_roles,
         }
 
+    class Schema:
+        id = fields.String()
+
 api.add_resource(NetworkResource)
