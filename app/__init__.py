@@ -1,32 +1,38 @@
 import flask
 
-from flask.ext.menu import Menu
-from flask.ext.potion import Api
-from flask.ext.sqlalchemy import SQLAlchemy, models_committed, before_models_committed
-from flask.ext.script import Manager
-from flask.ext.login import LoginManager, login_required
+from app.models import User, Role
+from app.resources import GatewayResource, NetworkResource, UserResource, VoucherResource
+from app.services import menu, db, manager, login_manager, api, security, principals
+from flask.ext.principal import UserNeed, AnonymousIdentity, identity_loaded, RoleNeed
+from flask.ext.security import current_user, SQLAlchemyUserDatastore
+
+import users
+import vouchers
+import gateways
+import networks
+import wifidog
 
 app = flask.Flask(__name__)
 app.config.from_object('config')
 
-menu = Menu(app)
-db = SQLAlchemy(app)
-manager = Manager(app)
-login_manager = LoginManager(app)
-api = Api(app, prefix='/api', decorators=[login_required])
+menu.init_app(app)
+db.init_app(app)
 
-import vouchers
-import users
+with app.app_context():
+    db.create_all()
 
-from gateways import Gateway
+    api.add_resource(UserResource)
+    api.add_resource(VoucherResource)
+    api.add_resource(GatewayResource)
+    api.add_resource(NetworkResource)
 
-Gateway.vouchers = db.relationship('Voucher', backref='gateway')
-Gateway.users = db.relationship('User', backref='gateway')
+manager.app = app
+login_manager.init_app(app)
+api.init_app(app)
+principals.init_app(app)
 
-from networks import Network
-Network.gateways = db.relationship('Gateway', backref='network')
-
-import wifidog
+datastore = SQLAlchemyUserDatastore(db, User, Role)
+security.init_app(app, datastore)
 
 app.register_blueprint(vouchers.bp)
 app.register_blueprint(users.bp)
@@ -34,7 +40,13 @@ app.register_blueprint(gateways.bp)
 app.register_blueprint(networks.bp)
 app.register_blueprint(wifidog.bp)
 
-db.create_all()
+@identity_loaded.connect_via(app)
+def on_identity_loaded(sender, identity):
+    if not isinstance(identity, AnonymousIdentity):
+        identity.provides.add(UserNeed(identity.id))
+
+        for role in current_user.roles:
+            identity.provides.add(RoleNeed(role.name))
 
 @app.route('/')
 def home():

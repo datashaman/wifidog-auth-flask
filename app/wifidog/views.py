@@ -1,9 +1,8 @@
 import flask
 
 from app import db
-from app.gateways import Gateway
-from app.vouchers import Voucher, VoucherForm, generate_token
-from app.wifidog.models import Auth, Ping
+from app.models import Auth, Gateway, Ping, Voucher, generate_token
+from app.forms import VoucherForm
 
 bp = flask.Blueprint('wifidog', __name__, url_prefix='/wifidog', template_folder='templates', static_folder='static')
 

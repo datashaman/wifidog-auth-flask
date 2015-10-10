@@ -1,12 +1,12 @@
 import flask
 
-from app import db
+from app.services import db
 from app.utils import is_logged_in, has_role
 from flask.ext.menu import register_menu
 from flask.ext.security import login_required, roles_required
 
-from .forms import NetworkForm
-from .models import Network
+from app.forms import NetworkForm
+from app.models import Network
 
 bp = flask.Blueprint('networks', __name__, url_prefix='/networks', template_folder='templates', static_folder='static')
 

@@ -1,6 +1,6 @@
 import flask
 
-from app import db
+from app.services import db
 from app.utils import is_logged_in, has_a_role
 from flask.ext.menu import register_menu
 from flask.ext.security import login_required, roles_required, roles_accepted

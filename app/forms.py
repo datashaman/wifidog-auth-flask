@@ -1,8 +1,9 @@
 from app.utils import args_get
 from flask.ext.wtf import Form
-from wtforms import HiddenField, PasswordField, TextField, validators
+from wtforms.ext.sqlalchemy.orm import model_form
+from wtforms import HiddenField, PasswordField, TextField, TextAreaField, validators
 
-from app.vouchers.models import Voucher
+from app.models import Network, Voucher
 
 class VoucherForm(Form):
     voucher = TextField('Voucher', [ validators.InputRequired() ], default=args_get('voucher'))
@@ -22,3 +23,8 @@ class VoucherForm(Form):
 
         if voucher.started_at is not None:
             raise validators.ValidationError('Voucher is in use')
+
+class NetworkForm(Form):
+    id = TextField('ID', [ validators.InputRequired() ])
+    title = TextField('Title', [ validators.InputRequired(), validators.Length(min=5, max=20) ])
+    description = TextAreaField('Description', [ validators.InputRequired() ])
