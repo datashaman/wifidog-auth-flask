@@ -4,9 +4,8 @@ import re
 import string
 import uuid
 
-from app.services import db, login_manager, api, principals
+from app.services import db, api, principals
 from flask.ext.potion import fields
-from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed
 from flask.ext.security import UserMixin, RoleMixin, current_user
 from random import choice
 from sqlalchemy.orm import backref
@@ -61,25 +60,6 @@ class User(db.Model, UserMixin):
 
     def to_dict(self):
         return { c.name: getattr(self, c.name) for c in self.__table__.columns }
-
-@login_manager.request_loader
-def load_user_from_request(request):
-    if request.authorization:
-        username, password = request.authorization.username, request.authorization.password
-        user = User.query.filter_by(email=username).first()
-
-        if user is not None and verify_and_update_password(password, user):
-            return user
-
-@login_manager.user_loader
-def load_user(id):
-    return User.query.get(id)
-
-@principals.identity_loader
-def read_identity_from_flask_login():
-    if current_user.is_authenticated():
-        return Identity(current_user.id)
-    return AnonymousIdentity()
 
 class Network(db.Model):
     __tablename__ = 'networks'

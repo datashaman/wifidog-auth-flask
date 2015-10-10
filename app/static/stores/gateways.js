@@ -6,22 +6,18 @@ function GatewayStore() {
 
     triggerUpdate = function() {
         $.getJSON(base, function(data) {
-            self.trigger('gateways.updated', data);
+            self.trigger('gateways.loaded', data);
         });
     };
 
     self.on('gateways.load', triggerUpdate);
 
-    self.on('gateways.create', function(id, title, description) {
+    self.on('gateways.create', function(attributes) {
         $.ajax({
             url: base,
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({
-                id,
-                title,
-                description
-            }),
+            data: JSON.stringify(attributes),
             success: triggerUpdate
         });
     });

@@ -11,13 +11,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='scripts/interactive.js') }}"></script>
 <script src="{{ url_for('static', filename='tags/gateways.tag') }}" type="riot/tag"></script>
 <script src="{{ url_for('static', filename='stores/gateways.js') }}"></script>
-
-<script>
-Zepto(function($) {
-    riot.mount('gateways');
-});
-</script>
 {% endblock %}

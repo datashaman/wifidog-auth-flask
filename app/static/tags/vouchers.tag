@@ -4,7 +4,9 @@
     <div class="actions-collection">
         <form class="pure-form" onsubmit={ create }>
             <fieldset>
-                <input name="create_minutes" type="number" min="0" step="30" value="60" required />
+                <input if={ isSuperAdmin() } name="network" type="text" placeholder="NetworkID" required />
+                <input if={ isSuperAdmin() || isNetworkAdmin() } name="gateway" type="text" placeholder="GatewayID" required />
+                <input name="minutes" type="number" min="0" step="30" value="60" required />
                 <button type="submit" class="pure-button pure-button-primary">
                     <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
                     Create
@@ -36,13 +38,13 @@
         <tbody>
             <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
                 <td><a href="/wifidog/login?voucher={ row['$id'] }">{ row['$id'] }</a></td>
-                <td>{ row.minutes }</td>
-                <td>{ renderDateTime(row.created_at) }</td>
-                <td>{ row.ip }</td>
-                <td>{ row.mac }</td>
-                <td>{ row.email }</td>
-                <td>{ renderDateTime(row.started_at) }</td>
-                <td>{ renderDateTime(calculateEndAt(row)) }</td>
+                <td>{ render(row.minutes) }</td>
+                <td>{ render(row.created_at) }</td>
+                <td>{ render(row.ip) }</td>
+                <td>{ render(row.mac) }</td>
+                <td>{ render(row.email) }</td>
+                <td>{ render(row.started_at) }</td>
+                <td>{ render(calculateEndAt(row)) }</td>
 
                 <td class="actions actions-row">
                     <button class="pure-button" onclick={ remove }>
@@ -58,12 +60,25 @@
     var self = this;
     self.vouchers = opts.vouchers;
 
-    RiotControl.on('vouchers.updated', function (vouchers) {
+    RiotControl.on('vouchers.loaded', function (vouchers) {
         self.vouchers = vouchers;
         self.update();
     });
 
+    RiotControl.on('currentuser.loaded', function (currentuser) {
+        self.currentuser = currentuser;
+        self.update();
+    });
+
     RiotControl.trigger('vouchers.load');
+
+    isSuperAdmin() {
+        return self.currentuser.roles.indexOf('super-admin') > -1;
+    }
+
+    isNetworkAdmin() {
+        return self.currentuser.roles.indexOf('network-admin') > -1;
+    }
 
     pad(number, length) {
         var str = '' + number;
@@ -94,7 +109,11 @@
     }
 
     create(e) {
-        RiotControl.trigger('vouchers.create', self.create_minutes.value);
+        RiotControl.trigger('vouchers.create', {
+            network: self.isSuperAdmin() ? self.network.value : self.currentuser.network,
+            gateway: self.isSuperAdmin() || self.isNetworkAdmin() ? self.gateway.value : self.currentuser.gateway,
+            minutes: parseInt(self.minutes.value)
+        });
         return false;
     }
 

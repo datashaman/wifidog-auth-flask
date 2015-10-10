@@ -4,6 +4,8 @@
     <div class="actions-collection">
         <form class="pure-form" onsubmit={ create }>
             <fieldset>
+                <input if={ isSuperAdmin() } name="network" type="text" placeholder="NetworkID" required />
+                <input if={ isSuperAdmin() || isNetworkAdmin() } name="gateway" type="text" placeholder="GatewayID" required />
                 <input name="email" type="text" placeholder="Email" required />
                 <input name="password" type="text" placeholder="Password" required />
                 <button type="submit" class="pure-button pure-button-primary">
@@ -21,8 +23,8 @@
     <table if={ users.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
         <thead>
             <tr>
-                <th>Network</th>
-                <th>Gateway</th>
+                <th if={ isSuperAdmin() }>Network</th>
+                <th if={ isSuperAdmin() || isNetworkAdmin() }>Gateway</th>
                 <th>Email</th>
                 <th>Created</th>
                 <th class="actions">Actions</th>
@@ -31,10 +33,10 @@
 
         <tbody>
             <tr each={ row, i in users } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
-                <td>{ row.network_id }</td>
-                <td>{ row.gateway_id }</td>
-                <td>{ row.email }</td>
-                <td>{ renderDateTime(row.created_at) }</td>
+                <td if={ isSuperAdmin() }>{ render(row.network) }</td>
+                <td if={ isSuperAdmin() || isNetworkAdmin() }>{ render(row.gateway) }</td>
+                <td>{ render(row.email) }</td>
+                <td>{ render(row.created_at) }</td>
 
                 <td class="actions actions-row">
                     <button class="pure-button" onclick={ remove }>
@@ -49,28 +51,24 @@
     <script>
     var self = this;
 
-    RiotControl.on('users.updated', function (users) {
+    RiotControl.on('users.loaded', function (users) {
         self.users = users;
+        self.update();
+    });
+
+    RiotControl.on('currentuser.loaded', function (currentuser) {
+        self.currentuser = currentuser;
         self.update();
     });
 
     RiotControl.trigger('users.load');
 
-    pad(number, length) {
-        var str = '' + number;
-
-        while (str.length < length) {
-            str = '0' + str;
-        }
-
-        return str;
+    isSuperAdmin() {
+        return self.currentuser.roles.indexOf('super-admin') > -1;
     }
 
-    renderDateTime(dt) {
-        if (dt) {
-            dt = new Date(dt.$date);
-            return dt.toLocaleString();
-        }
+    isNetworkAdmin() {
+        return self.currentuser.roles.indexOf('network-admin') > -1;
     }
 
     getId(e) {
@@ -78,7 +76,12 @@
     }
 
     create(e) {
-        RiotControl.trigger('users.create', self.email.value, self.password.value);
+        RiotControl.trigger('users.create', {
+            network: self.isSuperAdmin() ? self.network.value : self.currentuser.network,
+            gateway: self.isSuperAdmin() || self.isNetworkAdmin() ? self.gateway.value : self.currentuser.gateway,
+            email: self.email.value,
+            password: self.password.value
+        });
         return false;
     }
 

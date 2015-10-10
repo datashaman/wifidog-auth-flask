@@ -17,6 +17,7 @@
 </head>
 <body class="layout-base">
     <div class="container">
+        <currentuser></currentuser>
         {% block menu %}
         <div class="pure-menu pure-menu-horizontal">
             <ul class="pure-menu-list">
@@ -59,7 +60,17 @@
         </div>
     </footer>
 
+    <script src="{{ url_for('static', filename='scripts/interactive.js') }}"></script>
+    <script src="{{ url_for('static', filename='stores/currentuser.js') }}"></script>
+    <script src="{{ url_for('static', filename='tags/currentuser.tag') }}" type="riot/tag"></script>
+
     {% block scripts %}
     {% endblock %}
+
+    <script>
+    Zepto(function($) {
+        riot.mount('*');
+    });
+    </script>
 </body>
 </html>

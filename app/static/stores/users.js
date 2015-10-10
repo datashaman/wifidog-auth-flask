@@ -6,21 +6,18 @@ function UserStore() {
 
     triggerUpdate = function() {
         $.getJSON(base, function(data) {
-            self.trigger('users.updated', data);
+            self.trigger('users.loaded', data);
         });
     };
 
     self.on('users.load', triggerUpdate);
 
-    self.on('users.create', function(email, password) {
+    self.on('users.create', function(attributes) {
         $.ajax({
             url: base,
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({
-                email,
-                password
-            }),
+            data: JSON.stringify(attributes),
             success: triggerUpdate
         });
     });

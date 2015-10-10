@@ -6,20 +6,18 @@ function VoucherStore() {
 
     triggerUpdate = function() {
         $.getJSON(base, function(data) {
-            self.trigger('vouchers.updated', data);
+            self.trigger('vouchers.loaded', data);
         });
     };
 
     self.on('vouchers.load', triggerUpdate);
 
-    self.on('vouchers.create', function(minutes) {
+    self.on('vouchers.create', function(attributes) {
         $.ajax({
             url: base,
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({
-                minutes: parseInt(minutes)
-            }),
+            data: JSON.stringify(attributes),
             success: triggerUpdate
         });
     });

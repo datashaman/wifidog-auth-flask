@@ -9,7 +9,6 @@ from flask.ext.security import Security
 menu = Menu()
 db = SQLAlchemy()
 manager = Manager()
-login_manager = LoginManager()
-api = Api(prefix='/api', decorators=[login_required])
 security = Security()
 principals = Principal()
+api = Api(prefix='/api', decorators=[login_required])

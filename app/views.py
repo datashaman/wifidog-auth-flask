@@ -1,4 +1,5 @@
 import flask
+import json
 
 from app import app
 from app.forms import NetworkForm
@@ -6,19 +7,19 @@ from app.models import Network
 from app.services import db
 from app.utils import is_logged_in, has_role, has_a_role
 from flask.ext.menu import register_menu
-from flask.ext.security import login_required, roles_required, roles_accepted
+from flask.ext.security import login_required, roles_required, roles_accepted, current_user
 
 @app.route('/networks')
 @login_required
 @roles_required('super-admin')
 @register_menu(app, '.networks', 'Networks', visible_when=has_role('super-admin'), order=10)
-def network_index():
+def networks_index():
     return flask.render_template('networks/index.html')
 
 @app.route('/networks/new', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_required('super-admin')
-def network_new():
+def networks_new():
     network = Network()
     form = NetworkForm(flask.request.form, network)
 
@@ -36,7 +37,7 @@ def network_new():
 @app.route('/networks/<network_id>', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_required('super-admin')
-def network_edit(network_id):
+def networks_edit(network_id):
     network = Network.query.filter_by(id=network_id).first_or_404()
     form = NetworkForm(flask.request.form, network)
 
@@ -55,21 +56,21 @@ def network_edit(network_id):
 @login_required
 @roles_accepted('super-admin', 'network-admin')
 @register_menu(app, '.gateways', 'Gateways', visible_when=has_a_role('super-admin', 'network-admin'), order=20)
-def gateway_index():
+def gateways_index():
     return flask.render_template('gateways/index.html')
 
 @app.route('/users')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(app, '.users', 'Users', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=40)
-def user_index():
+def users_index():
     return flask.render_template('users/index.html')
 
 @app.route('/vouchers')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(app, '.vouchers', 'Vouchers', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=30)
-def voucher_index():
+def vouchers_index():
     return flask.render_template('vouchers/index.html')
 
 @app.route('/wifidog/login/', methods=[ 'GET', 'POST' ])

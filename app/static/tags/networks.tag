@@ -47,9 +47,9 @@
         <tbody>
             <tr each={ row, i in networks } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
                 <td><a href="#" onclick={ showEditForm }>{ row['$id'] }</a></td>
-                <td>{ row.title }</td>
-                <td>{ row.description }</td>
-                <td>{ renderDateTime(row.created_at) }</td>
+                <td>{ render(row.title) }</td>
+                <td>{ render(row.description) }</td>
+                <td>{ render(row.created_at) }</td>
 
                 <td class="actions actions-row">
                     <button class="pure-button" onclick={ remove }>
