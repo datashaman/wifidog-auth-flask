@@ -2,22 +2,22 @@
 
 {% block head %}
 <!--[if lt IE 9]>
-<script>html5.addElements('users')</script>
+<script>html5.addElements('gateways')</script>
 <![endif]-->
 {% endblock %}
 
 {% block content %}
-<users></users>
+<gateways></gateways>
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='scripts/interactive.js') }}"></script>
-<script src="{{ url_for('users.static', filename='users.tag') }}" type="riot/tag"></script>
-<script src="{{ url_for('users.static', filename='store.js') }}"></script>
+<script src="{{ url_for('static', filename='tags/gateways.tag') }}" type="riot/tag"></script>
+<script src="{{ url_for('static', filename='stores/gateways.js') }}"></script>
 
 <script>
 Zepto(function($) {
-    riot.mount('users');
+    riot.mount('gateways');
 });
 </script>
 {% endblock %}

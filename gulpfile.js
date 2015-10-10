@@ -3,7 +3,7 @@ var gulp = require('gulp'),
 
 gulp.task('styles', function() {
     return plugins.merge(
-        gulp.src('app/assets/styles/site.scss')
+        gulp.src('app/styles/site.scss')
           .pipe(plugins.sass.sync())
           .pipe(plugins.rename('site.css'))
           .pipe(gulp.dest('./tmp')),

@@ -11,6 +11,8 @@ from flask.ext.security import UserMixin, RoleMixin, current_user
 from random import choice
 from sqlalchemy.orm import backref
 
+import constants
+
 
 chars = string.letters + string.digits
 
@@ -40,10 +42,10 @@ class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    network_id = db.Column(db.Unicode, db.ForeignKey('networks.id'), nullable=False)
+    network_id = db.Column(db.Unicode, db.ForeignKey('networks.id'))
     network = db.relationship('Network', backref=backref('users', lazy='dynamic'))
 
-    gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'), nullable=False)
+    gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'))
     gateway = db.relationship('Gateway', backref=backref('users', lazy='dynamic'))
 
     email = db.Column(db.String(255), unique=True, nullable=False)

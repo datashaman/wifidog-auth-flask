@@ -6,14 +6,10 @@ from app.services import menu, db, manager, login_manager, api, security, princi
 from flask.ext.principal import UserNeed, AnonymousIdentity, identity_loaded, RoleNeed
 from flask.ext.security import current_user, SQLAlchemyUserDatastore
 
-import users
-import vouchers
-import gateways
-import networks
-import wifidog
-
 app = flask.Flask(__name__)
 app.config.from_object('config')
+
+import views
 
 menu.init_app(app)
 db.init_app(app)
@@ -33,12 +29,6 @@ principals.init_app(app)
 
 datastore = SQLAlchemyUserDatastore(db, User, Role)
 security.init_app(app, datastore)
-
-app.register_blueprint(vouchers.bp)
-app.register_blueprint(users.bp)
-app.register_blueprint(gateways.bp)
-app.register_blueprint(networks.bp)
-app.register_blueprint(wifidog.bp)
 
 @identity_loaded.connect_via(app)
 def on_identity_loaded(sender, identity):

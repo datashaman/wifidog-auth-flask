@@ -1,9 +1,27 @@
-from app.config import ROLES
-from app.networks.config import NETWORKS
-from app.networks.models import Network
-from app.models import datastore, Role
+from app import datastore
+from app.models import Role, Network, Gateway
 from app.services import db, manager
 from flask.ext.script import prompt, prompt_pass
+
+
+ROLES = {
+    'super-admin': 'Super Admin',
+    'network-admin': 'Network Admin',
+    'gateway-admin': 'Gateway Admin'
+}
+
+NETWORKS = {
+    u'test': {
+        'title': u'Test',
+        'description': u'Test Network',
+        'gateways': {
+            u'test': {
+                'title': u'Test',
+                'description': u'Test Gateway'
+            }
+        }
+    }
+}
 
 @manager.command
 def create_user(email=None, password=None, role=None, network=None, gateway=None):
@@ -58,8 +76,6 @@ def seed_roles():
 
 @manager.command
 def seed_networks():
-    from app.gateways import Gateway
-
     if Network.query.count() == 0:
         for network_id, defn in NETWORKS.iteritems():
             network = Network(id=network_id, title=defn['title'], description=defn['description'])
