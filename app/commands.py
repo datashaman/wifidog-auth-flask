@@ -21,9 +21,9 @@ NETWORKS = {
                 'title': u'The Drawing Room Café',
                 'description': u'''The Drawing Room is a café and a gallery, a social space and a creative space.
 
-                Our café offers a homely space, Deluxe coffee and good, healthy food.
+Our café offers a homely space, Deluxe coffee and good, healthy food.
 
-                As our name suggests, drawing is right at the heart of our operation. Our focus is on celebrating contemporary illustration, drawing, graphic design, print making and the humble sketch, where all great ideas begin…''',
+As our name suggests, drawing is right at the heart of our operation. Our focus is on celebrating contemporary illustration, drawing, graphic design, print making and the humble sketch, where all great ideas begin…''',
                 'contact_email': u'info@thedrawingroomcafe.co.za',
                 'contact_phone': '082 672 0515',
                 'url_home': u'http://thedrawingroomcafe.co.za/',

@@ -76,6 +76,7 @@ def vouchers_index():
 @app.route('/voucher', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+@register_menu(app, '.voucher', 'Generate Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=25)
 def vouchers_new():
     form = NewVoucherForm(flask.request.form)
 
@@ -153,8 +154,6 @@ def wifidog_ping():
 
 @app.route('/wifidog/auth/')
 def wifidog_auth():
-    voucher = Voucher.query.filter_by(token=flask.request.args.get('token')).first_or_404()
-
     auth = Auth(
         user_agent=flask.request.user_agent.string,
         stage=flask.request.args.get('stage'),
@@ -163,8 +162,7 @@ def wifidog_auth():
         token=flask.request.args.get('token'),
         incoming=flask.request.args.get('incoming'),
         outgoing=flask.request.args.get('outgoing'),
-        gateway_id=flask.request.args.get('gw_id'),
-        voucher_id=voucher.id
+        gateway_id=flask.request.args.get('gw_id')
     )
 
     (auth.status, auth.messages) = auth.process_request()

@@ -86,7 +86,7 @@ class Gateway(db.Model):
     description = db.Column(db.UnicodeText)
 
     contact_email = db.Column(db.Unicode)
-    contact_phone = db.Column(db.Unicode)
+    contact_phone = db.Column(db.String)
 
     url_home = db.Column(db.Unicode)
     url_facebook = db.Column(db.Unicode)
@@ -116,6 +116,8 @@ class Voucher(db.Model):
     incoming = db.Column(db.BigInteger, default=0)
     outgoing = db.Column(db.BigInteger, default=0)
 
+    active = db.Column(db.Boolean, default=True)
+
     def __repr__(self):
         return '<Voucher %r>' % self.id
 
@@ -137,7 +139,7 @@ class Auth(db.Model):
     gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('auths', lazy='dynamic'))
 
-    voucher_id = db.Column(db.String, db.ForeignKey('vouchers.id'), nullable=False)
+    voucher_id = db.Column(db.String, db.ForeignKey('vouchers.id'))
     voucher = db.relationship(Voucher, backref=backref('auths', lazy='dynamic'))
 
     status = db.Column(db.Integer)
@@ -154,14 +156,15 @@ class Auth(db.Model):
         if self.token is None:
             return (constants.AUTH_DENIED, 'No connection token provided')
 
-        voucher = Voucher.query.filter_by(token=self.token).first()
+        voucher = Voucher.query.filter_by(token=self.token, active=True).first()
 
         if voucher is None:
             return (constants.AUTH_DENIED, 'Requested token not found: %s' % self.token)
+        else:
+            self.voucher_id = voucher.id
 
         if voucher.ip is None:
             voucher.ip = flask.request.args.get('ip')
-            db.session.commit()
 
         if self.stage == constants.STAGE_LOGIN:
             if voucher.started_at is None:
@@ -170,7 +173,6 @@ class Auth(db.Model):
                     return (constants.AUTH_DENIED, 'Token is unused but too old: %s' % self.token)
 
                 voucher.started_at = datetime.datetime.utcnow()
-                db.session.commit()
 
                 return (constants.AUTH_ALLOWED, None)
             else:
@@ -195,8 +197,6 @@ class Auth(db.Model):
                     voucher.outgoing = self.outgoing
                 else:
                     messages += '| Warning: Outgoing counter is smaller than stored value; counter not updated'
-
-                db.session.commit()
             else:
                 messages += '| Incoming or outgoing counter is missing; counters not updated'
 

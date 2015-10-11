@@ -5,7 +5,7 @@ app.config.from_object('config')
 
 from app.models import User, Role
 from app.resources import GatewayResource, NetworkResource, UserResource, VoucherResource
-from app.services import menu, db, manager, api, security, principals, logos
+from app.services import menu, db, manager, api, security, principals, logos, markdown
 from flask.ext.login import current_user
 from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
 from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed
@@ -16,6 +16,7 @@ import views
 
 menu.init_app(app)
 db.init_app(app)
+markdown.init_app(app)
 
 with app.app_context():
     db.create_all()

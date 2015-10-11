@@ -11,7 +11,7 @@ fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 
 <div class="panel panel-portal">
-    <div class="panel-body">
+    <div class="panel-heading">
         {% if gateway.url_home %}
         <a href="{{ gateway.url_home }}">
         {% endif %}
@@ -23,9 +23,11 @@ fjs.parentNode.insertBefore(js, fjs);
         {% if gateway.url_home %}
         </a>
         {% endif %}
+    </div>
 
+    <div class="panel-body">
         {% if gateway.description %}
-        {{ gateway.description }}
+        {{ gateway.description | markdown }}
         {% endif %}
 
         {% if gateway.url_facebook %}

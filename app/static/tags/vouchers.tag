@@ -19,6 +19,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>A</th>
                 <th>Minutes</th>
                 <th>Created</th>
                 <th>IP</th>
@@ -34,6 +35,7 @@
         <tbody>
             <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
                 <td><a href="/wifidog/login?voucher={ row['$id'] }">{ row['$id'] }</a></td>
+                <td>{ row.active ? 'Y' : 'N' }</td>
                 <td>{ render(row.minutes) }</td>
                 <td>{ render(row.created_at) }</td>
                 <td>{ render(row.ip) }</td>
@@ -43,9 +45,15 @@
                 <td>{ render(calculateEndAt(row)) }</td>
 
                 <td class="actions actions-row">
-                    <button class="pure-button" onclick={ remove }>
-                        <span class="oi" data-glyph="x" title="Remove" aria-hidden="true"></span>
-                        Remove
+                    <button class="pure-button { row.active ? 'state-invalid' : 'state-valid' }" onclick={ toggleActive }>
+                        <span if={ row.active }>
+                            <span class="oi" data-glyph="x" title="Deactivate" aria-hidden="true"></span>
+                            Deactivate
+                        </span>
+                        <span if={ !row.active }>
+                            <span class="oi" data-glyph="check" title="Reactivate" aria-hidden="true"></span>
+                            Reactivate
+                        </span>
                     </button>
                 </td>
             </tr>
@@ -113,15 +121,9 @@
         return false;
     }
 
-    removeAll(e) {
+    toggleActive(e) {
         if(confirm('Are you sure?')) {
-            RiotControl.trigger('vouchers.remove');
-        }
-    }
-
-    remove(e) {
-        if(confirm('Are you sure?')) {
-            RiotControl.trigger('voucher.remove', self.getVoucherId(e));
+            RiotControl.trigger('voucher.toggle', self.getVoucherId(e));
         }
     }
     </script>
