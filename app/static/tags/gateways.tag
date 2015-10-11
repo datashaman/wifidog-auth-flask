@@ -217,7 +217,11 @@
                 network: self.isSuperAdmin() ? modal.network.value : self.currentuser.network,
                 id: modal.id.value,
                 title: modal.title.value,
-                description: modal.description.value
+                description: modal.description.value,
+                contact_email: modal.contact_email.value,
+                contact_phone: modal.contact_phone.value,
+                url_home: modal.url_home.value,
+                url_facebook: modal.url_facebook.value
             };
 
         if (modal.original_id.value) {

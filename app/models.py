@@ -83,7 +83,7 @@ class Gateway(db.Model):
     description = db.Column(db.UnicodeText)
 
     contact_email = db.Column(db.Unicode)
-    contact_number = db.Column(db.Unicode)
+    contact_phone = db.Column(db.Unicode)
 
     url_home = db.Column(db.Unicode)
     url_facebook = db.Column(db.Unicode)

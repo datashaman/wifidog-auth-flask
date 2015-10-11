@@ -58,6 +58,10 @@ table .actions {
     text-align: right;
 }
 
+th, td {
+    vertical-align: top;
+}
+
 .flashes {
     padding: 0;
     margin-bottom: 12px;
