@@ -1,6 +1,6 @@
 {
   "name": "wifidog-auth-flask",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "homepage": "https://github.com/datashaman/wifidog-auth-flask",
   "authors": [
     "datashaman <marlinf@datashaman.com>"
@@ -16,10 +16,12 @@
   "dependencies": {
     "purecss": "~0.6.0",
     "open-iconic": "~1.1.1",
-    "es5-shim": "~4.1.13",
+    "es5-shim": "~4.1.14",
     "html5shiv": "~3.7.3",
     "riot": "~2.2.4",
     "riotcontrol": "*",
-    "zepto": "~1.1.6"
+    "pure": "purecss#~0.6.0",
+    "RiotControl": "riotcontrol#*",
+    "zepto": "zeptojs#~1.1.6"
   }
 }

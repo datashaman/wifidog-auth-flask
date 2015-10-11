@@ -1,0 +1,43 @@
+{% extends 'layouts/login.html' %}
+
+{% block content %}
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+var js, fjs = d.getElementsByTagName(s)[0];
+if (d.getElementById(id)) return;
+js = d.createElement(s); js.id = id;
+js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.5&appId=89526572170";
+fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div class="panel panel-portal">
+    <div class="panel-body">
+        {% if gateway.url_home %}
+        <a href="{{ gateway.url_home }}">
+        {% endif %}
+        {% if gateway.logo %}
+        <img src="{{ url_for('static', filename='logos/%s' % gateway.logo) }}" />
+        {% else %}
+        {{ gateway.title }}
+        {% endif %}
+        {% if gateway.url_home %}
+        </a>
+        {% endif %}
+
+        {% if gateway.description %}
+        {{ gateway.description }}
+        {% endif %}
+
+        {% if gateway.url_facebook %}
+        <div class="fb-like"
+            data-href="{{ gateway.url_facebook }}"
+            data-width="300"
+            data-layout="standard"
+            data-action="like"
+            data-show-faces="true"
+            data-share="true">
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

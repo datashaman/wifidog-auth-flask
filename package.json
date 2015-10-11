@@ -1,6 +1,6 @@
 {
   "name": "wifidog-auth-flask",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A Wifidog Auth server written in Python Flask",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

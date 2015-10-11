@@ -1,7 +1,7 @@
 import flask
 
-from flask.ext.login import current_user
 from flask.ext.restless import ProcessingException
+from flask.ext.security import current_user
 
 def is_logged_out():
     return not current_user.is_authenticated()

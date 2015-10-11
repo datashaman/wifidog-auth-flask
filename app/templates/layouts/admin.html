@@ -33,21 +33,13 @@
                 {%- endif -%}
                 {%- endfor -%}
                 <li class="pure-menu-item">
-                    <a href="/logout" class="pure-menu-link">Logout</a>
+                <a href="/logout" class="pure-menu-link">Logout {{ current_user.email }}</a>
                 </li>
             </ul>
         </div>
         {% endblock %}
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <ul class="flashes">
-            {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
+        {% include 'layouts/flashes.html' %}
 
         {% block content %}
         {% endblock %}
@@ -59,7 +51,18 @@
         </div>
     </footer>
 
+    <script src="{{ url_for('static', filename='scripts/interactive.js') }}"></script>
+    <script src="{{ url_for('static', filename='stores/currentuser.js') }}"></script>
+    <script src="{{ url_for('static', filename='tags/modal.tag') }}" type="riot/tag"></script>
+
     {% block scripts %}
     {% endblock %}
+
+    <script>
+    Zepto(function($) {
+        riot.mount('*');
+        RiotControl.trigger('currentuser.load');
+    });
+    </script>
 </body>
 </html>

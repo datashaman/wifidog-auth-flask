@@ -1,10 +1,17 @@
 {% macro render_field(field) %}
-    {{ field(**kwargs)|safe }}
+{{ field(**kwargs)|safe }}
 
-    {% if field.errors %}
-    <div class="state state-invalid">
-        <span class="oi" data-glyph="x" title="X" aria-hidden="true"></span>
-        {{ field.errors | join('; ') }}
-    </div>
-    {% endif %}
+{% if field.errors %}
+<div class="state state-invalid">
+    <span class="oi" data-glyph="x" title="X" aria-hidden="true"></span>
+    {{ field.errors | join('; ') }}
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro render_group(field, label=None) %}
+<div class="pure-control-group">
+    <label for="{{ field.name }}">{{ label or field.label }}</label>
+    {{ render_field(field, required=field.flags.required) }}
+</div>
 {% endmacro %}

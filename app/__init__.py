@@ -1,40 +1,52 @@
 import flask
 
-from flask.ext.menu import Menu
-from flask.ext.restless import APIManager
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.script import Manager
-from flask.ext.login import LoginManager
+from app.models import User, Role
+from app.resources import GatewayResource, NetworkResource, UserResource, VoucherResource
+from app.services import menu, db, manager, api, security, principals, logos
+from flask.ext.login import current_user
+from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
+from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed
+from flask.ext.security import SQLAlchemyUserDatastore
+from flask.ext.uploads import configure_uploads
 
 app = flask.Flask(__name__)
 app.config.from_object('config')
 
-menu = Menu(app)
-db = SQLAlchemy(app)
-manager = Manager(app)
-api_manager = APIManager(app, flask_sqlalchemy_db=db)
-login_manager = LoginManager(app)
+import views
 
-import vouchers
-import users
+menu.init_app(app)
+db.init_app(app)
 
-from gateways import Gateway
+with app.app_context():
+    db.create_all()
 
-Gateway.vouchers = db.relationship('Voucher', backref='gateway')
-Gateway.users = db.relationship('User', backref='gateway')
+    api.add_resource(UserResource)
+    api.add_resource(VoucherResource)
+    api.add_resource(GatewayResource)
+    api.add_resource(NetworkResource)
 
-from networks import Network
-Network.gateways = db.relationship('Gateway', backref='network')
+    configure_uploads(app, logos)
 
-import wifidog
+manager.app = app
+api.init_app(app)
+principals.init_app(app)
 
-app.register_blueprint(vouchers.bp)
-app.register_blueprint(users.bp)
-app.register_blueprint(gateways.bp)
-app.register_blueprint(networks.bp)
-app.register_blueprint(wifidog.bp)
+datastore = SQLAlchemyUserDatastore(db, User, Role)
+security.init_app(app, datastore)
 
-db.create_all()
+@identity_loaded.connect_via(app)
+def on_identity_loaded(sender, identity):
+    if not isinstance(identity, AnonymousIdentity):
+        identity.provides.add(UserNeed(identity.id))
+
+        for role in current_user.roles:
+            identity.provides.add(RoleNeed(role.name))
+
+@principals.identity_loader
+def read_identity_from_flask_login():
+    if current_user.is_authenticated():
+        return Identity(current_user.id)
+    return AnonymousIdentity()
 
 @app.route('/')
 def home():

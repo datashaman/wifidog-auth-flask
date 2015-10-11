@@ -3,7 +3,7 @@ var gulp = require('gulp'),
 
 gulp.task('styles', function() {
     return plugins.merge(
-        gulp.src('app/assets/styles/site.scss')
+        gulp.src('app/styles/site.scss')
           .pipe(plugins.sass.sync())
           .pipe(plugins.rename('site.css'))
           .pipe(gulp.dest('./tmp')),
@@ -30,9 +30,10 @@ gulp.task('scripts', function() {
           .pipe(plugins.uglify())
           .pipe(gulp.dest('./app/static/scripts')),
         gulp.src([
-            'bower_components/zepto/zepto.js',
+            'bower_components/zepto/dist/zepto.js',
             'bower_components/riot/riot+compiler.js',
-            'bower_components/riotcontrol/riotcontrol.js'
+            'bower_components/riotcontrol/riotcontrol.js',
+            'app/static/globals.js',
         ]).pipe(plugins.concat('interactive.js'))
           .pipe(gulp.dest('./app/static/scripts'))
           .pipe(plugins.rename('interactive.min.js'))
