@@ -33,8 +33,9 @@ class Role(db.Model, RoleMixin):
     __tablename__ = 'roles'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255))
+
+    name = db.Column(db.Unicode(80), unique=True)
+    description = db.Column(db.Unicode(255))
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -47,10 +48,9 @@ class User(db.Model, UserMixin):
     gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'))
     gateway = db.relationship('Gateway', backref=backref('users', lazy='dynamic'))
 
-    email = db.Column(db.String(255), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.Unicode(255), unique=True, nullable=False)
+    password = db.Column(db.Unicode(255), nullable=False)
     active = db.Column(db.Boolean, default=True)
-    confirmed_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
@@ -65,8 +65,10 @@ class Network(db.Model):
     __tablename__ = 'networks'
 
     id = db.Column(db.Unicode, primary_key=True)
+
     title = db.Column(db.Unicode, nullable=False)
-    description = db.Column(db.Unicode, nullable=False)
+    description = db.Column(db.UnicodeText)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
 class Gateway(db.Model):
@@ -78,7 +80,8 @@ class Gateway(db.Model):
     network = db.relationship(Network, backref=backref('gateways', lazy='dynamic'))
 
     title = db.Column(db.Unicode, nullable=False)
-    description = db.Column(db.Unicode, nullable=False)
+    description = db.Column(db.UnicodeText)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
 class Voucher(db.Model):
@@ -88,17 +91,17 @@ class Voucher(db.Model):
     minutes = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     started_at = db.Column(db.DateTime)
-    gw_address = db.Column(db.String(15))
+    gw_address = db.Column(db.Unicode(15))
     gw_port = db.Column(db.Integer)
 
     gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'))
     gateway = db.relationship(Gateway, backref=backref('vouchers', lazy='dynamic'))
 
-    mac = db.Column(db.String(20))
-    ip = db.Column(db.String(15))
-    url = db.Column(db.String(255))
-    email = db.Column(db.String(255))
-    token = db.Column(db.String(255))
+    mac = db.Column(db.Unicode(20))
+    ip = db.Column(db.Unicode(15))
+    url = db.Column(db.Unicode(255))
+    email = db.Column(db.Unicode(255))
+    token = db.Column(db.Unicode(255))
     incoming = db.Column(db.BigInteger, default=0)
     outgoing = db.Column(db.BigInteger, default=0)
 
@@ -112,11 +115,11 @@ class Auth(db.Model):
     __tablename__ = 'auths'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_agent = db.Column(db.String(255))
-    stage = db.Column(db.String)
-    ip = db.Column(db.String(20))
-    mac = db.Column(db.String(20))
-    token = db.Column(db.String)
+    user_agent = db.Column(db.Unicode(255))
+    stage = db.Column(db.Unicode)
+    ip = db.Column(db.Unicode(20))
+    mac = db.Column(db.Unicode(20))
+    token = db.Column(db.Unicode)
     incoming = db.Column(db.BigInteger)
     outgoing = db.Column(db.BigInteger)
 
@@ -199,7 +202,7 @@ class Ping(db.Model):
     __tablename__ = 'pings'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_agent = db.Column(db.String(255))
+    user_agent = db.Column(db.Unicode(255))
 
     gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('pings', lazy='dynamic'))

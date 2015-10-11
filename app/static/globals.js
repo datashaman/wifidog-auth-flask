@@ -7,7 +7,7 @@ function render(attribute) {
             }
 
             if (typeof attribute.$ref != 'undefined') {
-                return attribute.$ref;
+                return attribute.$ref.replace(/^.*\//, '');
             }
             break;
         default:

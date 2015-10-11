@@ -4,6 +4,7 @@ from app.models import User, Role
 from app.resources import GatewayResource, NetworkResource, UserResource, VoucherResource
 from app.services import menu, db, manager, api, security, principals
 from flask.ext.login import current_user
+from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
 from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed
 from flask.ext.security import SQLAlchemyUserDatastore
 

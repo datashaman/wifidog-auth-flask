@@ -5,9 +5,9 @@ from flask.ext.script import prompt, prompt_pass
 
 
 ROLES = {
-    'super-admin': 'Super Admin',
-    'network-admin': 'Network Admin',
-    'gateway-admin': 'Gateway Admin'
+    u'super-admin': u'Super Admin',
+    u'network-admin': u'Network Admin',
+    u'gateway-admin': u'Gateway Admin'
 }
 
 NETWORKS = {

@@ -2,7 +2,7 @@ import flask
 import json
 
 from app import app
-from app.forms import NetworkForm
+from app.forms import NetworkForm, VoucherForm
 from app.models import Network
 from app.services import db
 from app.utils import is_logged_in, has_role, has_a_role

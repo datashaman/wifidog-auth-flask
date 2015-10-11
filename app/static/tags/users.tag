@@ -39,7 +39,7 @@
                 <td>{ render(row.created_at) }</td>
 
                 <td class="actions actions-row">
-                    <button class="pure-button" onclick={ remove }>
+                    <button class="pure-button" onclick={ remove } disabled={ currentuser.id == row['$id'] } title={ currentuser.id == row['$id'] ? 'Cowardly refuse to remove current user' : '' }>
                         <span class="oi" data-glyph="x" title="Remove" aria-hidden="true"></span>
                         Remove
                     </button>

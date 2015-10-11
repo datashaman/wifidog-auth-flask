@@ -17,7 +17,6 @@
 </head>
 <body class="layout-base">
     <div class="container">
-        <currentuser></currentuser>
         {% block menu %}
         <div class="pure-menu pure-menu-horizontal">
             <ul class="pure-menu-list">
@@ -34,7 +33,7 @@
                 {%- endif -%}
                 {%- endfor -%}
                 <li class="pure-menu-item">
-                    <a href="/logout" class="pure-menu-link">Logout</a>
+                <a href="/logout" class="pure-menu-link">Logout {{ current_user.email }}</a>
                 </li>
             </ul>
         </div>
@@ -70,6 +69,7 @@
     <script>
     Zepto(function($) {
         riot.mount('*');
+        RiotControl.trigger('currentuser.load');
     });
     </script>
 </body>
