@@ -7,10 +7,21 @@ from flask.ext.potion import fields, signals
 from flask.ext.potion.routes import Relation, Route, ItemRoute
 from flask.ext.potion.contrib.principals import PrincipalResource, PrincipalManager
 from flask.ext.security import current_user
+from PIL import Image
 
 super_admin_only = 'super-admin'
 network_or_above = ['super-admin', 'network-admin']
 gateway_or_above = ['super-admin', 'network-admin', 'gateway-admin']
+
+import os, errno
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
 
 class Manager(PrincipalManager):
     def instances(self, where=None, sort=None):
@@ -84,9 +95,20 @@ class GatewayResource(PrincipalResource):
     def logo(self, gateway):
         if 'file' in flask.request.files:
             filename = logos.save(flask.request.files['file'])
+
             self.manager.update(gateway, {
                 'logo': filename
             })
+
+            im = Image.open(logos.path(filename))
+
+            static_folder = os.path.abspath(os.path.dirname(__file__) + '/static/logos')
+            mkdir_p(static_folder)
+
+            im.thumbnail((300, 300), Image.ANTIALIAS)
+            im.save(static_folder + '/' + filename)
+
+
 
 class NetworkResource(PrincipalResource):
     gateways = Relation('gateways')

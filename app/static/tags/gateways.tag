@@ -75,6 +75,8 @@
             </div>
 
             <div if={ parent.modal.active == 'logo' } id="tab-logo" class="tab-content">
+                <img if={ parent.gateway.logo } src="/static/logos/{ parent.gateway.logo }" />
+
                 <div class="pure-g">
                     <div class="pure-u-1">
                         <label for="url_home">File Upload</label>

@@ -19,4 +19,5 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'data/local.db')
 THREADS_PER_PAGE = 8
 VOUCHER_MAXAGE = 120
 VOUCHER_DEFAULT_MINUTES = 60
-UPLOADED_LOGOS_DEST = os.path.join(BASE_DIR, 'app/static/logos')
+UPLOADS_DEFAULT_DEST = os.path.join(BASE_DIR, 'uploads')
+UPLOADS_DEFAULT_URL = '/static'
