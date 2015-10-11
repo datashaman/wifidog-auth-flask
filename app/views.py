@@ -3,7 +3,7 @@ import json
 
 from app import app
 from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm
-from app.models import Network, Voucher
+from app.models import Gateway, Network, Voucher
 from app.services import db
 from app.utils import is_logged_in, has_role, has_a_role
 from flask.ext.menu import register_menu
