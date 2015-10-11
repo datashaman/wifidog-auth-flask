@@ -77,9 +77,7 @@
     };
 
     RiotControl.on('networks.loaded', function (networks) {
-        self.update({
-            networks
-        });
+        self.update({ networks });
     });
 
     RiotControl.on('network.loaded', function (network) {
@@ -104,13 +102,6 @@
     });
 
     RiotControl.trigger('networks.load');
-
-    renderDateTime(dt) {
-        if (dt) {
-            dt = new Date(dt.$date);
-            return dt.toLocaleString();
-        }
-    }
 
     getId(e) {
         return $(e.target).closest('tr[data-id]').data('id');

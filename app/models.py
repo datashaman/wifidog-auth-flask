@@ -82,6 +82,12 @@ class Gateway(db.Model):
     title = db.Column(db.Unicode, nullable=False)
     description = db.Column(db.UnicodeText)
 
+    contact_email = db.Column(db.Unicode)
+    contact_number = db.Column(db.Unicode)
+
+    url_home = db.Column(db.Unicode)
+    url_facebook = db.Column(db.Unicode)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
 class Voucher(db.Model):
