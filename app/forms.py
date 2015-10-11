@@ -1,11 +1,16 @@
+from app import app
 from app.utils import args_get
 from flask.ext.wtf import Form
 from wtforms.ext.sqlalchemy.orm import model_form
-from wtforms import HiddenField, PasswordField, TextField, TextAreaField, validators
+from wtforms import HiddenField, PasswordField, TextField, TextAreaField, IntegerField, SelectField, validators
 
 from app.models import Network, Voucher
 
-class VoucherForm(Form):
+class NewVoucherForm(Form):
+    gateway_id = SelectField('Gateway')
+    minutes = IntegerField('Minutes', [ validators.InputRequired(), validators.NumberRange(min=0, max=app.config.get('VOUCHER_MAXAGE')) ], default=app.config.get('VOUCHER_DEFAULT_MINUTES'))
+
+class LoginVoucherForm(Form):
     voucher = TextField('Voucher', [ validators.InputRequired() ], default=args_get('voucher'))
     email = TextField('Email Address', [ validators.InputRequired(), validators.Email() ])
 
@@ -26,5 +31,6 @@ class VoucherForm(Form):
 
 class NetworkForm(Form):
     id = TextField('ID', [ validators.InputRequired() ])
+
     title = TextField('Title', [ validators.InputRequired(), validators.Length(min=5, max=20) ])
     description = TextAreaField('Description', [ validators.InputRequired() ])

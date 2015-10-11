@@ -94,7 +94,7 @@ class Voucher(db.Model):
     gw_address = db.Column(db.Unicode(15))
     gw_port = db.Column(db.Integer)
 
-    gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'))
+    gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('vouchers', lazy='dynamic'))
 
     mac = db.Column(db.Unicode(20))

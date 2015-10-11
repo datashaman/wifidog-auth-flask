@@ -2,8 +2,8 @@ import flask
 import json
 
 from app import app
-from app.forms import NetworkForm, VoucherForm
-from app.models import Network
+from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm
+from app.models import Network, Voucher
 from app.services import db
 from app.utils import is_logged_in, has_role, has_a_role
 from flask.ext.menu import register_menu
@@ -73,20 +73,53 @@ def users_index():
 def vouchers_index():
     return flask.render_template('vouchers/index.html')
 
+@app.route('/voucher', methods=[ 'GET', 'POST' ])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def vouchers_new():
+    form = NewVoucherForm(flask.request.form)
+
+    choices = []
+
+    if current_user.has_role('gateway-admin'):
+        choices = [[ current_user.gateway_id, '%s - %s' % (current_user.gateway.network.title, current_user.gateway.title) ]]
+    else:
+        if current_user.has_role('network-admin'):
+            networks = Network.query.filter_by(id=current_user.network_id).get()
+        else:
+            networks = Network.query.all()
+
+        for network in networks:
+            for gateway in network.gateways:
+                choices.append([ gateway.id, '%s - %s' % (network.title, gateway.title) ])
+
+    form.gateway_id.choices = choices
+
+    if form.validate_on_submit():
+        voucher = Voucher()
+        form.populate_obj(voucher)
+
+        if current_user.has_role('gateway-admin'):
+            voucher.gateway_id = current_user.gateway_id
+
+        db.session.add(voucher)
+        db.session.commit()
+
+        flask.flash(voucher.id, 'success')
+
+        return flask.redirect(flask.url_for('vouchers_new'))
+
+    return flask.render_template('vouchers/new.html', form=form)
+
 @app.route('/wifidog/login/', methods=[ 'GET', 'POST' ])
 def wifidog_login():
     form = VoucherForm(flask.request.form)
 
-    if flask.request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         voucher = Voucher.query.filter_by(id=form.voucher.data).first_or_404()
 
         if voucher.started_at is None:
-            voucher.gw_address = form.gw_address.data
-            voucher.gw_port = form.gw_port.data
-            voucher.gateway_id = form.gateway_id.data
-            voucher.mac = form.mac.data
-            voucher.url = form.url.data
-            voucher.email = form.email.data
+            form.populate_obj(voucher)
             voucher.token = generate_token()
             db.session.commit()
 
