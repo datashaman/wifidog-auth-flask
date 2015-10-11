@@ -12,10 +12,7 @@ install:
 	gulp
 
 bootstrap:
-	python manage.py seed_roles
-	python manage.py seed_networks
-	python manage.py create_user -e marlinf@datashaman.com -p marlinf -r super-admin
-	python manage.py create_user -e info@thedrawingroomcafe.co.za -p admin -r gateway-admin -n datashaman -g tdr
+	bootstrap.sh
 
 remove-db:
 	rm data/local.db

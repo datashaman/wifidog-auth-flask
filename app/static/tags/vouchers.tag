@@ -34,7 +34,7 @@
 
         <tbody>
             <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
-                <td><a href="/wifidog/login?voucher={ row['$id'] }">{ row['$id'] }</a></td>
+                <td>{ row['$id'] }</td>
                 <td>{ row.active ? 'Y' : 'N' }</td>
                 <td>{ render(row.minutes) }</td>
                 <td>{ render(row.created_at) }</td>
