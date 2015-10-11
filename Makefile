@@ -12,7 +12,7 @@ install:
 	gulp
 
 bootstrap:
-	bootstrap.sh
+	bash bootstrap.sh
 
 remove-db:
 	rm data/local.db
