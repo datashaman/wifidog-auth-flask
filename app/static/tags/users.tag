@@ -12,10 +12,6 @@
                     <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
                     Create
                 </button>
-                <button if={ users.length > 1 } type="button" class="pure-button" onclick={ removeAll }>
-                    <span class="oi" data-glyph="x" title="Remove All" aria-hidden="true"></span>
-                    Remove All
-                </button>
             </fieldset>
         </form>
     </div>

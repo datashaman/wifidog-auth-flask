@@ -24,11 +24,12 @@ function NetworkStore() {
             url: base,
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify(attributes),
-            success: function(data) {
-                self.trigger('network.saved', data);
-                load_many();
-            }
+            data: JSON.stringify(attributes)
+        }).done(function(data) {
+            self.trigger('network.saved', data);
+            load_many();
+        }).fail(function(xhr, errorType, error) {
+            self.trigger('network.error', JSON.parse(xhr.responseText));
         });
     });
 

@@ -30,7 +30,7 @@ gulp.task('scripts', function() {
           .pipe(plugins.uglify())
           .pipe(gulp.dest('./app/static/scripts')),
         gulp.src([
-            'bower_components/zepto/zepto.js',
+            'bower_components/zepto/dist/zepto.js',
             'bower_components/riot/riot+compiler.js',
             'bower_components/riotcontrol/riotcontrol.js',
             'app/static/globals.js',

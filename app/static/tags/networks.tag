@@ -1,16 +1,19 @@
 <networks>
     <modal heading={ modal.heading } hidden={ modal.hidden } dismissable="true" onclose={ cancel }>
         <form class="pure-form pure-form-stacked" onsubmit={ doNothing }>
-            <input type="hidden" id="original_id" value={ parent.network['$id'] } />
+            <input type="hidden" id="original_id" class="pure-input-1" value={ parent.network['$id'] } />
 
             <label for="id">ID</label>
-            <input type="text" id="id" name="id" value="{ parent.network['$id'] }" />
+            <input type="text" id="id" name="id" class="pure-input-1" value="{ parent.network['$id'] }" />
+            <div if={ parent.errors.id } class="state state-invalid">{ parent.errors.id }</div>
 
             <label for="title">Title</label>
-            <input type="text" id="title" name="title" value={ parent.network.title } />
+            <input type="text" id="title" name="title" class="pure-input-1" value={ parent.network.title } />
+            <div if={ parent.errors.title } class="state state-invalid">{ parent.errors.title }</div>
 
             <label for="description">Description</label>
-            <textarea id="description" name="description">{ parent.network.description }</textarea>
+            <textarea id="description" class="pure-input-1" name="description">{ parent.network.description }</textarea>
+            <div if={ parent.errors.description } class="state state-invalid">{ parent.errors.description }</div>
 
             <div class="actions">
                 <button type="button" class="pure-button" onclick={ parent.cancel }>Cancel</button>
@@ -86,6 +89,14 @@
         self.update();
     });
 
+    RiotControl.on('network.error', function (response) {
+        self.errors = {};
+        response.errors.forEach(function(error) {
+            self.errors[error.path[0]] = error.message;
+        });
+        console.log(self.errors);
+        self.update();
+    });
 
     RiotControl.on('network.saved', function () {
         self.modal.hidden = true;
