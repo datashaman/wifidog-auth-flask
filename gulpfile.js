@@ -33,6 +33,7 @@ gulp.task('scripts', function() {
             'bower_components/zepto/dist/zepto.js',
             'bower_components/riot/riot+compiler.js',
             'bower_components/riotcontrol/riotcontrol.js',
+            'bower_components/marked/lib/marked.js',
             'app/static/globals.js',
         ]).pipe(plugins.concat('interactive.js'))
           .pipe(gulp.dest('./app/static/scripts'))

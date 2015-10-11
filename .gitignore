@@ -1,4 +1,5 @@
 *.pyc
+bootstrap.sh
 bower_components/
 build/
 node_modules/
