@@ -112,7 +112,6 @@
                 <th if={ isSuperAdmin() }>Network</th>
                 <th>ID</th>
                 <th>Title</th>
-                <th>Description</th>
                 <th>Created At</th>
 
                 <th class="actions">Actions</th>
@@ -124,7 +123,6 @@
                 <td if={ isSuperAdmin() }>{ render(row.network) }</td>
                 <td><a href="#" onclick={ showEditForm }>{ row['$id'] }</a></td>
                 <td>{ render(row.title) }</td>
-                <td>{ render(row.description) }</td>
                 <td>{ render(row.created_at) }</td>
 
                 <td class="actions actions-row">

@@ -124,6 +124,8 @@ def wifidog_login():
             voucher.token = generate_token()
             db.session.commit()
 
+            # flask.flash('Logged in, continue to <a href="%s">%s</a>' % (form.url.data, form.url.data), 'success')
+
             url = 'http://%s:%s/wifidog/auth?token=%s' % (voucher.gw_address, voucher.gw_port, voucher.token)
             return flask.redirect(url)
 

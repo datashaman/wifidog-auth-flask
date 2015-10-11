@@ -1,6 +1,6 @@
 {
   "name": "wifidog-auth-flask",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://github.com/datashaman/wifidog-auth-flask",
   "authors": [
     "datashaman <marlinf@datashaman.com>"
@@ -22,6 +22,7 @@
     "riotcontrol": "*",
     "pure": "purecss#~0.6.0",
     "RiotControl": "riotcontrol#*",
-    "zepto": "zeptojs#~1.1.6"
+    "zepto": "zeptojs#~1.1.6",
+    "marked": "~0.3.5"
   }
 }
