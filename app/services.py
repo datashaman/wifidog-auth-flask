@@ -1,5 +1,6 @@
 from flask.ext.login import LoginManager, login_required
 from flask.ext.menu import Menu
+from flask.ext.misaka import Misaka
 from flask.ext.potion import Api
 from flask.ext.principal import Principal
 from flask.ext.script import Manager
@@ -8,6 +9,7 @@ from flask.ext.security import Security
 from flask.ext.uploads import UploadSet, IMAGES
 
 menu = Menu()
+markdown = Misaka()
 db = SQLAlchemy()
 manager = Manager()
 security = Security()

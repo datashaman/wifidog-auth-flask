@@ -14,11 +14,15 @@ install:
 bootstrap:
 	python manage.py seed_roles
 	python manage.py seed_networks
-	python manage.py create_user -e sa@example.com -p admin -r super-admin
-	python manage.py create_user -e na@example.com -p admin -r network-admin -n test
-	python manage.py create_user -e ga@example.com -p admin -r gateway-admin -n test -g test
+	python manage.py create_user -e marlinf@datashaman.com -p marlinf -r super-admin
+	python manage.py create_user -e info@thedrawingroomcafe.co.za -p admin -r gateway-admin -n datashaman -g tdr
+
+remove-db:
+	rm data/local.db
+
+reboot: remove-db bootstrap
 
 clean:
 	find . -name '*.pyc' -delete
 
-.PHONY: serve install bootstrap clean
+.PHONY: serve install bootstrap clean remove-db reboot

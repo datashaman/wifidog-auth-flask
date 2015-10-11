@@ -153,6 +153,12 @@ class VoucherResource(PrincipalResource):
         network = fields.ToOne('networks')
         gateway = fields.ToOne('gateways')
 
+    @ItemRoute.POST
+    def toggle(self, voucher):
+        self.manager.update(voucher, {
+            'active': not voucher.active
+        })
+
 @signals.before_create.connect_via(GatewayResource)
 @signals.before_create.connect_via(UserResource)
 @signals.before_create.connect_via(VoucherResource)

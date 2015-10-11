@@ -3,7 +3,7 @@ import json
 
 from app import app
 from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm
-from app.models import Gateway, Network, Voucher
+from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token
 from app.services import db
 from app.utils import is_logged_in, has_role, has_a_role
 from flask.ext.menu import register_menu
@@ -76,6 +76,7 @@ def vouchers_index():
 @app.route('/voucher', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+@register_menu(app, '.voucher', 'Generate Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=25)
 def vouchers_new():
     form = NewVoucherForm(flask.request.form)
 
@@ -113,7 +114,7 @@ def vouchers_new():
 
 @app.route('/wifidog/login/', methods=[ 'GET', 'POST' ])
 def wifidog_login():
-    form = VoucherForm(flask.request.form)
+    form = LoginVoucherForm(flask.request.form)
 
     if form.validate_on_submit():
         voucher = Voucher.query.filter_by(id=form.voucher.data).first_or_404()
@@ -153,8 +154,6 @@ def wifidog_ping():
 
 @app.route('/wifidog/auth/')
 def wifidog_auth():
-    voucher = Voucher.query.filter_by(token=flask.request.args.get('token')).first_or_404()
-
     auth = Auth(
         user_agent=flask.request.user_agent.string,
         stage=flask.request.args.get('stage'),
@@ -163,7 +162,7 @@ def wifidog_auth():
         token=flask.request.args.get('token'),
         incoming=flask.request.args.get('incoming'),
         outgoing=flask.request.args.get('outgoing'),
-        voucher_id=voucher.id
+        gateway_id=flask.request.args.get('gw_id')
     )
 
     (auth.status, auth.messages) = auth.process_request()

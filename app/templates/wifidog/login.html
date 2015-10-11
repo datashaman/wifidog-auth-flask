@@ -6,7 +6,8 @@
     <h1 class="panel-title">Login</h1>
 
     <div class="panel-body">
-        <form method="post" action="{{ url_for('wifidog.login') }}" class="pure-form pure-form-stacked">
+        <form method="post" action="{{ url_for('wifidog_login') }}" class="pure-form pure-form-stacked">
+            {{ form.csrf_token }}
             {{ form.gw_address | safe }}
             {{ form.gw_port | safe }}
             {{ form.gateway_id | safe }}

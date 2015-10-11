@@ -8,13 +8,13 @@ html {
 }
 
 body {
-    margin: 0 0 20px;
+    margin: 0 0 40px;
 
     & > footer {
         position: absolute;
         left: 0;
         bottom: 0;
-        height: 20px;
+        height: 40px;
         width: 100%;
     }
 }
@@ -54,7 +54,7 @@ h1 {
 }
 
 .panel-portal {
-    .panel-body {
+    .panel-heading {
         text-align: center;
     }
     .fb-like {
