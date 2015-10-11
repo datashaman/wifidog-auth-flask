@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 from app import datastore
 from app.models import Role, Network, Gateway
 from app.services import db, manager
@@ -11,13 +13,21 @@ ROLES = {
 }
 
 NETWORKS = {
-    u'test': {
-        'title': u'Test',
-        'description': u'Test Network',
+    u'datashaman': {
+        'title': u'datashaman',
+        'description': None,
         'gateways': {
-            u'test': {
-                'title': u'Test',
-                'description': u'Test Gateway'
+            u'tdr': {
+                'title': u'The Drawing Room Café',
+                'description': u'''The Drawing Room is a café and a gallery, a social space and a creative space.
+
+                Our café offers a homely space, Deluxe coffee and good, healthy food.
+
+                As our name suggests, drawing is right at the heart of our operation. Our focus is on celebrating contemporary illustration, drawing, graphic design, print making and the humble sketch, where all great ideas begin…''',
+                'contact_email': u'info@thedrawingroomcafe.co.za',
+                'contact_phone': '082 672 0515',
+                'url_home': u'http://thedrawingroomcafe.co.za/',
+                'url_facebook': u'https://www.facebook.com/thedrawingroomcafe',
             }
         }
     }

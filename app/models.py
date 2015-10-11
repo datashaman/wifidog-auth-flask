@@ -4,6 +4,9 @@ import re
 import string
 import uuid
 
+import flask
+
+from app import app
 from app.services import db, api, principals
 from flask.ext.potion import fields
 from flask.ext.security import UserMixin, RoleMixin, current_user
@@ -95,21 +98,21 @@ class Gateway(db.Model):
 class Voucher(db.Model):
     __tablename__ = 'vouchers'
 
-    id = db.Column(db.Unicode, primary_key=True, default=generate_id)
+    id = db.Column(db.String, primary_key=True, default=generate_id)
     minutes = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     started_at = db.Column(db.DateTime)
-    gw_address = db.Column(db.Unicode(15))
+    gw_address = db.Column(db.String(15))
     gw_port = db.Column(db.Integer)
 
     gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('vouchers', lazy='dynamic'))
 
-    mac = db.Column(db.Unicode(20))
-    ip = db.Column(db.Unicode(15))
+    mac = db.Column(db.String(20))
+    ip = db.Column(db.String(15))
     url = db.Column(db.Unicode(255))
     email = db.Column(db.Unicode(255))
-    token = db.Column(db.Unicode(255))
+    token = db.Column(db.String(255))
     incoming = db.Column(db.BigInteger, default=0)
     outgoing = db.Column(db.BigInteger, default=0)
 
@@ -123,16 +126,19 @@ class Auth(db.Model):
     __tablename__ = 'auths'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_agent = db.Column(db.Unicode(255))
-    stage = db.Column(db.Unicode)
-    ip = db.Column(db.Unicode(20))
-    mac = db.Column(db.Unicode(20))
-    token = db.Column(db.Unicode)
+    user_agent = db.Column(db.String(255))
+    stage = db.Column(db.String)
+    ip = db.Column(db.String(20))
+    mac = db.Column(db.String(20))
+    token = db.Column(db.String)
     incoming = db.Column(db.BigInteger)
     outgoing = db.Column(db.BigInteger)
 
     gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('auths', lazy='dynamic'))
+
+    voucher_id = db.Column(db.String, db.ForeignKey('vouchers.id'), nullable=False)
+    voucher = db.relationship(Voucher, backref=backref('auths', lazy='dynamic'))
 
     status = db.Column(db.Integer)
     messages = db.Column(db.Text)
@@ -155,9 +161,9 @@ class Auth(db.Model):
 
         if voucher.ip is None:
             voucher.ip = flask.request.args.get('ip')
-            db.session.commmit()
+            db.session.commit()
 
-        if self.stage == STAGE_LOGIN:
+        if self.stage == constants.STAGE_LOGIN:
             if voucher.started_at is None:
                 if voucher.created_at + datetime.timedelta(minutes=app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow():
                     db.session.delete(voucher)
@@ -210,7 +216,7 @@ class Ping(db.Model):
     __tablename__ = 'pings'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_agent = db.Column(db.Unicode(255))
+    user_agent = db.Column(db.String(255))
 
     gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('pings', lazy='dynamic'))
