@@ -1,7 +1,10 @@
+import flask
+
 from app.models import Network, User, Gateway, Voucher
+from app.services import logos
 from flask.ext.login import current_user
 from flask.ext.potion import fields, signals
-from flask.ext.potion.routes import Relation, Route
+from flask.ext.potion.routes import Relation, Route, ItemRoute
 from flask.ext.potion.contrib.principals import PrincipalResource, PrincipalManager
 from flask.ext.security import current_user
 
@@ -76,6 +79,14 @@ class GatewayResource(PrincipalResource):
         id = fields.String(min_length=3, max_length=20)
         network = fields.ToOne('networks')
         title = fields.String(min_length=3)
+
+    @ItemRoute.POST
+    def logo(self, gateway):
+        if 'file' in flask.request.files:
+            filename = logos.save(flask.request.files['file'])
+            self.manager.update(gateway, {
+                'logo': filename
+            })
 
 class NetworkResource(PrincipalResource):
     gateways = Relation('gateways')

@@ -2,6 +2,7 @@ serve:
 	python app.py
 
 install:
+	pip install -r requirements.txt
 	npm install
 	npm prune
 	bower install

@@ -2,11 +2,12 @@ import flask
 
 from app.models import User, Role
 from app.resources import GatewayResource, NetworkResource, UserResource, VoucherResource
-from app.services import menu, db, manager, api, security, principals
+from app.services import menu, db, manager, api, security, principals, logos
 from flask.ext.login import current_user
 from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
 from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed
 from flask.ext.security import SQLAlchemyUserDatastore
+from flask.ext.uploads import configure_uploads
 
 app = flask.Flask(__name__)
 app.config.from_object('config')
@@ -23,6 +24,8 @@ with app.app_context():
     api.add_resource(VoucherResource)
     api.add_resource(GatewayResource)
     api.add_resource(NetworkResource)
+
+    configure_uploads(app, logos)
 
 manager.app = app
 api.init_app(app)

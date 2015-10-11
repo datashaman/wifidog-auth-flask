@@ -88,6 +88,8 @@ class Gateway(db.Model):
     url_home = db.Column(db.Unicode)
     url_facebook = db.Column(db.Unicode)
 
+    logo = db.Column(db.String)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
 class Voucher(db.Model):

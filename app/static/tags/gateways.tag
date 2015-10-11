@@ -8,10 +8,11 @@
                     <li class="pure-menu-item { 'pure-menu-selected': parent.modal.active == 'basics' }"><a href="#" onclick={ parent.showTab('basics') } class="pure-menu-link">Basics</a></li>
                     <li class="pure-menu-item { 'pure-menu-selected': parent.modal.active == 'contact' }"><a href="#" onclick={ parent.showTab('contact') } class="pure-menu-link">Contact</a></li>
                     <li class="pure-menu-item { 'pure-menu-selected': parent.modal.active == 'social' }"><a href="#" onclick={ parent.showTab('social') } class="pure-menu-link">Social</a></li>
+                    <li class="pure-menu-item { 'pure-menu-selected': parent.modal.active == 'logo' }"><a href="#" onclick={ parent.showTab('logo') } class="pure-menu-link">Logo</a></li>
                 </ul>
             </div>
 
-            <div if={ parent.modal.active == 'basics' } id="basics" class="tab-content">
+            <div if={ parent.modal.active == 'basics' } id="tab-basics" class="tab-content">
                 <div class="pure-g">
                     <div class="pure-u-1" if={ parent.isSuperAdmin() }>
                         <label for="id">Network</label>
@@ -41,7 +42,7 @@
                 </div>
             </div>
 
-            <div if={ parent.modal.active == 'contact' } id="contact" class="tab-content">
+            <div if={ parent.modal.active == 'contact' } id="tab-contact" class="tab-content">
                 <div class="pure-g">
                     <div class="pure-u-1">
                         <label for="contact_email">Email</label>
@@ -57,7 +58,7 @@
                 </div>
             </div>
 
-            <div if={ parent.modal.active == 'social' } id="social" class="tab-content">
+            <div if={ parent.modal.active == 'social' } id="tab-social" class="tab-content">
                 <div class="pure-g">
                     <div class="pure-u-1">
                         <label for="url_home">Home Page</label>
@@ -69,6 +70,16 @@
                         <label for="url_home">Facebook Page</label>
                         <input type="text" id="url_facebook" name="url_facebook" class="pure-u-1" value={ parent.gateway.url_facebook } />
                         <div if={ parent.errors.url_facebook } class="state state-invalid">{ parent.errors.url_facebook }</div>
+                    </div>
+                </div>
+            </div>
+
+            <div if={ parent.modal.active == 'logo' } id="tab-logo" class="tab-content">
+                <div class="pure-g">
+                    <div class="pure-u-1">
+                        <label for="url_home">File Upload</label>
+                        <input type="file" id="logo" name="logo" class="pure-u-1" />
+                        <div if={ parent.errors.logo } class="state state-invalid">{ parent.errors.logo }</div>
                     </div>
                 </div>
             </div>
@@ -162,7 +173,6 @@
         response.errors.forEach(function(error) {
             self.errors[error.path[0]] = error.message;
         });
-        console.log(self.errors);
         self.update();
     });
 
@@ -210,6 +220,7 @@
 
         if (modal.original_id.value) {
             RiotControl.trigger('gateway.save', modal.original_id.value, data);
+            RiotControl.trigger('gateway.upload', modal.original_id.value, modal.logo.files[0]);
         } else {
             RiotControl.trigger('gateways.create', data);
         }

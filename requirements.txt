@@ -9,5 +9,6 @@ Flask-Bcrypt
 git+file:///home/marlinf/Projects/flask-restless@master#egg=Flask-Restless
 Flask-Script
 Flask-Security
+Flask-Uploads
 marshmallow
 uwsgi
