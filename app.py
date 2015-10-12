@@ -1,6 +1,6 @@
 from app import create_app
 
-[ application, datastore ] = create_app()
+app = create_app()
 
 if __name__ == '__main__':
-    application.run(debug=True, host=application.config['HOST'], port=int(application.config['PORT']))
+    app.run(debug=True, host=app.config['HOST'], port=int(app.config['PORT']))

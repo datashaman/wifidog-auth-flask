@@ -1,13 +1,13 @@
 import flask
 
-from app.models import User, Role, db
+from app.models import User, Role, db, users
 from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource
 from flask.ext.login import current_user, LoginManager
 from flask.ext.misaka import Misaka
 from flask.ext.uploads import configure_uploads
 from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
 from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed, Principal
-from flask.ext.security import SQLAlchemyUserDatastore, Security
+from flask.ext.security import Security
 from flask.ext.uploads import UploadSet, IMAGES
 
 
@@ -19,8 +19,13 @@ def create_app():
     api.init_app(app)
 
     markdown = Misaka()
+
     security = Security()
+    security.init_app(app, users)
+
     principals = Principal()
+    principals.init_app(app)
+
     logos = UploadSet('logos', IMAGES)
 
     markdown.init_app(app)
@@ -29,11 +34,6 @@ def create_app():
         db.create_all()
 
     configure_uploads(app, logos)
-
-    principals.init_app(app)
-
-    datastore = SQLAlchemyUserDatastore(db, User, Role)
-    security.init_app(app, datastore)
 
     from app.views import menu, bp
 
@@ -54,5 +54,5 @@ def create_app():
             return Identity(current_user.id)
         return AnonymousIdentity()
 
-    return [ app, datastore ]
+    return app
 

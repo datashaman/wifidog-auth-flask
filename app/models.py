@@ -9,7 +9,7 @@ import flask
 from app.services import db, api, principals
 from flask import current_app
 from flask.ext.potion import fields
-from flask.ext.security import UserMixin, RoleMixin, current_user
+from flask.ext.security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore, Security
 from flask.ext.sqlalchemy import SQLAlchemy
 from random import choice
 from sqlalchemy.orm import backref
@@ -65,6 +65,8 @@ class User(db.Model, UserMixin):
 
     def to_dict(self):
         return { c.name: getattr(self, c.name) for c in self.__table__.columns }
+
+users = SQLAlchemyUserDatastore(db, User, Role)
 
 class Network(db.Model):
     __tablename__ = 'networks'

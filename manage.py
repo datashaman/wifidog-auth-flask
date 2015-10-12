@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from app import create_app
-from app.models import Role, Network, Gateway, db
+from app.models import Role, Network, Gateway, db, users
 from flask.ext.script import Manager
 from flask.ext.script import prompt, prompt_pass
 from sqlalchemy import text
@@ -14,7 +14,7 @@ ROLES = {
     u'gateway-admin': u'Gateway Admin'
 }
 
-[ app, datastore ] = create_app()
+app = create_app()
 manager = Manager(app)
 
 @manager.command
@@ -75,7 +75,7 @@ def create_user(email, password, role=None, network=None, gateway=None):
             print 'Gateway is required for a gateway admin'
             return
 
-    user = datastore.create_user(email=email, password=password)
+    user = users.create_user(email=email, password=password)
 
     user.network_id = network
     user.gateway_id = gateway
