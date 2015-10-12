@@ -104,7 +104,9 @@
     calculateEndAt(row) {
         if (row.started_at) {
             var dt = new Date(row.started_at.$date);
-            return new Date(dt.getTime() + row.minutes * 60000);
+            return {
+		$date: new Date(dt.getTime() + row.minutes * 60000)
+	    };
         }
     }
 

@@ -1,9 +1,11 @@
 # encoding: utf-8
 
+from app import app
 from app import datastore
 from app.models import Role, Network, Gateway
 from app.services import db, manager
 from flask.ext.script import prompt, prompt_pass
+from sqlalchemy import text
 
 
 ROLES = {
