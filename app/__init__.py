@@ -1,54 +1,58 @@
 import flask
 
-app = flask.Flask(__name__)
-app.config.from_object('config')
-
-from app.models import User, Role
-from app.resources import GatewayResource, NetworkResource, UserResource, VoucherResource
-from app.services import menu, db, manager, api, security, principals, logos, markdown
-from flask.ext.login import current_user
-from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
-from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed
-from flask.ext.security import SQLAlchemyUserDatastore
+from app.models import User, Role, db
+from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource
+from flask.ext.login import current_user, LoginManager
+from flask.ext.misaka import Misaka
 from flask.ext.uploads import configure_uploads
+from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
+from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed, Principal
+from flask.ext.security import SQLAlchemyUserDatastore, Security
+from flask.ext.uploads import UploadSet, IMAGES
 
-import views
 
-menu.init_app(app)
-db.init_app(app)
-markdown.init_app(app)
+def create_app():
+    app = flask.Flask(__name__)
+    app.config.from_object('config')
 
-with app.app_context():
-    db.create_all()
+    db.init_app(app)
+    api.init_app(app)
 
-    api.add_resource(UserResource)
-    api.add_resource(VoucherResource)
-    api.add_resource(GatewayResource)
-    api.add_resource(NetworkResource)
+    markdown = Misaka()
+    security = Security()
+    principals = Principal()
+    logos = UploadSet('logos', IMAGES)
+
+    markdown.init_app(app)
+
+    with app.app_context():
+        db.create_all()
 
     configure_uploads(app, logos)
 
-manager.app = app
-api.init_app(app)
-principals.init_app(app)
+    principals.init_app(app)
 
-datastore = SQLAlchemyUserDatastore(db, User, Role)
-security.init_app(app, datastore)
+    datastore = SQLAlchemyUserDatastore(db, User, Role)
+    security.init_app(app, datastore)
 
-@identity_loaded.connect_via(app)
-def on_identity_loaded(sender, identity):
-    if not isinstance(identity, AnonymousIdentity):
-        identity.provides.add(UserNeed(identity.id))
+    from app.views import menu, bp
 
-        for role in current_user.roles:
-            identity.provides.add(RoleNeed(role.name))
+    menu.init_app(app)
+    app.register_blueprint(bp)
 
-@principals.identity_loader
-def read_identity_from_flask_login():
-    if current_user.is_authenticated():
-        return Identity(current_user.id)
-    return AnonymousIdentity()
+    @identity_loaded.connect_via(app)
+    def on_identity_loaded(sender, identity):
+        if not isinstance(identity, AnonymousIdentity):
+            identity.provides.add(UserNeed(identity.id))
 
-@app.route('/')
-def home():
-    return flask.redirect(flask.url_for('security.login'))
+            for role in current_user.roles:
+                identity.provides.add(RoleNeed(role.name))
+
+    @principals.identity_loader
+    def read_identity_from_flask_login():
+        if current_user.is_authenticated():
+            return Identity(current_user.id)
+        return AnonymousIdentity()
+
+    return [ app, datastore ]
+

@@ -1,22 +1,25 @@
 import flask
 import json
 
-from app import app
 from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm
 from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token
 from app.services import db
 from app.utils import is_logged_in, has_role, has_a_role
-from flask.ext.menu import register_menu
+from flask import Blueprint
+from flask.ext.menu import register_menu, Menu
 from flask.ext.security import login_required, roles_required, roles_accepted, current_user
 
-@app.route('/networks')
+menu = Menu()
+bp = Blueprint('app', __name__)
+
+@bp.route('/networks')
 @login_required
 @roles_required('super-admin')
-@register_menu(app, '.networks', 'Networks', visible_when=has_role('super-admin'), order=10)
+@register_menu(bp, '.networks', 'Networks', visible_when=has_role('super-admin'), order=10)
 def networks_index():
     return flask.render_template('networks/index.html')
 
-@app.route('/networks/new', methods=[ 'GET', 'POST' ])
+@bp.route('/networks/new', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_required('super-admin')
 def networks_new():
@@ -30,11 +33,11 @@ def networks_new():
 
         flask.flash('Network created')
 
-        return flask.redirect(flask.url_for('.index'))
+        return flask.redirect(flask.url_for('.networks_index'))
 
     return flask.render_template('networks/edit.html', form=form, network=network)
 
-@app.route('/networks/<network_id>', methods=[ 'GET', 'POST' ])
+@bp.route('/networks/<network_id>', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_required('super-admin')
 def networks_edit(network_id):
@@ -48,35 +51,35 @@ def networks_edit(network_id):
 
         flask.flash('Network updated')
 
-        return flask.redirect(flask.url_for('.index'))
+        return flask.redirect(flask.url_for('.networks_index'))
 
     return flask.render_template('networks/edit.html', form=form, network=network)
 
-@app.route('/gateways')
+@bp.route('/gateways')
 @login_required
 @roles_accepted('super-admin', 'network-admin')
-@register_menu(app, '.gateways', 'Gateways', visible_when=has_a_role('super-admin', 'network-admin'), order=20)
+@register_menu(bp, '.gateways', 'Gateways', visible_when=has_a_role('super-admin', 'network-admin'), order=20)
 def gateways_index():
     return flask.render_template('gateways/index.html')
 
-@app.route('/users')
+@bp.route('/users')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(app, '.users', 'Users', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=40)
+@register_menu(bp, '.users', 'Users', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=40)
 def users_index():
     return flask.render_template('users/index.html')
 
-@app.route('/vouchers')
+@bp.route('/vouchers')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(app, '.vouchers', 'Vouchers', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=30)
+@register_menu(bp, '.vouchers', 'Vouchers', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=30)
 def vouchers_index():
     return flask.render_template('vouchers/index.html')
 
-@app.route('/voucher', methods=[ 'GET', 'POST' ])
+@bp.route('/voucher', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(app, '.voucher', 'Generate Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=25)
+@register_menu(bp, '.voucher', 'Generate Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=25)
 def vouchers_new():
     form = NewVoucherForm(flask.request.form)
 
@@ -108,11 +111,11 @@ def vouchers_new():
 
         flask.flash(voucher.id, 'success')
 
-        return flask.redirect(flask.url_for('vouchers_new'))
+        return flask.redirect(flask.url_for('.vouchers_new'))
 
     return flask.render_template('vouchers/new.html', form=form)
 
-@app.route('/wifidog/login/', methods=[ 'GET', 'POST' ])
+@bp.route('/wifidog/login/', methods=[ 'GET', 'POST' ])
 def wifidog_login():
     form = LoginVoucherForm(flask.request.form)
 
@@ -140,7 +143,7 @@ def wifidog_login():
     gateway = Gateway.query.filter_by(id=gateway_id).first_or_404()
     return flask.render_template('wifidog/login.html', form=form, gateway=gateway)
 
-@app.route('/wifidog/ping/')
+@bp.route('/wifidog/ping/')
 def wifidog_ping():
     ping = Ping(
         user_agent=flask.request.user_agent.string,
@@ -154,7 +157,7 @@ def wifidog_ping():
     db.session.commit()
     return ('Pong', 200)
 
-@app.route('/wifidog/auth/')
+@bp.route('/wifidog/auth/')
 def wifidog_auth():
     auth = Auth(
         user_agent=flask.request.user_agent.string,
@@ -174,7 +177,11 @@ def wifidog_auth():
 
     return ("Auth: %s\nMessages: %s\n" % (auth.status, auth.messages), 200)
 
-@app.route('/wifidog/portal/')
+@bp.route('/wifidog/portal/')
 def wifidog_portal():
     gateway = Gateway.query.filter_by(id=flask.request.args.get('gw_id')).first_or_404()
     return flask.render_template('wifidog/portal.html', gateway=gateway)
+
+@bp.route('/')
+def home():
+    return flask.redirect(flask.url_for('security.login'))

@@ -6,15 +6,17 @@ import uuid
 
 import flask
 
-from app import app
 from app.services import db, api, principals
+from flask import current_app
 from flask.ext.potion import fields
 from flask.ext.security import UserMixin, RoleMixin, current_user
+from flask.ext.sqlalchemy import SQLAlchemy
 from random import choice
 from sqlalchemy.orm import backref
 
 import constants
 
+db = SQLAlchemy()
 
 chars = string.letters + string.digits
 
@@ -168,7 +170,7 @@ class Auth(db.Model):
 
         if self.stage == constants.STAGE_LOGIN:
             if voucher.started_at is None:
-                if voucher.created_at + datetime.timedelta(minutes=app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow():
+                if voucher.created_at + datetime.timedelta(minutes=current_app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow():
                     db.session.delete(voucher)
                     return (constants.AUTH_DENIED, 'Token is unused but too old: %s' % self.token)
 

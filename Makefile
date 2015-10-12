@@ -1,6 +1,10 @@
 serve:
 	python app.py
 
+setup:
+	sudo apt-get install nodejs npm python-pip
+	sudo npm install -g bower gulp
+
 install:
 	pip install -r requirements.txt
 	npm install
@@ -12,7 +16,7 @@ install:
 	gulp
 
 bootstrap:
-	bash bootstrap.sh
+	python bootstrap.py
 
 remove-db:
 	rm -f data/local.db

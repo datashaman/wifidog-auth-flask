@@ -2,3 +2,47 @@ Wifidog Auth Flask
 ==================
 
 A time-based voucher authentication server for Wifidog Captive Portal written in Python Flask. WIP.
+
+Requirements:
+
+* nodejs and npm
+* globally-installed bower and gulp
+
+Setup required (for Ubuntu or Debian):
+
+    sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev
+    sudo npm install -g bower gulp
+
+Logout and login to activate virtualenvwrapper then:
+
+    mkvirtualenv auth
+
+Make sure you're in your projects folder and clone the repository:
+
+    git clone https://github.com/datashaman/wifidog-auth-flask.git auth
+
+Go into the folder and install the dependencies (you should be in your virtualenv at this point):
+
+    cd auth
+    pip install -r requirements.txt
+    npm install
+    bower install
+	cd bower_components/purecss && npm install && node_modules/.bin/grunt
+	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
+
+Build the static files (see gulpfile.js for details):
+
+	gulp
+
+Bootstrap the database (stored at data/local.db):
+
+    python manage.py create_roles
+
+    python manage.py create_network example-network "Example Network"
+    python manage.py create_gateway example-gateway "Example Gateway"
+
+    python manage.py create_user -e super@example.com -p password -r super-admin
+    python manage.py create_user -e network@example.com -p password -r network-admin -n example-network
+    python manage.py create_user -e gateway@example.com -p password -r gateway-admin -n example-network -g example-gateway
+
+Read the help for each command for more options.

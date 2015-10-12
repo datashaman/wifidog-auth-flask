@@ -19,7 +19,7 @@
     <div class="container">
         {% block menu %}
         <div class="pure-menu pure-menu-horizontal">
-            <a href="{{ url_for('home') }}" class="pure-menu-heading pure-menu-link">BRAND</a>
+            <a href="{{ url_for('.home') }}" class="pure-menu-heading pure-menu-link">BRAND</a>
 
             <ul class="pure-menu-list">
                 {%- for item in current_menu.children recursive -%}
