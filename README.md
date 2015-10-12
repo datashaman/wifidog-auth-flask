@@ -1,7 +1,9 @@
 Wifidog Auth Flask
 ==================
 
-A time-based voucher authentication server for Wifidog Captive Portal written in Python Flask. WIP.
+Time-based voucher authentication server for Wifidog Captive Portal written in Python Flask. WIP.
+
+Bandwidth-based vouchering coming soon.
 
 Setup required (for Ubuntu or Debian):
 
