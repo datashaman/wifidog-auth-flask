@@ -4,7 +4,7 @@
 {% block content %}
 <div class="panel panel-voucher">
     <h1 class="panel-title">
-        {% include 'layouts/flashes.html' %}
+        {{ request.args.get('id') }}
     </h1>
 
     <div class="panel-body">

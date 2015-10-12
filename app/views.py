@@ -109,9 +109,7 @@ def vouchers_new():
         db.session.add(voucher)
         db.session.commit()
 
-        flask.flash(voucher.id, 'success')
-
-        return flask.redirect(flask.url_for('.vouchers_new'))
+        return flask.redirect(flask.url_for('.vouchers_new', id=voucher.id))
 
     return flask.render_template('vouchers/new.html', form=form)
 

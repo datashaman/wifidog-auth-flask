@@ -54,7 +54,7 @@ h1 {
 }
 
 .panel-portal {
-    .panel-heading {
+    .panel-title {
         text-align: center;
     }
     .fb-like {
@@ -107,12 +107,11 @@ th, td {
     }
 }
 
-.panel-voucher .flashes {
-    .success {
-        font-size: 150%;
-        font-family: Georgia, Times, "Times New Roman", serif;
-        font-weight: normal;
-    }
+.panel-voucher .panel-title {
+    font-size: 200%;
+    font-family: Georgia, Times, "Times New Roman", serif;
+    font-weight: normal;
+    text-align: justify;
 }
 
 .state {
