@@ -35,7 +35,7 @@ Bootstrap the database (stored at data/local.db):
     python manage.py create_roles
 
     python manage.py create_network example-network "Example Network"
-    python manage.py create_gateway example-gateway "Example Gateway"
+    python manage.py create_gateway example-network example-gateway "Example Gateway"
 
     python manage.py create_user -e super@example.com -p password -r super-admin
     python manage.py create_user -e network@example.com -p password -r network-admin -n example-network
