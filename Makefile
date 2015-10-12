@@ -1,5 +1,5 @@
 serve:
-	python app.py
+	python serve.py
 
 setup:
 	sudo apt-get install nodejs npm python-pip
