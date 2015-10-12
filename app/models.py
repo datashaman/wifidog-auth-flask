@@ -225,7 +225,7 @@ class Ping(db.Model):
 
     sys_uptime = db.Column(db.BigInteger)
     sys_memfree = db.Column(db.BigInteger)
-    sys_load = db.Column(db.Numeric(5, 2))
+    sys_load = db.Column(db.String)
     wifidog_uptime = db.Column(db.BigInteger)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 

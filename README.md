@@ -3,11 +3,6 @@ Wifidog Auth Flask
 
 A time-based voucher authentication server for Wifidog Captive Portal written in Python Flask. WIP.
 
-Requirements:
-
-* nodejs and npm
-* globally-installed bower and gulp
-
 Setup required (for Ubuntu or Debian):
 
     sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev
@@ -24,6 +19,7 @@ Make sure you're in your projects folder and clone the repository:
 Go into the folder and install the dependencies (you should be in your virtualenv at this point):
 
     cd auth
+    setvirtualenvproject
     pip install -r requirements.txt
     npm install
     bower install

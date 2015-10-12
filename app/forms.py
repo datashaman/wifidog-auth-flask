@@ -8,9 +8,12 @@ from app.models import Network, Voucher
 
 import constants
 
+def default_minutes():
+    return current_app.config.get('VOUCHER_DEFAULT_MINUTES')
+
 class NewVoucherForm(Form):
     gateway_id = SelectField('Gateway')
-    minutes = IntegerField('Minutes', [ validators.InputRequired(), validators.NumberRange(min=0) ])
+    minutes = IntegerField('Minutes', [ validators.InputRequired(), validators.NumberRange(min=0) ], default=default_minutes)
 
 class LoginVoucherForm(Form):
     voucher = TextField('Voucher', [ validators.InputRequired() ], default=args_get('voucher'))
