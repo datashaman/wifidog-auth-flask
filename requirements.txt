@@ -11,4 +11,5 @@ Flask-Script
 Flask-Security
 Flask-Uploads
 marshmallow
+pillow
 uwsgi

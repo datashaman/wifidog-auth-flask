@@ -15,7 +15,7 @@ bootstrap:
 	bash bootstrap.sh
 
 remove-db:
-	rm data/local.db
+	rm -f data/local.db
 
 reboot: remove-db bootstrap
 

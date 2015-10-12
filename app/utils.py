@@ -1,6 +1,5 @@
 import flask
 
-from flask.ext.restless import ProcessingException
 from flask.ext.security import current_user
 
 def is_logged_out():
