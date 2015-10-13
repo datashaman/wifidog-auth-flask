@@ -28,7 +28,19 @@
     &copy; datashaman
     </footer>
 
+    <script src="{{ url_for('static', filename='scripts/interactive.js') }}"></script>
+
     {% block scripts %}
     {% endblock %}
+
+    <script>
+    Zepto(function($) {
+        setupNotifications();
+        var eventSource = new EventSource('{{ url_for('app.push') }}');
+        eventSource.onmessage = function(response) {
+            new Notification(response.data);
+        };
+    });
+    </script>
 </body>
 </html>
