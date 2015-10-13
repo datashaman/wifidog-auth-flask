@@ -14,7 +14,7 @@
 
             <div if={ parent.modal.active == 'basics' } id="tab-basics" class="tab-content">
                 <div class="pure-g">
-                    <div class="pure-u-1" if={ parent.isSuperAdmin() }>
+                    <div class="pure-u-1" if={ parent.hasRole('super-admin') }>
                         <label for="id">Network</label>
                         <select id="network" name="network" class="pure-input-1">
                             <option each={ parent.networks } value={ id }>{ title }</option>
@@ -106,10 +106,10 @@
         </form>
     </div>
 
-    <table if={ gateways.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+    <table if={ rows.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
         <thead>
             <tr>
-                <th if={ isSuperAdmin() }>Network</th>
+                <th if={ hasRole('super-admin') }>Network</th>
                 <th>ID</th>
                 <th>Title</th>
                 <th>Created At</th>
@@ -119,8 +119,8 @@
         </thead>
 
         <tbody>
-            <tr each={ row, i in gateways } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
-                <td if={ isSuperAdmin() }>{ render(row.network) }</td>
+            <tr each={ row, i in rows } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
+                <td if={ hasRole('super-admin') }>{ render(row.network) }</td>
                 <td><a href="#" onclick={ showEditForm }>{ row['$id'] }</a></td>
                 <td>{ render(row.title) }</td>
                 <td>{ render(row.created_at) }</td>
@@ -139,12 +139,17 @@
     .tab-content { min-height: 250px; }
     </style>
 
+    this.mixin('render');
+    this.mixin('currentuser');
+
     var self = this,
         defaultGateway = {
             id: '',
             title: '',
             description: ''
         };
+
+    self.rows = [];
 
     self.modal = {
         active: 'basics',
@@ -153,11 +158,13 @@
     };
 
     RiotControl.on('networks.loaded', function (networks) {
-        self.update({ networks });
+        self.networks = networks;
+        self.update();
     });
 
     RiotControl.on('gateways.loaded', function (gateways) {
-        self.update({ gateways });
+        self.rows = gateways;
+        self.update();
     });
 
     RiotControl.on('gateway.loaded', function (gateway) {
@@ -181,10 +188,6 @@
         self.update();
     });
 
-    RiotControl.on('currentuser.loaded', function (currentuser) {
-        self.update({ currentuser });
-    });
-
     RiotControl.trigger('gateways.load');
     RiotControl.trigger('networks.load');
 
@@ -194,10 +197,6 @@
             self.update();
             return false;
         }
-    }
-
-    isSuperAdmin() {
-        return self.currentuser.roles.indexOf('super-admin') > -1;
     }
 
     getId(e) {
@@ -212,7 +211,7 @@
     save(e) {
         var modal = self.tags.modal,
             data = {
-                network: self.isSuperAdmin() ? modal.network.value : self.currentuser.network,
+                network: self.hasRole('super-admin') ? modal.network.value : self.currentuser.network,
                 id: modal.id.value,
                 title: modal.title.value,
                 description: modal.description.value,

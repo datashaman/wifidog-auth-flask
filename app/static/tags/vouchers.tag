@@ -4,8 +4,8 @@
     <div class="actions-collection">
         <form class="pure-form" onsubmit={ create }>
             <fieldset>
-                <input if={ isSuperAdmin() } name="network" type="text" placeholder="NetworkID" required />
-                <input if={ isSuperAdmin() || isNetworkAdmin() } name="gateway" type="text" placeholder="GatewayID" required />
+                <input if={ hasRole('super-admin') } name="network" type="text" placeholder="NetworkID" required />
+                <input if={ hasRole('super-admin') || hasRole('network-admin') } name="gateway" type="text" placeholder="GatewayID" required />
                 <input name="minutes" type="number" min="0" step="30" value="60" required />
                 <button type="submit" class="pure-button pure-button-primary">
                     <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
@@ -62,6 +62,10 @@
 
     <script>
     var self = this;
+
+    self.mixin('render');
+    self.mixin('currentuser');
+
     self.vouchers = opts.vouchers;
 
     RiotControl.on('vouchers.loaded', function (vouchers) {
@@ -69,20 +73,7 @@
         self.update();
     });
 
-    RiotControl.on('currentuser.loaded', function (currentuser) {
-        self.currentuser = currentuser;
-        self.update();
-    });
-
     RiotControl.trigger('vouchers.load');
-
-    isSuperAdmin() {
-        return self.currentuser.roles.indexOf('super-admin') > -1;
-    }
-
-    isNetworkAdmin() {
-        return self.currentuser.roles.indexOf('network-admin') > -1;
-    }
 
     pad(number, length) {
         var str = '' + number;
@@ -105,8 +96,8 @@
         if (row.started_at) {
             var dt = new Date(row.started_at.$date);
             return {
-		$date: new Date(dt.getTime() + row.minutes * 60000)
-	    };
+                $date: new Date(dt.getTime() + row.minutes * 60000)
+            };
         }
     }
 
@@ -116,8 +107,8 @@
 
     create(e) {
         RiotControl.trigger('vouchers.create', {
-            network: self.isSuperAdmin() ? self.network.value : self.currentuser.network,
-            gateway: self.isSuperAdmin() || self.isNetworkAdmin() ? self.gateway.value : self.currentuser.gateway,
+            network: self.hasRole('super-admin') ? self.network.value : self.currentuser.network,
+            gateway: self.hasRole('super-admin') || self.hasRole('network-admin') ? self.gateway.value : self.currentuser.gateway,
             minutes: parseInt(self.minutes.value)
         });
         return false;

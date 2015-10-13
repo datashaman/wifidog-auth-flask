@@ -15,14 +15,27 @@
     "url": "https://github.com/datashaman/wifidog-auth-flask/issues"
   },
   "devDependencies": {
-    "gulp-load-plugins": "~1.0.0-rc.1",
+    "babel": "^5.8.23",
+    "browser-sync": "~2.9.11",
+    "event-stream": "~3.3.1",
     "gulp": "~3.9.0",
+    "gulp-autoprefixer": "~3.0.2",
+    "gulp-combine-media-queries": "~0.2.0",
     "gulp-concat": "~2.6.0",
-    "gulp-rename": "~1.2.2",
-    "gulp-uglify": "~1.4.1",
-    "gulp-minify": "0.0.5",
-    "gulp-uglifycss": "~1.0.4",
+    "gulp-cssmin": "^0.1.7",
+    "gulp-load-plugins": "~1.0.0-rc.1",
     "gulp-merge": "~0.1.1",
-    "gulp-sass": "~2.0.4"
+    "gulp-minify": "0.0.5",
+    "gulp-rename": "~1.2.2",
+    "gulp-riot": "^0.3.1",
+    "gulp-ruby-sass": "~2.0.4",
+    "gulp-uglify": "~1.4.1",
+    "gulp-util": "~3.0.6",
+    "promise": "~7.0.4",
+    "riot": "^2.2.4"
+  },
+  "dependencies": {
+    "cssmin": "^0.4.3",
+    "gulp-size": "~2.0.0"
   }
 }

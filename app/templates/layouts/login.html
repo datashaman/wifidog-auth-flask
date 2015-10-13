@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/screen.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/screen.min.css') }}" />
 
     {% block styles %}
     {% endblock %}
@@ -28,7 +28,7 @@
     &copy; datashaman
     </footer>
 
-    <script src="{{ url_for('static', filename='scripts/interactive.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/site.min.js') }}"></script>
 
     {% block scripts %}
     {% endblock %}

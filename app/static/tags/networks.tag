@@ -35,7 +35,7 @@
         </form>
     </div>
 
-    <table if={ networks.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+    <table if={ rows.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
         <thead>
             <tr>
                 <th>ID</th>
@@ -48,7 +48,7 @@
         </thead>
 
         <tbody>
-            <tr each={ row, i in networks } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
+            <tr each={ row, i in rows } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
                 <td><a href="#" onclick={ showEditForm }>{ row['$id'] }</a></td>
                 <td>{ render(row.title) }</td>
                 <td>{ render(row.description) }</td>
@@ -71,13 +71,18 @@
             description: ''
         };
 
+    self.mixin('render');
+
+    self.rows = [];
+
     self.modal = {
         heading: '',
         hidden: true
     };
 
     RiotControl.on('networks.loaded', function (networks) {
-        self.update({ networks });
+        self.rows = networks;
+        self.update();
     });
 
     RiotControl.on('network.loaded', function (network) {
@@ -92,7 +97,6 @@
         response.errors.forEach(function(error) {
             self.errors[error.path[0]] = error.message;
         });
-        console.log(self.errors);
         self.update();
     });
 

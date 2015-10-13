@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/screen.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/screen.min.css') }}" />
 
     <!--[if lt IE 9]>
-    <script src="{{ url_for('static', filename='scripts/ie.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/ie.min.js') }}"></script>
     <![endif]-->
 
     {% block head %}
@@ -51,9 +51,7 @@
         </div>
     </footer>
 
-    <script src="{{ url_for('static', filename='scripts/interactive.js') }}"></script>
-    <script src="{{ url_for('static', filename='stores/currentuser.js') }}"></script>
-    <script src="{{ url_for('static', filename='tags/raw.tag') }}" type="riot/tag"></script>
+    <script src="{{ url_for('static', filename='scripts/admin.min.js') }}"></script>
     <script src="{{ url_for('static', filename='tags/modal.tag') }}" type="riot/tag"></script>
 
     {% block scripts %}
@@ -62,12 +60,16 @@
     <script>
     Zepto(function($) {
         riot.mount('*');
-        RiotControl.trigger('currentuser.load');
+
         setupNotifications();
+
         var eventSource = new EventSource('{{ url_for('app.push') }}');
+
         eventSource.onmessage = function(response) {
             new Notification(response.data);
         };
+
+        RiotControl.trigger('currentuser.load');
     });
     </script>
 </body>

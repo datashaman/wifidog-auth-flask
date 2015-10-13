@@ -4,8 +4,8 @@
     <div class="actions-collection">
         <form class="pure-form" onsubmit={ create }>
             <fieldset>
-                <input if={ isSuperAdmin() } name="network" type="text" placeholder="NetworkID" required />
-                <input if={ isSuperAdmin() || isNetworkAdmin() } name="gateway" type="text" placeholder="GatewayID" required />
+                <input if={ hasRole('super-admin') } name="network" type="text" placeholder="NetworkID" required />
+                <input if={ hasRole('super-admin') || hasRole('network-admin') } name="gateway" type="text" placeholder="GatewayID" required />
                 <input name="email" type="text" placeholder="Email" required />
                 <input name="password" type="text" placeholder="Password" required />
                 <button type="submit" class="pure-button pure-button-primary">
@@ -16,11 +16,11 @@
         </form>
     </div>
 
-    <table if={ users.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+    <table if={ rows.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
         <thead>
             <tr>
-                <th if={ isSuperAdmin() }>Network</th>
-                <th if={ isSuperAdmin() || isNetworkAdmin() }>Gateway</th>
+                <th if={ hasRole('super-admin') }>Network</th>
+                <th if={ hasRole('super-admin') || hasRole('network-admin') }>Gateway</th>
                 <th>Email</th>
                 <th>Created</th>
                 <th class="actions">Actions</th>
@@ -28,9 +28,9 @@
         </thead>
 
         <tbody>
-            <tr each={ row, i in users } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
-                <td if={ isSuperAdmin() }>{ render(row.network) }</td>
-                <td if={ isSuperAdmin() || isNetworkAdmin() }>{ render(row.gateway) }</td>
+            <tr each={ row, i in rows } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
+                <td if={ hasRole('super-admin') }>{ render(row.network) }</td>
+                <td if={ hasRole('super-admin') || hasRole('network-admin') }>{ render(row.gateway) }</td>
                 <td>{ render(row.email) }</td>
                 <td>{ render(row.created_at) }</td>
 
@@ -44,28 +44,17 @@
         </tbody>
     </table>
 
-    <script>
+    this.mixin('render');
+    this.mixin('currentuser');
+
     var self = this;
 
     RiotControl.on('users.loaded', function (users) {
-        self.users = users;
-        self.update();
-    });
-
-    RiotControl.on('currentuser.loaded', function (currentuser) {
-        self.currentuser = currentuser;
+        self.rows = users;
         self.update();
     });
 
     RiotControl.trigger('users.load');
-
-    isSuperAdmin() {
-        return self.currentuser.roles.indexOf('super-admin') > -1;
-    }
-
-    isNetworkAdmin() {
-        return self.currentuser.roles.indexOf('network-admin') > -1;
-    }
 
     getId(e) {
         return $(e.target).closest('tr[data-id]').data('id');
@@ -73,8 +62,8 @@
 
     create(e) {
         RiotControl.trigger('users.create', {
-            network: self.isSuperAdmin() ? self.network.value : self.currentuser.network,
-            gateway: self.isSuperAdmin() || self.isNetworkAdmin() ? self.gateway.value : self.currentuser.gateway,
+            network: self.hasRole('super-admin') ? self.network.value : self.currentuser.network,
+            gateway: self.hasRole('super-admin') || self.hasRole('network-admin') ? self.gateway.value : self.currentuser.gateway,
             email: self.email.value,
             password: self.password.value
         });
@@ -92,5 +81,4 @@
             RiotControl.trigger('user.remove', self.getId(e));
         }
     }
-    </script>
 </users>

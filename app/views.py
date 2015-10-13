@@ -3,44 +3,17 @@ import gevent
 import json
 import time
 
-from gevent import monkey
-monkey.patch_all()
-
-from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
-from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
-from app.utils import is_logged_in, has_role, has_a_role
 from flask import Blueprint
 from flask.ext.menu import register_menu, Menu
 from flask.ext.security import login_required, roles_required, roles_accepted, current_user
-from redis import StrictRedis, ConnectionError
 
 menu = Menu()
 bp = Blueprint('app', __name__)
-redis = StrictRedis(host='127.0.0.1', port=6379, db=13)
 
-def event_stream():
-    channels = [ 'notifications' ]
-
-    pubsub = redis.pubsub()
-    pubsub.subscribe(channels)
-
-    count = 0
-    while True:
-        try:
-            for message in pubsub.listen():
-                if message['type'] == 'message':
-                    yield 'data:%s\n\n' % message['data']
-        except ConnectionError:
-            while True:
-                print('lost connection; trying to reconnect...')
-
-                try:
-                    redis.ping()
-                except ConnectionError:
-                    time.sleep(10)
-                else:
-                    pubsub.subscribe(channels)
-                    break
+from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
+from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
+from app.push import redis, event_stream
+from app.utils import is_logged_in, has_role, has_a_role
 
 @bp.route('/broadcast', methods=[ 'GET', 'POST' ])
 @register_menu(bp, '.broadcast', 'Broadcast', visible_when=has_role('super-admin'), order=5)

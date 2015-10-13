@@ -12,12 +12,5 @@
     }
     </style>
 
-    var self = this;
-
-    RiotControl.on('currentuser.loaded', function(user) {
-        self.user = user;
-        self.update();
-    });
-
-    RiotControl.trigger('currentuser.load');
+    this.mixin('currentuser');
 </currentuser>

@@ -11,7 +11,7 @@ install:
 	npm prune
 	bower install
 	bower prune
-	cd bower_components/purecss && npm install && node_modules/.bin/grunt
+	cd bower_components/pure && npm install && node_modules/.bin/grunt
 	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
 	gulp
 

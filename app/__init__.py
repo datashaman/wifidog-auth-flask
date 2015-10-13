@@ -52,4 +52,3 @@ def create_app():
         return AnonymousIdentity()
 
     return app
-
