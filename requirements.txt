@@ -10,6 +10,10 @@ Flask-Bcrypt
 Flask-Script
 Flask-Security
 Flask-Uploads
-marshmallow
+functools32
+gunicorn
+greenlet
+gevent
+markupsafe
 pillow
-uwsgi
+redis

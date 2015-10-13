@@ -7,7 +7,7 @@ Bandwidth-based vouchering coming soon.
 
 Setup required (for Ubuntu or Debian):
 
-    sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev
+    sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev redis-server
     sudo npm install -g bower gulp
 
 Logout and login to activate virtualenvwrapper then:

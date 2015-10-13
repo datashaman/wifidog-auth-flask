@@ -1,14 +1,13 @@
 import flask
 
 from app.models import User, Role, db, users
-from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource
+from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource, logos
 from flask.ext.login import current_user, LoginManager
 from flask.ext.misaka import Misaka
 from flask.ext.uploads import configure_uploads
 from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
 from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed, Principal
 from flask.ext.security import Security
-from flask.ext.uploads import UploadSet, IMAGES
 
 
 def create_app():
@@ -25,8 +24,6 @@ def create_app():
 
     principals = Principal()
     principals.init_app(app)
-
-    logos = UploadSet('logos', IMAGES)
 
     markdown.init_app(app)
 

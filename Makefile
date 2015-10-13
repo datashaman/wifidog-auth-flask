@@ -2,7 +2,7 @@ serve:
 	python serve.py
 
 setup:
-	sudo apt-get install nodejs npm python-pip
+	sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
 	sudo npm install -g bower gulp
 
 install:

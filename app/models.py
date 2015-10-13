@@ -6,7 +6,6 @@ import uuid
 
 import flask
 
-from app.services import db, api, principals
 from flask import current_app
 from flask.ext.potion import fields
 from flask.ext.security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore, Security

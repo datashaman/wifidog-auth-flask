@@ -3,12 +3,12 @@ import flask
 import os
 
 from app.models import Network, User, Gateway, Voucher
-from app.services import logos
 from flask.ext.login import current_user, login_required
 from flask.ext.potion import Api, fields, signals
 from flask.ext.potion.routes import Relation, Route, ItemRoute
 from flask.ext.potion.contrib.principals import PrincipalResource, PrincipalManager
 from flask.ext.security import current_user
+from flask.ext.uploads import UploadSet, IMAGES
 from PIL import Image
 
 super_admin_only = 'super-admin'
@@ -16,7 +16,7 @@ network_or_above = ['super-admin', 'network-admin']
 gateway_or_above = ['super-admin', 'network-admin', 'gateway-admin']
 
 api = Api(prefix='/api', decorators=[login_required])
-
+logos = UploadSet('logos', IMAGES)
 
 def mkdir_p(path):
     try:
