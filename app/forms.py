@@ -15,6 +15,9 @@ class NewVoucherForm(Form):
     gateway_id = SelectField('Gateway')
     minutes = IntegerField('Minutes', [ validators.InputRequired(), validators.NumberRange(min=0) ], default=default_minutes)
 
+class BroadcastForm(Form):
+    message = TextField('Message', [ validators.InputRequired() ])
+
 class LoginVoucherForm(Form):
     voucher = TextField('Voucher', [ validators.InputRequired() ], default=args_get('voucher'))
     email = TextField('Email Address', [ validators.InputRequired(), validators.Email() ])

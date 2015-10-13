@@ -6,7 +6,7 @@ import time
 from gevent import monkey
 monkey.patch_all()
 
-from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm
+from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
 from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
 from app.utils import is_logged_in, has_role, has_a_role
 from flask import Blueprint
@@ -16,7 +16,7 @@ from redis import StrictRedis, ConnectionError
 
 menu = Menu()
 bp = Blueprint('app', __name__)
-redis = StrictRedis(host='localhost', port=6379, db=13)
+redis = StrictRedis(host='127.0.0.1', port=6379, db=13)
 
 def event_stream():
     channels = [ 'notifications' ]
@@ -41,6 +41,18 @@ def event_stream():
                 else:
                     pubsub.subscribe(channels)
                     break
+
+@bp.route('/broadcast', methods=[ 'GET', 'POST' ])
+@register_menu(bp, '.broadcast', 'Broadcast', visible_when=has_role('super-admin'), order=5)
+def broadcast():
+    form = BroadcastForm(flask.request.form)
+
+    if form.validate_on_submit():
+        redis.publish('notifications', form.message.data)
+        flask.flash('Message published')
+        return flask.redirect(flask.url_for('.broadcast'))
+
+    return flask.render_template('broadcast.html', form=form)
 
 @bp.route('/push')
 def push():
