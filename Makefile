@@ -1,5 +1,5 @@
 serve:
-	python serve.py
+	gunicorn -k gevent -b '127.0.0.1:8080' 'app:create_app()'
 
 setup:
 	sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
