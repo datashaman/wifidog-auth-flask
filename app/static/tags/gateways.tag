@@ -1,7 +1,7 @@
 <gateways>
     <modal heading={ modal.heading } hidden={ modal.hidden } dismissable="true" onclose={ cancel }>
         <form class="pure-form pure-form-stacked" onsubmit={ doNothing }>
-            <input type="hidden" id="original_id" class="pure-input-1" value={ parent.gateway['$id'] } />
+            <input type="hidden" id="original_id" class="pure-input-1" value={ parent.row['$id'] } />
 
             <div class="pure-menu pure-menu-horizontal">
                 <ul class="pure-menu-list">
@@ -24,19 +24,19 @@
 
                     <div class="pure-u-1-2">
                         <label for="id">ID</label>
-                        <input type="text" id="id" name="id" class="pure-u-23-24" value="{ parent.gateway['$id'] }" />
+                        <input type="text" id="id" name="id" class="pure-u-23-24" value="{ parent.row['$id'] }" />
                         <div if={ parent.errors.id } class="state state-invalid">{ parent.errors.id }</div>
                     </div>
 
                     <div class="pure-u-1-2">
                         <label for="title">Title</label>
-                        <input type="text" id="title" name="title" class="pure-u-1" value={ parent.gateway.title } />
+                        <input type="text" id="title" name="title" class="pure-u-1" value={ parent.row.title } />
                         <div if={ parent.errors.title } class="state state-invalid">{ parent.errors.title }</div>
                     </div>
 
                     <div class="pure-u-1">
                         <label for="description">Description</label>
-                        <textarea id="description" class="pure-u-1" name="description">{ parent.gateway.description }</textarea>
+                        <textarea id="description" class="pure-u-1" name="description">{ parent.row.description }</textarea>
                         <div if={ parent.errors.description } class="state state-invalid">{ parent.errors.description }</div>
                     </div>
                 </div>
@@ -46,13 +46,13 @@
                 <div class="pure-g">
                     <div class="pure-u-1">
                         <label for="contact_email">Email</label>
-                        <input type="text" id="contact_email" name="contact_email" class="pure-u-1" value={ parent.gateway.contact_email } />
+                        <input type="text" id="contact_email" name="contact_email" class="pure-u-1" value={ parent.row.contact_email } />
                         <div if={ parent.errors.contact_email } class="state state-invalid">{ parent.errors.contact_email }</div>
                     </div>
 
                     <div class="pure-u-1">
                         <label for="contact_phone">Phone Number</label>
-                        <input type="text" id="contact_phone" name="contact_phone" class="pure-u-1" value={ parent.gateway.contact_phone } />
+                        <input type="text" id="contact_phone" name="contact_phone" class="pure-u-1" value={ parent.row.contact_phone } />
                         <div if={ parent.errors.contact_phone } class="state state-invalid">{ parent.errors.contact_phone }</div>
                     </div>
                 </div>
@@ -62,20 +62,20 @@
                 <div class="pure-g">
                     <div class="pure-u-1">
                         <label for="url_home">Home Page</label>
-                        <input type="text" id="url_home" name="url_home" class="pure-u-1" value={ parent.gateway.url_home } />
+                        <input type="text" id="url_home" name="url_home" class="pure-u-1" value={ parent.row.url_home } />
                         <div if={ parent.errors.url_home } class="state state-invalid">{ parent.errors.url_home }</div>
                     </div>
 
                     <div class="pure-u-1">
                         <label for="url_home">Facebook Page</label>
-                        <input type="text" id="url_facebook" name="url_facebook" class="pure-u-1" value={ parent.gateway.url_facebook } />
+                        <input type="text" id="url_facebook" name="url_facebook" class="pure-u-1" value={ parent.row.url_facebook } />
                         <div if={ parent.errors.url_facebook } class="state state-invalid">{ parent.errors.url_facebook }</div>
                     </div>
                 </div>
             </div>
 
             <div if={ parent.modal.active == 'logo' } id="tab-logo" class="tab-content">
-                <img if={ parent.gateway.logo } src="/static/logos/{ parent.gateway.logo }" />
+                <img if={ parent.row.logo } src="/static/logos/{ parent.row.logo }" />
 
                 <div class="pure-g">
                     <div class="pure-u-1">
@@ -142,108 +142,39 @@
     this.mixin('render');
     this.mixin('currentuser');
 
-    var self = this,
-        defaultGateway = {
+    $.extend(this, {
+        item: 'gateway',
+        collection: 'gateways',
+        defaultObject: {
             id: '',
             title: '',
             description: ''
-        };
-
-    self.rows = [];
-
-    self.modal = {
-        active: 'basics',
-        heading: '',
-        hidden: true
-    };
-
-    RiotControl.on('networks.loaded', function (networks) {
-        self.networks = networks;
-        self.update();
+        },
+        modal: {
+            active: 'basics',
+            heading: '',
+            hidden: true
+        },
+        saveColumns: [
+            'id',
+            'title',
+            'description',
+            'contact_email',
+            'contact_phone',
+            'url_home',
+            'url_facebook'
+        ],
+        beforeSave: function(data, modal) {
+            data.network = this.hasRole('super-admin') ? modal.network.value : this.currentuser.network;
+            console.log(data);
+        }
     });
 
-    RiotControl.on('gateways.loaded', function (gateways) {
-        self.rows = gateways;
-        self.update();
-    });
+    this.mixin('crud');
 
-    RiotControl.on('gateway.loaded', function (gateway) {
-        self.errors = {};
-        self.gateway = gateway;
-        self.modal.heading = gateway.title;
-        self.modal.hidden = false;
-        self.update();
-    });
+    RiotControl.trigger('networks.loaded', function (networks) {
+        this.update({ networks: networks });
+    }.bind(this));
 
-    RiotControl.on('gateway.error', function (response) {
-        self.errors = {};
-        response.errors.forEach(function(error) {
-            self.errors[error.path[0]] = error.message;
-        });
-        self.update();
-    });
-
-    RiotControl.on('gateway.saved', function () {
-        self.modal.hidden = true;
-        self.update();
-    });
-
-    RiotControl.trigger('gateways.load');
     RiotControl.trigger('networks.load');
-
-    showTab(active) {
-        return function(e) {
-            self.modal.active = active;
-            self.update();
-            return false;
-        }
-    }
-
-    getId(e) {
-        return $(e.target).closest('tr[data-id]').data('id');
-    }
-
-    cancel(e) {
-        self.modal.hidden = true;
-        self.update();
-    }
-
-    save(e) {
-        var modal = self.tags.modal,
-            data = {
-                network: self.hasRole('super-admin') ? modal.network.value : self.currentuser.network,
-                id: modal.id.value,
-                title: modal.title.value,
-                description: modal.description.value,
-                contact_email: modal.contact_email.value,
-                contact_phone: modal.contact_phone.value,
-                url_home: modal.url_home.value,
-                url_facebook: modal.url_facebook.value
-            };
-
-        if (modal.original_id.value) {
-            RiotControl.trigger('gateway.save', modal.original_id.value, data);
-            RiotControl.trigger('gateway.upload', modal.original_id.value, modal.logo.files[0]);
-        } else {
-            RiotControl.trigger('gateways.create', data);
-        }
-
-        return false;
-    }
-
-    remove(e) {
-        if(confirm('Are you sure?')) {
-            RiotControl.trigger('gateway.remove', self.getId(e));
-        }
-    }
-
-    showEditForm(e) {
-        RiotControl.trigger('gateway.load', self.getId(e));
-    }
-
-    showNewForm(e) {
-        self.gateway = defaultGateway;
-        self.modal.heading = 'New Gateway';
-        self.modal.hidden = false;
-    }
 </gateways>

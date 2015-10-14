@@ -88,12 +88,8 @@ gulp.task('serve', [ 'build' ], function() {
       proxy: 'localhost:8080'
     });
 
-    gulp.watch('app/styles/**/*', [ 'styles' ]);
-    gulp.watch([
-        'app/scripts/**/*',
-        'app/mixins/**/*',
-        'app/static/tags/**/*'
-    ], [ 'scripts' ]);
+    gulp.watch(vendorStyles + siteStyles, [ 'styles' ]);
+    gulp.watch(ieScripts + adminScripts + siteScripts, [ 'scripts' ]);
     gulp.watch('app/templates/**/*.html', reload);
 });
 

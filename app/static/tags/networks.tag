@@ -1,18 +1,18 @@
 <networks>
     <modal heading={ modal.heading } hidden={ modal.hidden } dismissable="true" onclose={ cancel }>
         <form class="pure-form pure-form-stacked" onsubmit={ doNothing }>
-            <input type="hidden" id="original_id" class="pure-input-1" value={ parent.network['$id'] } />
+            <input type="hidden" id="original_id" class="pure-input-1" value={ parent.row['$id'] } />
 
             <label for="id">ID</label>
-            <input type="text" id="id" name="id" class="pure-input-1" value="{ parent.network['$id'] }" />
+            <input type="text" id="id" name="id" class="pure-input-1" value="{ parent.row['$id'] }" />
             <div if={ parent.errors.id } class="state state-invalid">{ parent.errors.id }</div>
 
             <label for="title">Title</label>
-            <input type="text" id="title" name="title" class="pure-input-1" value={ parent.network.title } />
+            <input type="text" id="title" name="title" class="pure-input-1" value={ parent.row.title } />
             <div if={ parent.errors.title } class="state state-invalid">{ parent.errors.title }</div>
 
             <label for="description">Description</label>
-            <textarea id="description" class="pure-input-1" name="description">{ parent.network.description }</textarea>
+            <textarea id="description" class="pure-input-1" name="description">{ parent.row.description }</textarea>
             <div if={ parent.errors.description } class="state state-invalid">{ parent.errors.description }</div>
 
             <div class="actions">
@@ -64,88 +64,21 @@
         </tbody>
     </table>
 
-    var self = this,
-        defaultNetwork = {
+    this.mixin('render');
+
+    $.extend(this, {
+        modal: {
+            hidden: true
+        },
+        item: 'network',
+        collection: 'networks',
+        defaultObject: {
             id: '',
             title: '',
             description: ''
-        };
-
-    self.mixin('render');
-
-    self.rows = [];
-
-    self.modal = {
-        heading: '',
-        hidden: true
-    };
-
-    RiotControl.on('networks.loaded', function (networks) {
-        self.rows = networks;
-        self.update();
+        },
+        saveColumns: [ 'id', 'title', 'description' ]
     });
 
-    RiotControl.on('network.loaded', function (network) {
-        self.network = network;
-        self.modal.heading = network.title;
-        self.modal.hidden = false;
-        self.update();
-    });
-
-    RiotControl.on('network.error', function (response) {
-        self.errors = {};
-        response.errors.forEach(function(error) {
-            self.errors[error.path[0]] = error.message;
-        });
-        self.update();
-    });
-
-    RiotControl.on('network.saved', function () {
-        self.modal.hidden = true;
-        self.update();
-    });
-
-    RiotControl.trigger('networks.load');
-
-    getId(e) {
-        return $(e.target).closest('tr[data-id]').data('id');
-    }
-
-    cancel(e) {
-        self.modal.hidden = true;
-        self.update();
-    }
-
-    save(e) {
-        var modal = self.tags.modal,
-            data = {
-                id: modal.id.value,
-                title: modal.title.value,
-                description: modal.description.value
-            };
-
-        if (modal.original_id.value) {
-            RiotControl.trigger('network.save', modal.original_id.value, data);
-        } else {
-            RiotControl.trigger('networks.create', data);
-        }
-
-        return false;
-    }
-
-    remove(e) {
-        if(confirm('Are you sure?')) {
-            RiotControl.trigger('network.remove', self.getId(e));
-        }
-    }
-
-    showEditForm(e) {
-        RiotControl.trigger('network.load', self.getId(e));
-    }
-
-    showNewForm(e) {
-        self.network = defaultNetwork;
-        self.modal.heading = 'New Network';
-        self.modal.hidden = false;
-    }
+    this.mixin('crud');
 </networks>

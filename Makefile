@@ -25,5 +25,7 @@ reboot: remove-db bootstrap
 
 clean:
 	find . -name '*.pyc' -delete
+	rm -rf app/static/styles/*
+	rm -rf app/static/scripts/*
 
 .PHONY: serve install bootstrap clean remove-db reboot
