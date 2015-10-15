@@ -19,8 +19,8 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Status</th>
-                <th>Created / Started / Ends</th>
+                <th>S</th>
+                <th>Times</th>
                 <th>IP</th>
                 <th>MAC</th>
                 <th>Email</th>
@@ -33,7 +33,7 @@
         <tbody>
             <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
                 <td>{ row['$id'] }</td>
-                <td>{ row.status }</td>
+                <td><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
                 <td>{ renderTimes(row) }</td>
                 <td>{ render(row.ip) }</td>
                 <td>{ render(row.mac) }</td>
@@ -57,6 +57,14 @@
     self.mixin('currentuser');
 
     self.vouchers = opts.vouchers;
+
+    self.statusIcons = {
+        new: 'file',
+        started: 'bolt',
+        finished: 'flag',
+        expired: 'circle-x',
+        deleted: 'trash'
+    };
 
     RiotControl.on('vouchers.loaded', function (vouchers) {
         self.vouchers = vouchers;
@@ -101,7 +109,7 @@
 
         if (row.started_at) {
             result += ' / ' + self.renderTime(row.started_at);
-            result += ' / ' + self.renderTime(self.calculateEndAt(row.started_at));
+            result += ' / ' + self.renderTime(self.calculateEndAt(row));
         }
 
         return result;

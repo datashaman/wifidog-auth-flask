@@ -196,12 +196,13 @@ class Auth(db.Model):
                 messages += '| Incoming or outgoing counter is missing; counters not updated'
 
             if self.stage == constants.STAGE_LOGOUT:
-                voucher.status = 'logged-out'
-                messages += '| User is now logged out'
-            else:
-                if voucher.is_finished():
-                    voucher.status = 'finished'
-                    return (constants.AUTH_DENIED, 'Token has expired: %s' % self.token)
+                # Ignore this, when you login the timer starts, that's it
+                # (at least it is for this model)
+                messages += '| Logout is not implemented'
+
+            if voucher.started_at is not None and voucher.is_finished():
+                voucher.status = 'finished'
+                return (constants.AUTH_DENIED, 'Token has expired: %s' % self.token)
 
             return (constants.AUTH_ALLOWED, messages)
         else:

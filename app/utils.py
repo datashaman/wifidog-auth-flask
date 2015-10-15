@@ -34,6 +34,9 @@ def has_a_role(*roles):
 
 def args_get(which):
     def func():
-        return flask.request.args.get(which)
+        value = flask.request.args.get(which)
+        if value == '':
+            value = None
+        return value
     return func
 
