@@ -19,14 +19,12 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>A</th>
-                <th>Minutes</th>
-                <th>Created</th>
+                <th>Status</th>
+                <th>Created / Started / Ends</th>
                 <th>IP</th>
                 <th>MAC</th>
                 <th>Email</th>
-                <th>Started</th>
-                <th>Ends</th>
+                <th>Minutes</th>
 
                 <th class="actions">Actions</th>
             </tr>
@@ -35,25 +33,17 @@
         <tbody>
             <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
                 <td>{ row['$id'] }</td>
-                <td>{ row.active ? 'Y' : 'N' }</td>
-                <td>{ render(row.minutes) }</td>
-                <td>{ render(row.created_at) }</td>
+                <td>{ row.status }</td>
+                <td>{ renderTimes(row) }</td>
                 <td>{ render(row.ip) }</td>
                 <td>{ render(row.mac) }</td>
                 <td>{ render(row.email) }</td>
-                <td>{ render(row.started_at) }</td>
-                <td>{ render(calculateEndAt(row)) }</td>
+                <td>{ render(row.minutes) }</td>
 
                 <td class="actions actions-row">
-                    <button class="pure-button { row.active ? 'state-invalid' : 'state-valid' }" onclick={ toggleActive }>
-                        <span if={ row.active }>
-                            <span class="oi" data-glyph="x" title="Deactivate" aria-hidden="true"></span>
-                            Deactivate
-                        </span>
-                        <span if={ !row.active }>
-                            <span class="oi" data-glyph="check" title="Reactivate" aria-hidden="true"></span>
-                            Reactivate
-                        </span>
+                    <button class="pure-button" onclick={ extend }>
+                        <span class="oi" data-glyph="clock" title="Extend" aria-hidden="true"></span>
+                        Extend
                     </button>
                 </td>
             </tr>
@@ -85,7 +75,7 @@
         return str;
     }
 
-    renderDateTime(dt) {
+    renderTime(dt) {
         if (dt) {
             dt = new Date(dt.$date);
             return self.pad(dt.getHours(), 2) + ':' + self.pad(dt.getMinutes(), 2);
@@ -101,7 +91,23 @@
         }
     }
 
-    getVoucherId(e) {
+    extend(e) {
+        RiotControl.trigger('voucher.extend', self.getId(e));
+        return false;
+    }
+
+    renderTimes(row) {
+        var result = self.renderTime(row.created_at);
+
+        if (row.started_at) {
+            result += ' / ' + self.renderTime(row.started_at);
+            result += ' / ' + self.renderTime(self.calculateEndAt(row.started_at));
+        }
+
+        return result;
+    }
+
+    getId(e) {
         return $(e.target).closest('tr[data-id]').data('id');
     }
 

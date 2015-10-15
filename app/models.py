@@ -59,12 +59,6 @@ class User(db.Model, UserMixin):
 
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
 
-    def __repr__(self):
-        return '<User %r>' % self.email
-
-    def to_dict(self):
-        return { c.name: getattr(self, c.name) for c in self.__table__.columns }
-
 users = SQLAlchemyUserDatastore(db, User, Role)
 
 class Network(db.Model):
@@ -119,13 +113,13 @@ class Voucher(db.Model):
     incoming = db.Column(db.BigInteger, default=0)
     outgoing = db.Column(db.BigInteger, default=0)
 
-    active = db.Column(db.Boolean, default=True)
+    status = db.Column(db.String(20), nullable=False, default='new')
 
-    def __repr__(self):
-        return '<Voucher %r>' % self.id
+    def is_expired(self):
+        return self.created_at + datetime.timedelta(minutes=current_app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow()
 
-    def to_dict(self):
-        return { c.name: getattr(self, c.name) for c in self.__table__.columns }
+    def is_finished(self):
+        return self.started_at + datetime.timedelta(minutes=self.minutes) < datetime.datetime.utcnow()
 
 class Auth(db.Model):
     __tablename__ = 'auths'
@@ -149,17 +143,14 @@ class Auth(db.Model):
     messages = db.Column(db.Text)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
-    def __repr__(self):
-        return '<Auth %r>' % self.id
-
-    def to_dict(self):
-        return { c.name: getattr(self, c.name) for c in self.__table__.columns }
+    def matches_voucher(self, voucher):
+        return self.gateway_id == voucher.gateway_id and self.mac == voucher.mac and self.ip == voucher.ip
 
     def process_request(self):
         if self.token is None:
             return (constants.AUTH_DENIED, 'No connection token provided')
 
-        voucher = Voucher.query.filter_by(token=self.token, active=True).first()
+        voucher = Voucher.query.filter_by(token=self.token).first()
 
         if voucher is None:
             return (constants.AUTH_DENIED, 'Requested token not found: %s' % self.token)
@@ -171,17 +162,18 @@ class Auth(db.Model):
 
         if self.stage == constants.STAGE_LOGIN:
             if voucher.started_at is None:
-                if voucher.created_at + datetime.timedelta(minutes=current_app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow():
-                    db.session.delete(voucher)
-                    return (constants.AUTH_DENIED, 'Token is unused but too old: %s' % self.token)
+                if voucher.is_expired():
+                    voucher.status = 'expired'
+                    return (constants.AUTH_DENIED, 'Token has expired: %s' % self.token)
 
                 voucher.started_at = datetime.datetime.utcnow()
+                voucher.status = 'started'
 
                 return (constants.AUTH_ALLOWED, None)
             else:
-                if voucher.gateway_id == self.gateway_id and voucher.mac == self.mac and voucher.ip == self.ip:
-                    if voucher.started_at + datetime.timedelta(minutes=voucher.minutes) < datetime.datetime.utcnow():
-                        db.session.delete(voucher)
+                if self.matches_voucher(voucher):
+                    if voucher.is_finished():
+                        voucher.status = 'finished'
                         return (constants.AUTH_DENIED, 'Token is in use but has expired: %s' % self.token)
                     else:
                         return (constants.AUTH_ALLOWED, 'Token is already in use but details match: %s' % self.token)
@@ -204,11 +196,11 @@ class Auth(db.Model):
                 messages += '| Incoming or outgoing counter is missing; counters not updated'
 
             if self.stage == constants.STAGE_LOGOUT:
-                db.session.delete(voucher)
+                voucher.status = 'logged-out'
                 messages += '| User is now logged out'
             else:
-                if voucher.started_at + datetime.timedelta(minutes=voucher.minutes) < datetime.datetime.utcnow():
-                    db.session.delete(voucher)
+                if voucher.is_finished():
+                    voucher.status = 'finished'
                     return (constants.AUTH_DENIED, 'Token has expired: %s' % self.token)
 
             return (constants.AUTH_ALLOWED, messages)
@@ -229,9 +221,3 @@ class Ping(db.Model):
     sys_load = db.Column(db.String)
     wifidog_uptime = db.Column(db.BigInteger)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
-
-    def __repr__(self):
-        return '<Ping %r>' % self.id
-
-    def to_dict(self):
-        return { c.name: getattr(self, c.name) for c in self.__table__.columns }
