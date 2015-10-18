@@ -1,7 +1,6 @@
 digraph voucher {
     new [shape=square];
     active [style=dotted];
-    blocked [style=dotted];
     expired [fontcolor=white,color=black,style=filled];
     ended [fontcolor=white,color=black,style=filled];
 
@@ -9,7 +8,5 @@ digraph voucher {
     new -> new [label=extend];
     active -> active [label=extend];
     active -> ended [label=end];
-    active -> blocked [label=block];
     new -> active [label=login];
-    blocked -> active [label=unblock];
 }

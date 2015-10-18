@@ -21,8 +21,7 @@
                 <th>ID</th>
                 <th>S</th>
                 <th>Times</th>
-                <th>IP</th>
-                <th>MAC</th>
+                <th>MAC/IP</th>
                 <th>Email</th>
                 <th>Minutes</th>
 
@@ -35,8 +34,7 @@
                 <td>{ row['$id'] }</td>
                 <td><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
                 <td>{ renderTimes(row) }</td>
-                <td>{ render(row.ip) }</td>
-                <td>{ render(row.mac) }</td>
+                <td>{ render(row.mac) } { render(row.ip) }</td>
                 <td>{ render(row.email) }</td>
                 <td>{ render(row.minutes) }</td>
 
@@ -59,7 +57,7 @@
 
     self.statusIcons = {
         new: 'file',
-        started: 'bolt',
+        active: 'bolt',
         finished: 'flag',
         expired: 'circle-x',
         deleted: 'trash'
@@ -85,8 +83,8 @@
         var result = self.renderTime(row.created_at);
 
         if (row.started_at) {
-            result += ' / ' + self.renderTime(row.started_at);
-            result += ' / ' + self.renderTime(self.calculateEndAt(row));
+            result += ' ' + self.renderTime(row.started_at);
+            result += ' ' + self.renderTime(self.calculateEndAt(row));
         }
 
         return result;

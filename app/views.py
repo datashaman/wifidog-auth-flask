@@ -143,17 +143,14 @@ def wifidog_login():
     form = LoginVoucherForm(flask.request.form)
 
     if form.validate_on_submit():
-        voucher = Voucher.query.filter_by(id=form.voucher.data).first_or_404()
+        voucher_id = form.voucher.data.upper()
+        voucher = Voucher.query.filter_by(id=voucher_id).first_or_404()
+        form.populate_obj(voucher)
+        voucher.token = generate_token()
+        db.session.commit()
 
-        if voucher.started_at is None:
-            form.populate_obj(voucher)
-            voucher.token = generate_token()
-            db.session.commit()
-
-            # flask.flash('Logged in, continue to <a href="%s">%s</a>' % (form.url.data, form.url.data), 'success')
-
-            url = 'http://%s:%s/wifidog/auth?token=%s' % (voucher.gw_address, voucher.gw_port, voucher.token)
-            return flask.redirect(url)
+        url = 'http://%s:%s/wifidog/auth?token=%s' % (voucher.gw_address, voucher.gw_port, voucher.token)
+        return flask.redirect(url)
 
     if flask.request.method == 'GET':
         gateway_id = flask.request.args.get('gw_id')

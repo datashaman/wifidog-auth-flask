@@ -1,5 +1,6 @@
 import base64
 import datetime
+import json
 import re
 import string
 import uuid
@@ -94,6 +95,26 @@ class Gateway(db.Model):
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
+def record_change(f):
+    def func(self, **kwargs):
+        source_status = self.status
+
+        f(self)
+
+        change = Change()
+        change.changed_type = type(self).__name__
+        change.changed_id = self.id
+        change.event = f.__name__
+        change.source = source_status
+        change.destination = self.status
+        change.args = json.dumps(kwargs)
+
+        if current_user.is_authenticated():
+            change.user_id = current_user.id
+
+        db.session.add(change)
+    return func
+
 class Voucher(db.Model):
     __tablename__ = 'vouchers'
 
@@ -117,11 +138,36 @@ class Voucher(db.Model):
 
     status = db.Column(db.String(20), nullable=False, default='new')
 
-    def is_expired(self):
+    def should_expire(self):
         return self.created_at + datetime.timedelta(minutes=current_app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow()
 
-    def is_finished(self):
+    def should_end(self):
         return self.started_at + datetime.timedelta(minutes=self.minutes) < datetime.datetime.utcnow()
+
+    @record_change
+    def extend(self):
+        self.minutes += 30
+
+    @record_change
+    def login(self):
+        self.started_at = datetime.datetime.utcnow()
+        self.status = 'active'
+
+    @record_change
+    def end(self):
+        self.status = 'ended'
+
+    @record_change
+    def expire(self):
+        self.status = 'expired'
+
+    @record_change
+    def block(self):
+        self.status = 'blocked'
+
+    @record_change
+    def unblock(self):
+        self.status = 'active'
 
     @property
     def available_actions(self):
@@ -166,21 +212,22 @@ class Auth(db.Model):
         if voucher.ip is None:
             voucher.ip = flask.request.args.get('ip')
 
+        if voucher.status in [ 'ended', 'expired' ]:
+            return (constants.AUTH_DENIED, 'Requested token is the wrong status: %s' % self.token)
+
         if self.stage == constants.STAGE_LOGIN:
             if voucher.started_at is None:
-                if voucher.is_expired():
-                    voucher.status = 'expired'
+                if voucher.should_expire():
+                    voucher.expire()
                     return (constants.AUTH_DENIED, 'Token has expired: %s' % self.token)
 
-                voucher.started_at = datetime.datetime.utcnow()
-                voucher.status = 'started'
-
+                voucher.login()
                 return (constants.AUTH_ALLOWED, None)
             else:
                 if self.matches_voucher(voucher):
-                    if voucher.is_finished():
-                        voucher.status = 'finished'
-                        return (constants.AUTH_DENIED, 'Token is in use but has expired: %s' % self.token)
+                    if voucher.should_end():
+                        voucher.end()
+                        return (constants.AUTH_DENIED, 'Token is in use but has ended: %s' % self.token)
                     else:
                         return (constants.AUTH_ALLOWED, 'Token is already in use but details match: %s' % self.token)
                 else:
@@ -206,9 +253,9 @@ class Auth(db.Model):
                 # (at least it is for this model)
                 messages += '| Logout is not implemented'
 
-            if voucher.started_at is not None and voucher.is_finished():
-                voucher.status = 'finished'
-                return (constants.AUTH_DENIED, 'Token has expired: %s' % self.token)
+            if voucher.started_at is not None and voucher.should_end():
+                voucher.end()
+                return (constants.AUTH_DENIED, 'Token has ended: %s' % self.token)
 
             return (constants.AUTH_ALLOWED, messages)
         else:
@@ -239,5 +286,6 @@ class Change(db.Model):
     source = db.Column(db.String(20))
     destination = db.Column(db.String(20))
     args = db.Column(db.Text)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship(User, backref=backref('changes', lazy='dynamic'))
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
