@@ -41,22 +41,21 @@
                 <td>{ render(row.minutes) }</td>
 
                 <td class="actions actions-row">
-                    <button class="pure-button" each={ event, defn in row.events } value={ event } title={ event } onclick={ action(event) }>
+                    <button class="pure-button" each={ action, defn in row.available_actions } value={ action } title={ action } onclick={ handleAction }>
                         <span if={ defn.icon } class="oi" data-glyph={ defn.icon } aria-hidden="true"></span>
-                        { event }
+                        { action }
                     </button>
                 </td>
             </tr>
         </tbody>
     </table>
 
-    <script>
     var self = this;
 
     self.mixin('render');
     self.mixin('currentuser');
 
-    self.vouchers = opts.vouchers;
+    self.vouchers = [];
 
     self.statusIcons = {
         new: 'file',
@@ -73,23 +72,6 @@
 
     RiotControl.trigger('vouchers.load');
 
-    pad(number, length) {
-        var str = '' + number;
-
-        while (str.length < length) {
-            str = '0' + str;
-        }
-
-        return str;
-    }
-
-    renderTime(dt) {
-        if (dt) {
-            dt = new Date(dt.$date);
-            return self.pad(dt.getHours(), 2) + ':' + self.pad(dt.getMinutes(), 2);
-        }
-    }
-
     calculateEndAt(row) {
         if (row.started_at) {
             var dt = new Date(row.started_at.$date);
@@ -97,11 +79,6 @@
                 $date: new Date(dt.getTime() + row.minutes * 60000)
             };
         }
-    }
-
-    extend(e) {
-        RiotControl.trigger('voucher.extend', self.getId(e));
-        return false;
     }
 
     renderTimes(row) {
@@ -115,17 +92,21 @@
         return result;
     }
 
-    action(event) {
-        return function(e) {
-            $.ajax({
-                type: 'POST',
-                url: '/api/vouchers/' + self.getId(e) + '/' + event
-            }).done(function() {
-                console.log(arguments);
-            }).fail(function() {
-                console.error(arguments);
-            });
-        }.bind(this);
+    handleAction(e) {
+        var action = $(e.target).val(),
+            id = self.getId(e);
+
+        console.log('voucher', action, id);
+
+        switch(action) {
+        case 'delete':
+            if(confirm('Are you sure?')) {
+                RiotControl.trigger('voucher.remove', id);
+            }
+            break;
+        default:
+            RiotControl.trigger('voucher.' + action, id);
+        }
     }
 
     getId(e) {
@@ -140,11 +121,4 @@
         });
         return false;
     }
-
-    toggleActive(e) {
-        if(confirm('Are you sure?')) {
-            RiotControl.trigger('voucher.toggle', self.getVoucherId(e));
-        }
-    }
-    </script>
 </vouchers>

@@ -1,7 +1,7 @@
 import json
 import pydot
 
-events = {
+actions = {
     'delete': {
         'interface': 'admin',
         'icon': 'x',
@@ -28,12 +28,12 @@ events = {
     },
 }
 
-def get_events(status, interface):
+def available_actions(status, interface):
     if status in states:
         result = {}
-        for event, defn in events.iteritems():
-            if event in states[status] and defn['interface'] == interface:
-                result[event] = defn
+        for action, defn in actions.iteritems():
+            if action in states[status] and defn['interface'] == interface:
+                result[action] = defn
         return result
 
     return []

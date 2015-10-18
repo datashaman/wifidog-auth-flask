@@ -5,8 +5,6 @@ from app.models import Change, db
 
 class VoucherAdmin(object):
     def workflow(self, user, voucher, event, **args):
-        print states
-
         if voucher.status in states:
             source_status = voucher.status
             state = states[source_status]

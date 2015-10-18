@@ -2,7 +2,7 @@ import errno
 import flask
 import os
 
-from app.graphs import states, events
+from app.graphs import states, actions
 from app.models import Network, User, Gateway, Voucher
 from flask.ext.login import current_user, login_required
 from flask.ext.potion import Api, fields, signals
@@ -38,6 +38,12 @@ class Manager(PrincipalManager):
             query = query.filter_by(gateway_id=current_user.gateway_id)
 
         return query
+
+class VoucherManager(Manager):
+    def extend(self, voucher):
+        self.update(voucher, {
+            'minutes': voucher.minutes + 30,
+        })
 
 class UserResource(PrincipalResource):
     class Meta:
@@ -137,7 +143,7 @@ class NetworkResource(PrincipalResource):
 
 class VoucherResource(PrincipalResource):
     class Meta:
-        manager = Manager
+        manager = VoucherManager
 
         model = Voucher
         include_id = True
@@ -149,30 +155,32 @@ class VoucherResource(PrincipalResource):
             'update': gateway_or_above,
             'delete': gateway_or_above,
         }
-        read_only_fields = ('created_at', 'events')
+        read_only_fields = ('created_at', 'available_actions')
 
     class Schema:
         network = fields.ToOne('networks')
         gateway = fields.ToOne('gateways')
-        events = fields.String()
+        available_actions = fields.String()
 
     @ItemRoute.POST
     def expire(self, voucher):
-        voucher.expire(current_user)
+        self.manager.expire(voucher)
+
+    @ItemRoute.POST
+    def end(self, voucher):
+        self.manager.end(voucher)
 
     @ItemRoute.POST
     def extend(self, voucher):
-        self.manager.update(voucher, {
-            'minutes': voucher.minutes + 30,
-        })
+        self.manager.extend(voucher)
 
-for event, defn in events.iteritems():
     @ItemRoute.POST
-    def func(self, voucher):
-        print 'here'
-    func.__name__ = event
-    print event
-    setattr(VoucherResource, event, func)
+    def block(self, voucher):
+        self.manager.block(voucher)
+
+    @ItemRoute.POST
+    def unblock(self, voucher):
+        self.manager.unblock(voucher)
 
 @signals.before_create.connect_via(GatewayResource)
 @signals.before_create.connect_via(UserResource)

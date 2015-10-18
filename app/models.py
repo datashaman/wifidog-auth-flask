@@ -6,7 +6,7 @@ import uuid
 
 import flask
 
-from app.graphs import states, get_events
+from app.graphs import states, available_actions
 from flask import current_app
 from flask.ext.potion import fields
 from flask.ext.security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore, Security
@@ -124,8 +124,8 @@ class Voucher(db.Model):
         return self.started_at + datetime.timedelta(minutes=self.minutes) < datetime.datetime.utcnow()
 
     @property
-    def events(self):
-        return get_events(self.status, 'admin')
+    def available_actions(self):
+        return available_actions(self.status, 'admin')
 
 class Auth(db.Model):
     __tablename__ = 'auths'

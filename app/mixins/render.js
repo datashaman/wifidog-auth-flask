@@ -13,5 +13,23 @@ riot.mixin('render', {
             default:
                 return attribute;
         }
+    },
+
+    renderTime: function(dt) {
+        if (dt) {
+            dt = new Date(dt.$date);
+            return this.pad(dt.getHours(), 2) + ':' + this.pad(dt.getMinutes(), 2);
+        }
+    },
+
+    pad: function(number, length) {
+        var str = '' + number;
+
+        while (str.length < length) {
+            str = '0' + str;
+        }
+
+        return str;
     }
+
 });

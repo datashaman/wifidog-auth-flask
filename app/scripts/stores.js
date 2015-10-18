@@ -97,16 +97,18 @@ gateways.on('gateway.upload', function(id, file) {
     return xhr.send(fd);
 });
 
-vouchers.on('voucher.extend', function(id) {
-    $.ajax({
-        type: 'POST',
-        url: '/api/vouchers/' + id + '/extend'
-    }).done(function() {
-        console.log('voucher', id, 'extended');
-        this.load_collection();
-    }.bind(this)).fail(function(xhr, errorType, error) {
-        console.error('voucher', id, 'error', JSON.parse(xhr.responseText));
-        // self.trigger('voucher' + '.error', JSON.parse(xhr.responseText));
+[ 'expire', 'end', 'extend', 'block', 'unblock' ].forEach(function(action) {
+    vouchers.on('voucher.' + action, function(id) {
+        $.ajax({
+            type: 'POST',
+            url: '/api/vouchers/' + id + '/' + action
+        }).done(function() {
+            console.log('voucher', action, id);
+            this.load_collection();
+        }.bind(this)).fail(function(xhr, errorType, error) {
+            console.error('voucher', action, id, 'error', JSON.parse(xhr.responseText));
+            // self.trigger('voucher' + '.error', JSON.parse(xhr.responseText));
+        });
     });
 });
 
