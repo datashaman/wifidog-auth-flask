@@ -1,9 +1,8 @@
 import flask
-import gevent
 import json
 import time
 
-from flask import Blueprint
+from flask import Blueprint, current_app
 from flask.ext.menu import register_menu, Menu
 from flask.ext.security import login_required, roles_required, roles_accepted, current_user
 
@@ -15,8 +14,13 @@ from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
 from app.push import redis, event_stream
 from app.utils import is_logged_in, has_role, has_a_role
 
+def push_is_visible():
+    return current_app.config.get('PUSH_ENABLED') and has_role('super-admin')
+
 @bp.route('/broadcast', methods=[ 'GET', 'POST' ])
-@register_menu(bp, '.broadcast', 'Broadcast', visible_when=has_role('super-admin'), order=5)
+@login_required
+@roles_required('super-admin')
+@register_menu(bp, '.broadcast', 'Broadcast', visible_when=push_is_visible, order=5)
 def broadcast():
     form = BroadcastForm(flask.request.form)
 
@@ -28,6 +32,8 @@ def broadcast():
     return flask.render_template('broadcast.html', form=form)
 
 @bp.route('/push')
+@login_required
+@roles_required('super-admin')
 def push():
     return flask.Response(event_stream(), mimetype='text/event-stream')
 

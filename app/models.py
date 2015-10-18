@@ -6,6 +6,7 @@ import uuid
 
 import flask
 
+from app.graphs import states, get_events
 from flask import current_app
 from flask.ext.potion import fields
 from flask.ext.security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore, Security
@@ -38,22 +39,23 @@ class Role(db.Model, RoleMixin):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    name = db.Column(db.Unicode(80), unique=True)
-    description = db.Column(db.Unicode(255))
+    name = db.Column(db.Unicode(20), unique=True)
+    description = db.Column(db.Unicode(40))
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
 
-    network_id = db.Column(db.Unicode, db.ForeignKey('networks.id'))
+    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id'))
     network = db.relationship('Network', backref=backref('users', lazy='dynamic'))
 
-    gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'))
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id'))
     gateway = db.relationship('Gateway', backref=backref('users', lazy='dynamic'))
 
     email = db.Column(db.Unicode(255), unique=True, nullable=False)
-    password = db.Column(db.Unicode(255), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
@@ -64,9 +66,9 @@ users = SQLAlchemyUserDatastore(db, User, Role)
 class Network(db.Model):
     __tablename__ = 'networks'
 
-    id = db.Column(db.Unicode, primary_key=True)
+    id = db.Column(db.Unicode(20), primary_key=True)
 
-    title = db.Column(db.Unicode, nullable=False)
+    title = db.Column(db.Unicode(40), nullable=False)
     description = db.Column(db.UnicodeText)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
@@ -74,35 +76,35 @@ class Network(db.Model):
 class Gateway(db.Model):
     __tablename__ = 'gateways'
 
-    id = db.Column(db.Unicode, primary_key=True)
+    id = db.Column(db.Unicode(20), primary_key=True)
 
-    network_id = db.Column(db.Unicode, db.ForeignKey('networks.id'), nullable=False)
+    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id'), nullable=False)
     network = db.relationship(Network, backref=backref('gateways', lazy='dynamic'))
 
-    title = db.Column(db.Unicode, nullable=False)
+    title = db.Column(db.Unicode(40), nullable=False)
     description = db.Column(db.UnicodeText)
 
-    contact_email = db.Column(db.Unicode)
+    contact_email = db.Column(db.Unicode(255))
     contact_phone = db.Column(db.String)
 
-    url_home = db.Column(db.Unicode)
-    url_facebook = db.Column(db.Unicode)
+    url_home = db.Column(db.Unicode(255))
+    url_facebook = db.Column(db.Unicode(255))
 
-    logo = db.Column(db.String)
+    logo = db.Column(db.String(255))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
 class Voucher(db.Model):
     __tablename__ = 'vouchers'
 
-    id = db.Column(db.String, primary_key=True, default=generate_id)
+    id = db.Column(db.String(20), primary_key=True, default=generate_id)
     minutes = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     started_at = db.Column(db.DateTime)
     gw_address = db.Column(db.String(15))
     gw_port = db.Column(db.Integer)
 
-    gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'), nullable=False)
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('vouchers', lazy='dynamic'))
 
     mac = db.Column(db.String(20))
@@ -121,22 +123,26 @@ class Voucher(db.Model):
     def is_finished(self):
         return self.started_at + datetime.timedelta(minutes=self.minutes) < datetime.datetime.utcnow()
 
+    @property
+    def events(self):
+        return get_events(self.status, 'admin')
+
 class Auth(db.Model):
     __tablename__ = 'auths'
 
     id = db.Column(db.Integer, primary_key=True)
     user_agent = db.Column(db.String(255))
-    stage = db.Column(db.String)
+    stage = db.Column(db.String(20))
     ip = db.Column(db.String(20))
     mac = db.Column(db.String(20))
-    token = db.Column(db.String)
+    token = db.Column(db.String(255))
     incoming = db.Column(db.BigInteger)
     outgoing = db.Column(db.BigInteger)
 
-    gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'), nullable=False)
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('auths', lazy='dynamic'))
 
-    voucher_id = db.Column(db.String, db.ForeignKey('vouchers.id'))
+    voucher_id = db.Column(db.String(20), db.ForeignKey('vouchers.id'))
     voucher = db.relationship(Voucher, backref=backref('auths', lazy='dynamic'))
 
     status = db.Column(db.Integer)
@@ -214,7 +220,7 @@ class Ping(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_agent = db.Column(db.String(255))
 
-    gateway_id = db.Column(db.Unicode, db.ForeignKey('gateways.id'), nullable=False)
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('pings', lazy='dynamic'))
 
     sys_uptime = db.Column(db.BigInteger)
@@ -222,3 +228,16 @@ class Ping(db.Model):
     sys_load = db.Column(db.String)
     wifidog_uptime = db.Column(db.BigInteger)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+class Change(db.Model):
+    __tablename__ = 'changes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    changed_type = db.Column(db.String(40))
+    changed_id = db.Column(db.Integer)
+    event = db.Column(db.String(20))
+    source = db.Column(db.String(20))
+    destination = db.Column(db.String(20))
+    args = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship(User, backref=backref('changes', lazy='dynamic'))

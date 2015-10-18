@@ -2,6 +2,7 @@ import os
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
+PUSH_ENABLED = False
 CSRF_ENABLED = True
 CSRF_SESSION_KEY = 'ABigSecretIsHardToFind'
 DATABASE_CONNECTION_OPTIONS = {}
@@ -9,7 +10,7 @@ DEBUG = True
 HOST = '0.0.0.0'
 PORT = 8080
 SECRET_KEY = 'AnotherBigSecretIsAlsoHardToFind'
-SECURITY_PASSWORD_HASH = 'sha256_crypt'
+SECURITY_PASSWORD_HASH = 'sha512_crypt'
 SECURITY_PASSWORD_SALT = 'ThisIsNotALoveSong'
 SECURITY_POST_LOGIN_VIEW = 'app.vouchers_index'
 SECURITY_POST_LOGOUT_VIEW = 'login'

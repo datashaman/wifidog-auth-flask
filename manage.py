@@ -2,9 +2,10 @@
 # encoding: utf-8
 
 from app import create_app
-from app.models import Role, Network, Gateway, db, users
-from flask.ext.script import Manager
-from flask.ext.script import prompt, prompt_pass
+from app.admin import VoucherAdmin
+from app.models import Role, Network, Gateway, Voucher, db, users
+from flask.ext.script import Manager, prompt, prompt_pass
+from flask.ext.security.utils import encrypt_password, verify_password
 from sqlalchemy import text
 
 
@@ -16,6 +17,15 @@ ROLES = {
 
 app = create_app()
 manager = Manager(app)
+
+@manager.command
+def create_voucher(gateway, minutes=60):
+    voucher = Voucher()
+    voucher.gateway_id = gateway
+    voucher.minutes = minutes
+    db.session.add(voucher)
+    db.session.commit()
+    print 'Voucher created: %s' % voucher.id
 
 @manager.command
 def create_network(id, title, description=None):
@@ -75,7 +85,7 @@ def create_user(email, password, role=None, network=None, gateway=None):
             print 'Gateway is required for a gateway admin'
             return
 
-    user = users.create_user(email=email, password=password)
+    user = users.create_user(email=email, password=encrypt_password(password))
 
     user.network_id = network
     user.gateway_id = gateway
@@ -106,6 +116,19 @@ def expire_vouchers():
     # Old vouchers that have not been used yet
     sql = "delete from vouchers where datetime(created_at, '+' || %d || ' minutes') < current_timestamp and started_at is null" % app.config.get('VOUCHER_MAXAGE', 120)
     db.engine.execute(text(sql))
+
+@manager.command
+def workflow(email, password, voucher, event, **args):
+    user = users.get_user(email)
+
+    if user:
+        if verify_password(password, user.password):
+            voucher = Voucher.query.get(voucher)
+            va = VoucherAdmin()
+            va.workflow(user, voucher, event, **args)
+            return
+
+    print 'Login failed'
 
 if __name__ == '__main__':
     manager.run()

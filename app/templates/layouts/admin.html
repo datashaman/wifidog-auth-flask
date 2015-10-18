@@ -60,16 +60,17 @@
 
     <script>
     Zepto(function($) {
-        riot.mount('*');
-
-        setupNotifications();
-
+        {% if config.get('PUSH_ENABLED') %}
         var eventSource = new EventSource('{{ url_for('app.push') }}');
 
         eventSource.onmessage = function(response) {
             new Notification(response.data);
         };
+        {% endif %}
 
+        setupNotifications();
+
+        riot.mount('*');
         RiotControl.trigger('currentuser.load');
     });
     </script>

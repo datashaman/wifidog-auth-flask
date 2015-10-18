@@ -41,9 +41,9 @@
                 <td>{ render(row.minutes) }</td>
 
                 <td class="actions actions-row">
-                    <button class="pure-button" onclick={ extend }>
-                        <span class="oi" data-glyph="clock" title="Extend" aria-hidden="true"></span>
-                        Extend
+                    <button class="pure-button" each={ event, defn in row.events } value={ event } title={ event } onclick={ action(event) }>
+                        <span if={ defn.icon } class="oi" data-glyph={ defn.icon } aria-hidden="true"></span>
+                        { event }
                     </button>
                 </td>
             </tr>
@@ -113,6 +113,19 @@
         }
 
         return result;
+    }
+
+    action(event) {
+        return function(e) {
+            $.ajax({
+                type: 'POST',
+                url: '/api/vouchers/' + self.getId(e) + '/' + event
+            }).done(function() {
+                console.log(arguments);
+            }).fail(function() {
+                console.error(arguments);
+            });
+        }.bind(this);
     }
 
     getId(e) {

@@ -2,6 +2,7 @@ import errno
 import flask
 import os
 
+from app.graphs import states, events
 from app.models import Network, User, Gateway, Voucher
 from flask.ext.login import current_user, login_required
 from flask.ext.potion import Api, fields, signals
@@ -111,8 +112,6 @@ class GatewayResource(PrincipalResource):
             im.thumbnail((300, 300), Image.ANTIALIAS)
             im.save(static_folder + '/' + filename)
 
-
-
 class NetworkResource(PrincipalResource):
     gateways = Relation('gateways')
     users = Relation('users')
@@ -150,17 +149,30 @@ class VoucherResource(PrincipalResource):
             'update': gateway_or_above,
             'delete': gateway_or_above,
         }
-        read_only_fields = ('created_at',)
+        read_only_fields = ('created_at', 'events')
 
     class Schema:
         network = fields.ToOne('networks')
         gateway = fields.ToOne('gateways')
+        events = fields.String()
+
+    @ItemRoute.POST
+    def expire(self, voucher):
+        voucher.expire(current_user)
 
     @ItemRoute.POST
     def extend(self, voucher):
         self.manager.update(voucher, {
             'minutes': voucher.minutes + 30,
         })
+
+for event, defn in events.iteritems():
+    @ItemRoute.POST
+    def func(self, voucher):
+        print 'here'
+    func.__name__ = event
+    print event
+    setattr(VoucherResource, event, func)
 
 @signals.before_create.connect_via(GatewayResource)
 @signals.before_create.connect_via(UserResource)

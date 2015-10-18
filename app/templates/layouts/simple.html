@@ -1,0 +1,32 @@
+{% extends 'layouts/base.html' %}
+
+{% block body %}
+<body class="layout-login">
+    <div class="content">
+    {% block content %}
+    {% endblock %}
+    </div>
+
+    <footer>
+    &copy; datashaman
+    </footer>
+
+    <script src="{{ url_for('static', filename='scripts/site.min.js') }}"></script>
+
+    {% block scripts %}
+    {% endblock %}
+
+    <script>
+    Zepto(function($) {
+        {% if config.get('PUSH_ENABLED') %}
+        var eventSource = new EventSource('{{ url_for('app.push') }}');
+        eventSource.onmessage = function(response) {
+            new Notification(response.data);
+        };
+        {% endif %}
+
+        setupNotifications();
+    });
+    </script>
+</body>
+{% endblock %}

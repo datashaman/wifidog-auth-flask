@@ -1,5 +1,6 @@
 import flask
 
+from app.admin import VoucherAdmin
 from app.models import User, Role, db, users
 from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource, logos
 from flask.ext.login import current_user, LoginManager

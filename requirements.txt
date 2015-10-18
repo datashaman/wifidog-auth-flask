@@ -11,9 +11,12 @@ Flask-Script
 Flask-Security
 Flask-Uploads
 functools32
+gitchangelog
 gunicorn
 greenlet
 gevent
 markupsafe
 pillow
+pydot
+pyparsing==1.5.2
 redis

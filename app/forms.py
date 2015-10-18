@@ -34,8 +34,8 @@ class LoginVoucherForm(Form):
         if voucher is None:
             raise validators.ValidationError('Voucher does not exist')
 
-        if voucher.started_at is not None:
-            raise validators.ValidationError('Voucher is in use')
+        if voucher != 'new':
+            raise validators.ValidationError('Voucher is %s' % voucher.status)
 
 class NetworkForm(Form):
     id = TextField('ID', [ validators.InputRequired() ])

@@ -1,5 +1,8 @@
 serve:
-	gunicorn -k gevent -b '127.0.0.1:8080' 'app:create_app()'
+	python manage.py runserver -p 8080
+
+serve-production:
+	gunicorn --reload -k gevent -b '127.0.0.1:8080' 'app:create_app()'
 
 setup:
 	sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
@@ -27,5 +30,11 @@ clean:
 	find . -name '*.pyc' -delete
 	rm -rf app/static/styles/*
 	rm -rf app/static/scripts/*
+
+graphs:
+	python app/graphs.py
+
+dot:
+	dot -Tpng -O app/graphs.dot && eog app/graphs.dot.png
 
 .PHONY: serve install bootstrap clean remove-db reboot
