@@ -2,12 +2,11 @@ import flask
 import json
 import time
 
-from flask import Blueprint, current_app
 from flask.ext.menu import register_menu, Menu
 from flask.ext.security import login_required, roles_required, roles_accepted, current_user
 
 menu = Menu()
-bp = Blueprint('app', __name__)
+bp = flask.Blueprint('app', __name__)
 
 from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
 from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
@@ -15,7 +14,7 @@ from app.push import redis, event_stream
 from app.utils import is_logged_in, has_role, has_a_role
 
 def push_is_visible():
-    return current_app.config.get('PUSH_ENABLED') and has_role('super-admin')
+    return flask.current_app.config.get('PUSH_ENABLED') and has_role('super-admin')
 
 @bp.route('/broadcast', methods=[ 'GET', 'POST' ])
 @login_required
@@ -150,6 +149,8 @@ def wifidog_login():
             voucher.token = generate_token()
             db.session.commit()
 
+            session['voucher'] = voucher
+
             # flask.flash('Logged in, continue to <a href="%s">%s</a>' % (form.url.data, form.url.data), 'success')
 
             url = 'http://%s:%s/wifidog/auth?token=%s' % (voucher.gw_address, voucher.gw_port, voucher.token)
@@ -202,6 +203,7 @@ def wifidog_auth():
 
 @bp.route('/wifidog/portal/')
 def wifidog_portal():
+    voucher = session['voucher']
     gateway = Gateway.query.filter_by(id=flask.request.args.get('gw_id')).first_or_404()
     return flask.render_template('wifidog/portal.html', gateway=gateway)
 
