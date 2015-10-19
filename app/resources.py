@@ -168,6 +168,7 @@ class VoucherResource(PrincipalResource):
         network = fields.ToOne('networks')
         gateway = fields.ToOne('gateways')
         available_actions = fields.String()
+        time_left = fields.Integer()
 
     @ItemRoute.POST
     def extend(self, voucher):
