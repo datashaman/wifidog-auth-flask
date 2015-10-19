@@ -36,7 +36,7 @@
                 <td>{ renderTimes(row) }</td>
                 <td>{ render(row.mac) } { render(row.ip) }</td>
                 <td>{ render(row.email) }</td>
-                <td>{ render(row.time_left) }/{ render(row.minutes) }</td>
+                <td>{ row.time_left ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>
 
                 <td class="actions actions-row">
                     <button class="pure-button" each={ action, defn in row.available_actions } value={ action } title={ action } onclick={ handleAction }>
