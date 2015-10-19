@@ -1,5 +1,8 @@
 {% extends 'layouts/plain.html' %}
 
+{% block head %}
+{% endblock %}
+
 {% block content %}
 <div id="fb-root"></div>
 <script>(function(d, s, id) {
@@ -26,6 +29,12 @@ fjs.parentNode.insertBefore(js, fjs);
     </div>
 
     <div class="panel-body">
+        {% if voucher %}
+        <ul class="flashes">
+               <li class="success"><span id="time_left">{{ voucher.time_left }}</span> minutes left</li>
+        </ul>
+        {% endif %}
+
         {% if gateway.description %}
         {{ gateway.description | markdown }}
         {% endif %}
@@ -42,4 +51,24 @@ fjs.parentNode.insertBefore(js, fjs);
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% if voucher %}
+<script>
+Zepto(function($) {
+    var time_left = {{ voucher.time_left }};
+    setInterval(function() {
+        time_left--;
+        $('#time_left').html(time_left);
+    }, 60000);
+
+    if(time_left > 5) {
+        setTimeout(function() {
+            new Notification(time_left + ' minutes left');
+        }, (time_left - 5) * 60000);
+    }
+});
+</script>
+{% endif %}
 {% endblock %}

@@ -55,9 +55,6 @@
     <script src="{{ url_for('static', filename='tags/raw.tag') }}" type="riot/tag"></script>
     <script src="{{ url_for('static', filename='tags/modal.tag') }}" type="riot/tag"></script>
 
-    {% block scripts %}
-    {% endblock %}
-
     <script>
     Zepto(function($) {
         {% if config.get('PUSH_ENABLED') %}
@@ -74,5 +71,8 @@
         RiotControl.trigger('currentuser.load');
     });
     </script>
+
+    {% block scripts %}
+    {% endblock %}
 </body>
 </html>

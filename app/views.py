@@ -143,13 +143,14 @@ def wifidog_login():
     form = LoginVoucherForm(flask.request.form)
 
     if form.validate_on_submit():
-        voucher = Voucher.query.filter_by(id=form.voucher.data).first_or_404()
+        voucher_id = form.voucher.data.upper()
+        voucher = Voucher.query.get(voucher_id)
 
         form.populate_obj(voucher)
         voucher.token = generate_token()
         db.session.commit()
 
-        session['voucher'] = voucher
+        flask.session['voucher_token'] = voucher.token
 
         # flask.flash('Logged in, continue to <a href="%s">%s</a>' % (form.url.data, form.url.data), 'success')
 
@@ -203,9 +204,13 @@ def wifidog_auth():
 
 @bp.route('/wifidog/portal/')
 def wifidog_portal():
-    voucher = session['voucher']
+    voucher_token = flask.session.get('voucher_token')
+    if voucher_token:
+        voucher = Voucher.query.filter_by(token=voucher_token).first_or_404()
+    else:
+        voucher = None
     gateway = Gateway.query.filter_by(id=flask.request.args.get('gw_id')).first_or_404()
-    return flask.render_template('wifidog/portal.html', gateway=gateway)
+    return flask.render_template('wifidog/portal.html', gateway=gateway, voucher=voucher)
 
 @bp.route('/')
 def home():

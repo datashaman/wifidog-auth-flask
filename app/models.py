@@ -144,6 +144,11 @@ class Voucher(db.Model):
     def should_end(self):
         return self.started_at + datetime.timedelta(minutes=self.minutes) < datetime.datetime.utcnow()
 
+    @property
+    def time_left(self):
+        seconds = ((self.started_at + datetime.timedelta(minutes=self.minutes)) - datetime.datetime.utcnow()).seconds
+        return seconds / 60
+
     @record_change
     def extend(self):
         self.minutes += 30
