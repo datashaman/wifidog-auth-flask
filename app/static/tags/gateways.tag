@@ -139,6 +139,14 @@
     .tab-content { min-height: 250px; }
     </style>
 
+    showTab(active) {
+        return function(e) {
+            this.modal.active = active;
+            this.update();
+            return e;
+        }.bind(this);
+    }
+
     this.mixin('render');
     this.mixin('currentuser');
 

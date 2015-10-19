@@ -117,18 +117,5 @@ def expire_vouchers():
     sql = "delete from vouchers where datetime(created_at, '+' || %d || ' minutes') < current_timestamp and started_at is null" % app.config.get('VOUCHER_MAXAGE', 120)
     db.engine.execute(text(sql))
 
-@manager.command
-def workflow(email, password, voucher, event, **args):
-    user = users.get_user(email)
-
-    if user:
-        if verify_password(password, user.password):
-            voucher = Voucher.query.get(voucher)
-            va = VoucherAdmin()
-            va.workflow(user, voucher, event, **args)
-            return
-
-    print 'Login failed'
-
 if __name__ == '__main__':
     manager.run()

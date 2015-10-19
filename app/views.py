@@ -2,6 +2,7 @@ import flask
 import json
 import time
 
+from flask import Blueprint, current_app
 from flask.ext.menu import register_menu, Menu
 from flask.ext.security import login_required, roles_required, roles_accepted, current_user
 
@@ -144,17 +145,16 @@ def wifidog_login():
     if form.validate_on_submit():
         voucher = Voucher.query.filter_by(id=form.voucher.data).first_or_404()
 
-        if voucher.started_at is None:
-            form.populate_obj(voucher)
-            voucher.token = generate_token()
-            db.session.commit()
+        form.populate_obj(voucher)
+        voucher.token = generate_token()
+        db.session.commit()
 
-            session['voucher'] = voucher
+        session['voucher'] = voucher
 
-            # flask.flash('Logged in, continue to <a href="%s">%s</a>' % (form.url.data, form.url.data), 'success')
+        # flask.flash('Logged in, continue to <a href="%s">%s</a>' % (form.url.data, form.url.data), 'success')
 
-            url = 'http://%s:%s/wifidog/auth?token=%s' % (voucher.gw_address, voucher.gw_port, voucher.token)
-            return flask.redirect(url)
+        url = 'http://%s:%s/wifidog/auth?token=%s' % (voucher.gw_address, voucher.gw_port, voucher.token)
+        return flask.redirect(url)
 
     if flask.request.method == 'GET':
         gateway_id = flask.request.args.get('gw_id')

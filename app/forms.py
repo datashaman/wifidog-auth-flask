@@ -29,12 +29,13 @@ class LoginVoucherForm(Form):
     url = HiddenField('URL', default=args_get('url'))
 
     def validate_voucher(form, field):
-        voucher = Voucher.query.get(field.data)
+        voucher_id = field.data.upper()
+        voucher = Voucher.query.get(voucher_id)
 
         if voucher is None:
             raise validators.ValidationError('Voucher does not exist')
 
-        if voucher != 'new':
+        if voucher.status != 'new':
             raise validators.ValidationError('Voucher is %s' % voucher.status)
 
 class NetworkForm(Form):

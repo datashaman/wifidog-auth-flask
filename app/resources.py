@@ -3,7 +3,7 @@ import flask
 import os
 
 from app.graphs import states, actions
-from app.models import Network, User, Gateway, Voucher
+from app.models import Network, User, Gateway, Voucher, db
 from flask.ext.login import current_user, login_required
 from flask.ext.potion import Api, fields, signals
 from flask.ext.potion.routes import Relation, Route, ItemRoute
@@ -41,9 +41,16 @@ class Manager(PrincipalManager):
 
 class VoucherManager(Manager):
     def extend(self, voucher):
-        self.update(voucher, {
-            'minutes': voucher.minutes + 30,
-        })
+        voucher.extend()
+        db.session.commit()
+
+    def block(self, voucher):
+        voucher.block()
+        db.session.commit()
+
+    def unblock(self, voucher):
+        voucher.unblock()
+        db.session.commit()
 
 class UserResource(PrincipalResource):
     class Meta:
@@ -161,14 +168,6 @@ class VoucherResource(PrincipalResource):
         network = fields.ToOne('networks')
         gateway = fields.ToOne('gateways')
         available_actions = fields.String()
-
-    @ItemRoute.POST
-    def expire(self, voucher):
-        self.manager.expire(voucher)
-
-    @ItemRoute.POST
-    def end(self, voucher):
-        self.manager.end(voucher)
 
     @ItemRoute.POST
     def extend(self, voucher):

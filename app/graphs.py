@@ -20,12 +20,6 @@ actions = {
         'interface': 'user',
         'icon': 'enter',
     },
-    'block': {
-        'interface': 'admin',
-    },
-    'unblock': {
-        'interface': 'admin',
-    },
 }
 
 def available_actions(status, interface):
