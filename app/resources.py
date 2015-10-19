@@ -162,7 +162,7 @@ class VoucherResource(PrincipalResource):
             'update': gateway_or_above,
             'delete': gateway_or_above,
         }
-        read_only_fields = ('created_at', 'available_actions')
+        read_only_fields = ('created_at', 'available_actions', 'time_left')
 
     class Schema:
         network = fields.ToOne('networks')
