@@ -6,6 +6,7 @@ from app.admin import VoucherAdmin
 from app.models import Role, Network, Gateway, Voucher, db, users
 from flask.ext.script import Manager, prompt, prompt_pass
 from flask.ext.security.utils import encrypt_password
+from flask.ext.zen import Test, ZenTest
 from sqlalchemy import text
 
 
@@ -18,31 +19,44 @@ ROLES = {
 app = create_app()
 manager = Manager(app)
 
-@manager.command
-def create_voucher(gateway, minutes=60):
-    voucher = Voucher()
-    voucher.gateway_id = gateway
-    voucher.minutes = minutes
-    db.session.add(voucher)
-    db.session.commit()
-    print 'Voucher created: %s' % voucher.id
+manager.add_command('test', Test())
+manager.add_command('zen', ZenTest())
 
 @manager.command
-def create_network(id, title, description=None):
+def create_voucher(gateway, minutes=60, id=None, quiet=True):
+    voucher = Voucher()
+
+    # Allow explicit setting of ID (for tests)
+    if id is not None:
+        voucher.id = id
+
+    voucher.gateway_id = gateway
+    voucher.minutes = minutes
+
+    db.session.add(voucher)
+    db.session.commit()
+
+    if not quiet:
+        print 'Voucher created: %s' % voucher.id
+
+@manager.command
+def create_network(id, title, description=None, quiet=True):
     network = Network()
     network.id = id
     network.title = title
     network.description = description
     db.session.add(network)
     db.session.commit()
-    print 'Network created'
+
+    if not quiet:
+        print 'Network created'
 
 @manager.command
 @manager.option('-e', '--email', help='Contact Email')
 @manager.option('-p', '--phone', help='Contact Phone')
 @manager.option('-h', '--home', help='Home URL')
 @manager.option('-f', '--facebook', help='Facebook URL')
-def create_gateway(network, id, title, description=None, email=None, phone=None, home=None, facebook=None, logo=None):
+def create_gateway(network, id, title, description=None, email=None, phone=None, home=None, facebook=None, logo=None, quiet=True):
     gateway = Gateway()
     gateway.network_id = network
     gateway.id = id
@@ -54,10 +68,12 @@ def create_gateway(network, id, title, description=None, email=None, phone=None,
     gateway.url_facebook = facebook
     db.session.add(gateway)
     db.session.commit()
-    print 'Gateway created'
+
+    if not quiet:
+        print 'Gateway created'
 
 @manager.command
-def create_user(email, password, role=None, network=None, gateway=None):
+def create_user(email, password, role, network=None, gateway=None, quiet=True):
     if email is None:
         email = prompt('Email')
 
@@ -95,10 +111,12 @@ def create_user(email, password, role=None, network=None, gateway=None):
         user.roles.append(role)
 
     db.session.commit()
-    print 'User created'
+
+    if not quiet:
+        print 'User created'
 
 @manager.command
-def create_roles():
+def create_roles(quiet=True):
     if Role.query.count() == 0:
         for name, description in ROLES.iteritems():
             role = Role()
@@ -106,6 +124,9 @@ def create_roles():
             role.description = description
             db.session.add(role)
         db.session.commit()
+
+        if not quiet:
+            print 'Roles created'
 
 @manager.command
 def expire_vouchers():

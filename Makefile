@@ -4,6 +4,9 @@ serve:
 serve-production:
 	gunicorn --reload -k gevent -b '127.0.0.1:8080' 'app:create_app()'
 
+test:
+	python tests.py
+
 setup:
 	sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
 	sudo npm install -g bower gulp

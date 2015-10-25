@@ -15,7 +15,8 @@ def create_app():
     app = flask.Flask(__name__)
     app.config.from_object('config')
 
-    db.init_app(app)
+    init_db(app)
+
     api.init_app(app)
 
     markdown = Misaka()
@@ -27,9 +28,6 @@ def create_app():
     principals.init_app(app)
 
     markdown.init_app(app)
-
-    with app.app_context():
-        db.create_all()
 
     configure_uploads(app, logos)
 
@@ -66,3 +64,8 @@ def create_app():
         return AnonymousIdentity()
 
     return app
+
+def init_db(app):
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()

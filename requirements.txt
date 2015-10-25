@@ -10,11 +10,13 @@ Flask-Bcrypt
 Flask-Script
 Flask-Security
 Flask-Uploads
+Flask-Zen
 functools32
 gitchangelog
 gunicorn
 greenlet
 gevent
+lxml
 markupsafe
 pillow
 pydot
