@@ -16,7 +16,7 @@ super_admin_only = 'super-admin'
 network_or_above = ['super-admin', 'network-admin']
 gateway_or_above = ['super-admin', 'network-admin', 'gateway-admin']
 
-api = Api(prefix='/api', decorators=[login_required])
+api = Api(prefix='/api')
 logos = UploadSet('logos', IMAGES)
 
 def mkdir_p(path):
@@ -96,7 +96,7 @@ class GatewayResource(PrincipalResource):
         id_converter = 'string'
         id_field_class = fields.String
         permissions = {
-            'read': gateway_or_above,
+            'read': 'yes',
             'create': network_or_above,
             'update': network_or_above,
             'delete': network_or_above,

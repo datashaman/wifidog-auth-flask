@@ -10,17 +10,23 @@ function Store(item, collection) {
     riot.observable(self);
 
     self.load_item = function(id) {
-        $.getJSON(base + '/' + id, function(data) {
+        $.ajax({
+            url: base + '/' + id,
+            dataType: 'json'
+        }).done(function(data) {
             console.log(item, id, 'loaded', data);
             self.trigger(item + '.loaded', data);
+        }).fail(function() {
+            console.error(arguments);
         });
     };
 
     self.load_collection = function() {
-        $.getJSON(base, function(data) {
-            console.log(collection, 'loaded', data);
-            self.trigger(collection + '.loaded', data);
-        });
+        $.getJSON(base)
+            .done(function(data) {
+                console.log(collection, 'loaded', data);
+                self.trigger(collection + '.loaded', data);
+            });
     };
 
     self.on(item + '.load', self.load_item);
