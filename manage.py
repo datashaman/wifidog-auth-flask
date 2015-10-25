@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from app import create_app
+from app import create_app, init_db
 from app.admin import VoucherAdmin
 from app.models import Role, Network, Gateway, Voucher, db, users
 from flask.ext.script import Manager, prompt, prompt_pass
@@ -17,6 +17,34 @@ ROLES = {
 
 app = create_app()
 manager = Manager(app)
+
+@manager.command
+def bootstrap_tests():
+    filename = app.config['BASE_DIR'] + '/data/tests.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + filename
+
+    init_db(app)
+
+    create_roles(quiet=True)
+
+    create_network(u'main-network', u'Network', quiet=True)
+    create_network(u'other-network', u'Other Network', quiet=True)
+
+    create_gateway(u'main-network', u'main-gateway', u'Main Gateway', quiet=True)
+    create_gateway(u'other-network', u'other-gateway', u'Other Gateway', quiet=True)
+
+    create_user(u'super-admin@example.com', u'admin', u'super-admin', quiet=True)
+
+    create_user(u'main-network@example.com', u'admin', u'network-admin', u'main-network', quiet=True)
+    create_user(u'other-network@example.com', u'admin', u'network-admin', u'other-network', quiet=True)
+
+    create_user(u'main-gateway@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway', quiet=True)
+    create_user(u'other-gateway@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway', quiet=True)
+
+    create_voucher(u'main-gateway', 60, 'main-1', quiet=True)
+    create_voucher(u'main-gateway', 60, 'main-2', quiet=True)
+    create_voucher(u'other-gateway', 60, 'other-1', quiet=True)
+    create_voucher(u'other-gateway', 60, 'other-2', quiet=True)
 
 @manager.command
 def create_voucher(gateway, minutes=60, id=None, quiet=True):

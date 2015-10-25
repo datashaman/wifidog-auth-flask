@@ -5,9 +5,13 @@ serve-production:
 	gunicorn --reload -k gevent -b '127.0.0.1:8080' 'app:create_app()'
 
 nodemon-tests:
+	rm -f data/tests.db
+	python manage.py bootstrap_tests
 	nodemon tests.py
 
 tests:
+	rm -f data/tests.db
+	python manage.py bootstrap_tests
 	python tests.py
 
 setup:
