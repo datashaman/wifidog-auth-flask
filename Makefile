@@ -2,7 +2,7 @@ serve:
 	python manage.py runserver -p 8080
 
 serve-production:
-	gunicorn --reload -k gevent -b '127.0.0.1:8080' 'app:create_app()'
+	gunicorn --reload -b '127.0.0.1:8080' 'app:create_app()'
 
 nodemon-tests:
 	rm -f data/tests.db
