@@ -4,7 +4,7 @@ serve:
 serve-production:
 	gunicorn --reload -k gevent -b '127.0.0.1:8080' 'app:create_app()'
 
-test:
+tests:
 	python tests.py
 
 setup:
