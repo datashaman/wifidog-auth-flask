@@ -11,31 +11,33 @@ bp = flask.Blueprint('app', __name__)
 
 from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
 from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
-from app.push import redis, event_stream
 from app.utils import is_logged_in, has_role, has_a_role
 
-def push_is_visible():
-    return flask.current_app.config.get('PUSH_ENABLED') and has_role('super-admin')
+if False: # Push is disabled for now
+    from app.push import redis, event_stream
 
-@bp.route('/broadcast', methods=[ 'GET', 'POST' ])
-@login_required
-@roles_required('super-admin')
-@register_menu(bp, '.broadcast', 'Broadcast', visible_when=push_is_visible, order=5)
-def broadcast():
-    form = BroadcastForm(flask.request.form)
+    def push_is_visible():
+        return flask.current_app.config.get('PUSH_ENABLED') and has_role('super-admin')
 
-    if form.validate_on_submit():
-        redis.publish('notifications', form.message.data)
-        flask.flash('Message published')
-        return flask.redirect(flask.url_for('.broadcast'))
+    @bp.route('/broadcast', methods=[ 'GET', 'POST' ])
+    @login_required
+    @roles_required('super-admin')
+    @register_menu(bp, '.broadcast', 'Broadcast', visible_when=push_is_visible, order=5)
+    def broadcast():
+        form = BroadcastForm(flask.request.form)
 
-    return flask.render_template('broadcast.html', form=form)
+        if form.validate_on_submit():
+            redis.publish('notifications', form.message.data)
+            flask.flash('Message published')
+            return flask.redirect(flask.url_for('.broadcast'))
 
-@bp.route('/push')
-@login_required
-@roles_required('super-admin')
-def push():
-    return flask.Response(event_stream(), mimetype='text/event-stream')
+        return flask.render_template('broadcast.html', form=form)
+
+    @bp.route('/push')
+    @login_required
+    @roles_required('super-admin')
+    def push():
+        return flask.Response(event_stream(), mimetype='text/event-stream')
 
 @bp.route('/networks')
 @login_required

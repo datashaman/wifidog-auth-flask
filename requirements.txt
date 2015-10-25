@@ -12,13 +12,11 @@ Flask-Uploads
 gitchangelog
 gunicorn
 greenlet
-gevent
 lxml
 markupsafe
 pillow
 git+git://github.com/nlhepler/pydot.git#egg=pydot
 pyparsing==1.5.2
-redis
 
 # Python 2.6
 # ordereddict
