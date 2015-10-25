@@ -6,7 +6,6 @@ from app.admin import VoucherAdmin
 from app.models import Role, Network, Gateway, Voucher, db, users
 from flask.ext.script import Manager, prompt, prompt_pass
 from flask.ext.security.utils import encrypt_password
-from flask.ext.zen import Test, ZenTest
 from sqlalchemy import text
 
 
@@ -18,9 +17,6 @@ ROLES = {
 
 app = create_app()
 manager = Manager(app)
-
-manager.add_command('test', Test())
-manager.add_command('zen', ZenTest())
 
 @manager.command
 def create_voucher(gateway, minutes=60, id=None, quiet=True):

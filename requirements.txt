@@ -9,7 +9,6 @@ Flask-Bcrypt
 Flask-Script
 Flask-Security
 Flask-Uploads
-Flask-Zen
 gitchangelog
 gunicorn
 greenlet
