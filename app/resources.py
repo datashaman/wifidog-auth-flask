@@ -76,13 +76,22 @@ class UserResource(PrincipalResource):
 
     @Route.GET
     def current(self):
-        return {
-            'id': current_user.id,
-            'email': current_user.email,
-            'roles': [ r.name for r in current_user.roles ],
-            'network': current_user.network_id,
-            'gateway': current_user.gateway_id,
-        }
+        if current_user.is_authenticated():
+            return {
+                'id': current_user.id,
+                'email': current_user.email,
+                'roles': [ r.name for r in current_user.roles ],
+                'network': current_user.network_id,
+                'gateway': current_user.gateway_id,
+            }
+        else:
+            return {
+                'id': None,
+                'email': None,
+                'roles': [],
+                'network': None,
+                'gateway': None
+            }
 
 class GatewayResource(PrincipalResource):
     users = Relation('users')

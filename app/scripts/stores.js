@@ -49,6 +49,8 @@ function Store(item, collection) {
     });
 
     self.on(item + '.save', function(id, attributes) {
+        console.log(item, id, 'save', attributes);
+
         $.ajax({
             url: base + '/' + id,
             type: 'PATCH',

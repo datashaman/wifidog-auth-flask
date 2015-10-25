@@ -10,6 +10,10 @@ riot.mixin('currentuser', {
 
     hasRole: function(role) {
         return this.currentuser.roles.indexOf(role) > -1;
+    },
+
+    isAdmin: function() {
+        return this.hasRole('super-admin') || this.hasRole('network-admin') || this.hasRole('gateway-admin');
     }
 
 });
