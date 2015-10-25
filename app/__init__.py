@@ -19,15 +19,11 @@ def create_app():
 
     api.init_app(app)
 
-    markdown = Misaka()
-
     security = Security()
     security.init_app(app, users)
 
     principals = Principal()
     principals.init_app(app)
-
-    markdown.init_app(app)
 
     configure_uploads(app, logos)
 
