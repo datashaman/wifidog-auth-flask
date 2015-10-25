@@ -79,23 +79,63 @@ class TestCase(unittest.TestCase):
         html = self.get_html(response)
         self.assertTitle(html, 'Login')
 
-        response = self.login('main-gateway@example.com', 'admin')
+        response = self.login('main-gateway1@example.com', 'admin')
 
         self.assertEquals(302, response.status_code)
         self.assertEquals('http://localhost/vouchers', response.headers['Location'])
 
     def test_vouchers_index(self):
-        self.login('main-gateway@example.com', 'admin')
+        self.login('main-gateway1@example.com', 'admin')
 
         response = self.client.get('/vouchers', follow_redirects=True)
         self.assertEquals(200, response.status_code)
 
-    def test_voucher_new(self):
-        self.login('main-gateway@example.com', 'admin')
+        html = self.get_html(response)
+        vouchers = html.find('//vouchers')
+
+        assert vouchers is not None
+
+    def test_voucher_new_as_gateway(self):
+        self.login('main-gateway1@example.com', 'admin')
 
         response = self.client.get('/voucher', follow_redirects=True)
-
         self.assertEquals(200, response.status_code)
+
+        html = self.get_html(response)
+        options = html.findall('//select[@id="gateway_id"]/option')
+
+        self.assertEquals(1, len(options))
+        self.assertEquals('main-gateway1', options[0].get('value'))
+
+    def test_voucher_new_as_network(self):
+        self.login('main-network@example.com', 'admin')
+
+        response = self.client.get('/voucher', follow_redirects=True)
+        self.assertEquals(200, response.status_code)
+
+        html = self.get_html(response)
+        options = html.findall('//select[@id="gateway_id"]/option')
+
+        self.assertEquals(2, len(options))
+
+        self.assertEquals('main-gateway1', options[0].get('value'))
+        self.assertEquals('main-gateway2', options[1].get('value'))
+
+    def test_voucher_new_as_super(self):
+        self.login('super-admin@example.com', 'admin')
+
+        response = self.client.get('/voucher', follow_redirects=True)
+        self.assertEquals(200, response.status_code)
+
+        html = self.get_html(response)
+        options = html.findall('//select[@id="gateway_id"]/option')
+
+        self.assertEquals(4, len(options))
+
+        self.assertEquals('main-gateway1', options[0].get('value'))
+        self.assertEquals('main-gateway2', options[1].get('value'))
+        self.assertEquals('other-gateway1', options[2].get('value'))
+        self.assertEquals('other-gateway2', options[3].get('value'))
 
 if __name__ == '__main__':
     unittest.main()

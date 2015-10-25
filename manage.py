@@ -30,21 +30,31 @@ def bootstrap_tests():
     create_network(u'main-network', u'Network', quiet=True)
     create_network(u'other-network', u'Other Network', quiet=True)
 
-    create_gateway(u'main-network', u'main-gateway', u'Main Gateway', quiet=True)
-    create_gateway(u'other-network', u'other-gateway', u'Other Gateway', quiet=True)
+    create_gateway(u'main-network', u'main-gateway1', u'Main Gateway #1', quiet=True)
+    create_gateway(u'main-network', u'main-gateway2', u'Main Gateway #2', quiet=True)
+
+    create_gateway(u'other-network', u'other-gateway1', u'Other Gateway #1', quiet=True)
+    create_gateway(u'other-network', u'other-gateway2', u'Other Gateway #2', quiet=True)
 
     create_user(u'super-admin@example.com', u'admin', u'super-admin', quiet=True)
 
     create_user(u'main-network@example.com', u'admin', u'network-admin', u'main-network', quiet=True)
     create_user(u'other-network@example.com', u'admin', u'network-admin', u'other-network', quiet=True)
 
-    create_user(u'main-gateway@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway', quiet=True)
-    create_user(u'other-gateway@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway', quiet=True)
+    create_user(u'main-gateway1@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway1', quiet=True)
+    create_user(u'main-gateway2@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway2', quiet=True)
 
-    create_voucher(u'main-gateway', 60, 'main-1', quiet=True)
-    create_voucher(u'main-gateway', 60, 'main-2', quiet=True)
-    create_voucher(u'other-gateway', 60, 'other-1', quiet=True)
-    create_voucher(u'other-gateway', 60, 'other-2', quiet=True)
+    create_user(u'other-gateway1@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway1', quiet=True)
+    create_user(u'other-gateway2@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway2', quiet=True)
+
+    create_voucher(u'main-gateway1', 60, 'main-1-1', quiet=True)
+    create_voucher(u'main-gateway1', 60, 'main-1-2', quiet=True)
+    create_voucher(u'main-gateway2', 60, 'main-2-1', quiet=True)
+    create_voucher(u'main-gateway2', 60, 'main-2-2', quiet=True)
+    create_voucher(u'other-gateway1', 60, 'other-1-1', quiet=True)
+    create_voucher(u'other-gateway1', 60, 'other-1-2', quiet=True)
+    create_voucher(u'other-gateway2', 60, 'other-2-1', quiet=True)
+    create_voucher(u'other-gateway2', 60, 'other-2-2', quiet=True)
 
 @manager.command
 def create_voucher(gateway, minutes=60, id=None, quiet=True):
