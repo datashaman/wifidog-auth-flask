@@ -116,7 +116,7 @@ def vouchers_new():
         choices = [[ current_user.gateway_id, '%s - %s' % (current_user.gateway.network.title, current_user.gateway.title) ]]
     else:
         if current_user.has_role('network-admin'):
-            networks = Network.query.filter_by(id=current_user.network_id).get()
+            networks = Network.query.filter_by(id=current_user.network_id).all()
         else:
             networks = Network.query.all()
 

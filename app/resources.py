@@ -31,8 +31,10 @@ class Manager(PrincipalManager):
     def instances(self, where=None, sort=None):
         query = PrincipalManager.instances(self, where, sort)
 
-        if current_user.has_role('network-admin'):
-            query = query.filter_by(network_id=current_user.network_id)
+        # Vouchers don't have a network_id
+        if not isinstance(self, VoucherManager):
+            if current_user.has_role('network-admin') or current_user.has_role('gateway-admin'):
+                query = query.filter_by(network_id=current_user.network_id)
 
         if current_user.has_role('gateway-admin'):
             query = query.filter_by(gateway_id=current_user.gateway_id)

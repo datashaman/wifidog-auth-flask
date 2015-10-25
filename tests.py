@@ -85,15 +85,16 @@ class TestCase(unittest.TestCase):
         self.assertEquals('http://localhost/vouchers', response.headers['Location'])
 
     def test_vouchers_index(self):
-        self.login('gateway-admin@example.com', 'admin')
+        self.login('main-gateway@example.com', 'admin')
 
         response = self.client.get('/vouchers', follow_redirects=True)
         self.assertEquals(200, response.status_code)
 
     def test_voucher_new(self):
-        self.login('gateway-admin@example.com', 'admin')
+        self.login('main-gateway@example.com', 'admin')
 
         response = self.client.get('/voucher', follow_redirects=True)
+
         self.assertEquals(200, response.status_code)
 
 if __name__ == '__main__':
