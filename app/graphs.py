@@ -34,24 +34,20 @@ def available_actions(status, interface):
 
 states = {}
 
-with file('app/graphs.dot') as f:
-    dot = f.read()
-    graph = pydot.graph_from_dot_data(dot)
+for state in ('new', 'active', 'expired', 'ended'):
+    states[state] = { 'delete': 'deleted' }
 
-    for node in graph.get_nodes():
-        status = node.get_name()
-        states[status] = { 'delete': 'deleted' }
+for ( source, method, destination) in (
+    ( 'new', 'expire', 'expired' ),
+    ( 'new', 'extend', 'new' ),
+    ( 'active', 'extend', 'active' ),
+    ( 'active', 'end', 'ended' ),
+    ( 'new', 'login', 'active' ),
+):
+    if source not in states:
+        states[source] = { 'delete': 'deleted' }
 
-    for edge in graph.get_edges():
-        source = edge.get_source()
-
-        if source not in states:
-            states[source] = { 'delete': 'deleted' }
-
-        method = edge.get_label()
-        destination = edge.get_destination()
-
-        states[source][method] = destination
+    states[source][method] = destination
 
 if __name__ == '__main__':
     print json.dumps(states, indent=4)

@@ -23,6 +23,8 @@ class TestCase(unittest.TestCase):
 
     def setUp(self):
         self.app = create_app()
+
+        self.app.config['TESTING'] = True
         self.app.config['WTF_CSRF_ENABLED'] = False
 
         self.fd, self.filename = tempfile.mkstemp()
