@@ -48,5 +48,4 @@ for ( source, method, destination) in (
 
 if __name__ == '__main__':
     import json
-
     print json.dumps(states, indent=4)

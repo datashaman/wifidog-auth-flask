@@ -31,13 +31,21 @@ class Manager(PrincipalManager):
     def instances(self, where=None, sort=None):
         query = PrincipalManager.instances(self, where, sort)
 
-        # Vouchers don't have a network_id
-        if not isinstance(self, VoucherManager):
-            if current_user.has_role('network-admin') or current_user.has_role('gateway-admin'):
+        if current_user.has_role('network-admin') or current_user.has_role('gateway-admin'):
+            if self.model == Network:
+                query = query.filter_by(id=current_user.network_id)
+            elif self.model in [ Gateway, User ]:
                 query = query.filter_by(network_id=current_user.network_id)
 
+        if current_user.has_role('network-admin'):
+            if self.model == Voucher:
+                query = query.join(Voucher.gateway).join(Gateway.network).filter(Network.id == current_user.network_id)
+
         if current_user.has_role('gateway-admin'):
-            query = query.filter_by(gateway_id=current_user.gateway_id)
+            if self.model == Gateway:
+                query = query.filter_by(id=current_user.gateway_id)
+            elif self.model in [ User, Voucher ]:
+                query = query.filter_by(gateway_id=current_user.gateway_id)
 
         return query
 

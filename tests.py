@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import json
 import os
 import tempfile
 import unittest
@@ -84,16 +85,76 @@ class TestCase(unittest.TestCase):
         self.assertEquals(302, response.status_code)
         self.assertEquals('http://localhost/vouchers', response.headers['Location'])
 
-    def test_vouchers_index(self):
+    def test_api_networks_index_as_gateway(self):
         self.login('main-gateway1@example.com', 'admin')
 
-        response = self.client.get('/vouchers', follow_redirects=True)
+        response = self.client.get('/api/networks', follow_redirects=True)
         self.assertEquals(200, response.status_code)
 
-        html = self.get_html(response)
-        vouchers = html.find('//vouchers')
+        networks = json.loads(response.data)
+        self.assertEquals(1, len(networks))
 
-        assert vouchers is not None
+        self.assertEquals('main-network', networks[0]['id'])
+
+    def test_api_networks_index_as_network(self):
+        self.login('main-network@example.com', 'admin')
+
+        response = self.client.get('/api/networks', follow_redirects=True)
+        self.assertEquals(200, response.status_code)
+
+        networks = json.loads(response.data)
+        self.assertEquals(1, len(networks))
+
+        self.assertEquals('main-network', networks[0]['id'])
+
+    def test_api_networks_index_as_super(self):
+        self.login('super-admin@example.com', 'admin')
+
+        response = self.client.get('/api/networks', follow_redirects=True)
+        self.assertEquals(200, response.status_code)
+
+        networks = json.loads(response.data)
+        self.assertEquals(2, len(networks))
+
+        self.assertEquals('main-network', networks[0]['id'])
+        self.assertEquals('other-network', networks[1]['id'])
+
+    def test_api_gateways_index_as_gateway(self):
+        self.login('main-gateway1@example.com', 'admin')
+
+        response = self.client.get('/api/gateways', follow_redirects=True)
+        self.assertEquals(200, response.status_code)
+
+        gateways = json.loads(response.data)
+        self.assertEquals(1, len(gateways))
+
+        self.assertEquals('main-gateway1', gateways[0]['id'])
+
+    def test_api_gateways_index_as_network(self):
+        self.login('main-network@example.com', 'admin')
+
+        response = self.client.get('/api/gateways', follow_redirects=True)
+        self.assertEquals(200, response.status_code)
+
+        gateways = json.loads(response.data)
+        self.assertEquals(2, len(gateways))
+
+        self.assertEquals('main-gateway1', gateways[0]['id'])
+        self.assertEquals('main-gateway2', gateways[1]['id'])
+
+    def test_api_gateways_index_as_super(self):
+        self.login('super-admin@example.com', 'admin')
+
+        response = self.client.get('/api/gateways', follow_redirects=True)
+        self.assertEquals(200, response.status_code)
+
+        gateways = json.loads(response.data)
+        self.assertEquals(4, len(gateways))
+
+        self.assertEquals('main-gateway1', gateways[0]['id'])
+        self.assertEquals('main-gateway2', gateways[1]['id'])
+        self.assertEquals('other-gateway1', gateways[2]['id'])
+        self.assertEquals('other-gateway2', gateways[3]['id'])
 
     def test_voucher_new_as_gateway(self):
         self.login('main-gateway1@example.com', 'admin')
