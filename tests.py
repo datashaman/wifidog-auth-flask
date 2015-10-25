@@ -12,7 +12,9 @@ from lxml import etree
 from manage import create_roles, create_user, create_network, create_gateway
 from StringIO import StringIO
 
-with open('./data/tests.db', 'r') as tests_db:
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+with open(BASE_DIR + '/data/tests.db', 'r') as tests_db:
     content = tests_db.read()
 
 class TestCase(unittest.TestCase):
