@@ -1,31 +1,33 @@
-{% extends 'layouts/plain.html' %}
+{% extends 'layouts/default.html' %}
 
 {% from "helpers/form.html" import render_field %}
 
 {% block content %}
-<div class="panel panel-login">
-    <h1 class="panel-title">Login</h1>
+<div class="content">
+    <div class="panel panel-login">
+        <h1 class="panel-title">Login</h1>
 
-    <div class="panel-body">
-        {% include "security/_messages.html" %}
+        <div class="panel-body">
+            {% include "security/_messages.html" %}
 
-        <form action="{{ url_for_security('login') }}" method="POST" class="pure-form pure-form-stacked" name="login_user_form">
-            {{ login_user_form.next | safe }}
-            {{ login_user_form.hidden_tag() }}
-            <fieldset>
-                {{ render_field(login_user_form.email, class='pure-input-1', placeholder='Email') }}
-                {{ render_field(login_user_form.password, class='pure-input-1', placeholder='Password') }}
+            <form action="{{ url_for_security('login') }}" method="POST" class="pure-form pure-form-stacked" name="login_user_form">
+                {{ login_user_form.next | safe }}
+                {{ login_user_form.hidden_tag() }}
+                <fieldset>
+                    {{ render_field(login_user_form.email, class='pure-input-1', placeholder='Email') }}
+                    {{ render_field(login_user_form.password, class='pure-input-1', placeholder='Password') }}
 
-                <label for="remember" class="pure-checkbox">
-                    <input id="remember" type="checkbox" name="remember" value="y" />
-                    Remember Me
-                </label>
-            </fieldset>
+                    <label for="remember" class="pure-checkbox">
+                        <input id="remember" type="checkbox" name="remember" value="y" />
+                        Remember Me
+                    </label>
+                </fieldset>
 
-            <button type="submit" class="pure-input-1 pure-button pure-button-primary">Go</button>
-        </form>
+                <button type="submit" class="pure-input-1 pure-button pure-button-primary">Go</button>
+            </form>
 
-        {% include "security/_menu.html" %}
+            {% include "security/_menu.html" %}
+        </div>
     </div>
 </div>
 

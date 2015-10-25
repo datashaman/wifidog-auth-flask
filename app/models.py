@@ -13,9 +13,18 @@ from flask.ext.potion import fields
 from flask.ext.security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore, Security
 from flask.ext.sqlalchemy import SQLAlchemy
 from random import choice
+
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import backref
 
 import constants
+
+@event.listens_for(Engine, 'connect')
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute('PRAGMA foreign_keys=ON')
+    cursor.close()
 
 db = SQLAlchemy()
 
@@ -48,10 +57,10 @@ class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id'))
+    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', onupdate='cascade'))
     network = db.relationship('Network', backref=backref('users', lazy='dynamic'))
 
-    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id'))
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'))
     gateway = db.relationship('Gateway', backref=backref('users', lazy='dynamic'))
 
     email = db.Column(db.Unicode(255), unique=True, nullable=False)
@@ -79,10 +88,11 @@ class Gateway(db.Model):
 
     id = db.Column(db.Unicode(20), primary_key=True)
 
-    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id'), nullable=False)
+    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', onupdate='cascade'), nullable=False)
     network = db.relationship(Network, backref=backref('gateways', lazy='dynamic'))
 
     title = db.Column(db.Unicode(40), nullable=False)
+    subtitle = db.Column(db.Unicode(60))
     description = db.Column(db.UnicodeText)
 
     contact_email = db.Column(db.Unicode(255))
@@ -125,7 +135,7 @@ class Voucher(db.Model):
     gw_address = db.Column(db.String(15))
     gw_port = db.Column(db.Integer)
 
-    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id'), nullable=False)
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('vouchers', lazy='dynamic'))
 
     mac = db.Column(db.String(20))
@@ -191,10 +201,10 @@ class Auth(db.Model):
     incoming = db.Column(db.BigInteger)
     outgoing = db.Column(db.BigInteger)
 
-    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id'), nullable=False)
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('auths', lazy='dynamic'))
 
-    voucher_id = db.Column(db.String(20), db.ForeignKey('vouchers.id'))
+    voucher_id = db.Column(db.String(20), db.ForeignKey('vouchers.id', onupdate='cascade'))
     voucher = db.relationship(Voucher, backref=backref('auths', lazy='dynamic'))
 
     status = db.Column(db.Integer)
@@ -273,7 +283,7 @@ class Ping(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_agent = db.Column(db.String(255))
 
-    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id'), nullable=False)
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('pings', lazy='dynamic'))
 
     sys_uptime = db.Column(db.BigInteger)

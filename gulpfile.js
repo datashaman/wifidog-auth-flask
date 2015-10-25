@@ -36,18 +36,15 @@ var isProduction = true,
         'bower_components/es5-shim/es5-shim.js',
         'bower_components/html5shiv/html5shiv.js'
     ],
-    adminScripts = [
+    siteScripts = [
         'bower_components/zepto/dist/zepto.js',
         'bower_components/riot/riot+compiler.js',
         'bower_components/riotcontrol/riotcontrol.js',
         'bower_components/marked/lib/marked.js',
         'app/scripts/notifications.js',
         'app/scripts/stores.js',
+        'app/scripts/ui.js',
         'app/mixins/**/*.js'
-    ],
-    siteScripts = [
-        'bower_components/zepto/dist/zepto.js',
-        'app/scripts/notifications.js'
     ];
 
 if(gutil.env.dev === true) {
@@ -68,7 +65,6 @@ gulp.task('styles', function() {
 gulp.task('scripts', function() {
     return es.concat(
         scripts(ieScripts, 'ie.min.js'),
-        scripts(adminScripts, 'admin.min.js'),
         scripts(siteScripts, 'site.min.js')
         ).pipe(isProduction ? plugins.uglify() : gutil.noop()).on('error', errorHandler)
          .pipe(plugins.size())
@@ -89,7 +85,7 @@ gulp.task('serve', [ 'build' ], function() {
     });
 
     gulp.watch(vendorStyles + siteStyles, [ 'styles' ]);
-    gulp.watch(ieScripts + adminScripts + siteScripts, [ 'scripts' ]);
+    gulp.watch(ieScripts + siteScripts, [ 'scripts' ]);
     gulp.watch('app/templates/**/*.html', reload);
 });
 

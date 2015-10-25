@@ -1,70 +1,72 @@
 <networks>
-    <modal heading={ modal.heading } hidden={ modal.hidden } dismissable="true" onclose={ cancel }>
-        <form class="pure-form pure-form-stacked" onsubmit={ doNothing }>
-            <input type="hidden" id="original_id" class="pure-input-1" value={ parent.row['$id'] } />
+    <modal heading={ modal.heading } hidden={ modal.hidden } cancelevent="network.cancel" row={ row }>
+        <form id="form" class="pure-form pure-form-stacked" onsubmit={ doNothing }>
+            <input type="hidden" id="original_id" class="pure-input-1" value={ opts.row['$id'] } />
 
             <label for="id">ID</label>
-            <input type="text" id="id" name="id" class="pure-input-1" value="{ parent.row['$id'] }" />
-            <div if={ parent.errors.id } class="state state-invalid">{ parent.errors.id }</div>
+            <input type="text" id="id" name="id" class="pure-input-1" value="{ opts.row['$id'] }" />
+            <div if={ opts.errors.id } class="state state-invalid">{ opts.errors.id }</div>
 
             <label for="title">Title</label>
-            <input type="text" id="title" name="title" class="pure-input-1" value={ parent.row.title } />
-            <div if={ parent.errors.title } class="state state-invalid">{ parent.errors.title }</div>
+            <input type="text" id="title" name="title" class="pure-input-1" value={ opts.row.title } />
+            <div if={ opts.errors.title } class="state state-invalid">{ opts.errors.title }</div>
 
             <label for="description">Description</label>
-            <textarea id="description" class="pure-input-1" name="description">{ parent.row.description }</textarea>
-            <div if={ parent.errors.description } class="state state-invalid">{ parent.errors.description }</div>
+            <textarea id="description" class="pure-input-1" name="description">{ opts.row.description }</textarea>
+            <div if={ opts.errors.description } class="state state-invalid">{ opts.errors.description }</div>
 
             <div class="actions">
-                <button type="button" class="pure-button" onclick={ parent.cancel }>Cancel</button>
-                <button type="submit" class="pure-button pure-button-primary" onclick={ parent.save }>Save</button>
+                <button type="submit" class="pure-button pure-button-primary" onclick={ parent.onOk }>Ok</button>
+                <button type="button" class="pure-button" onclick={ parent.triggerEvent('network.cancel') }>Cancel</button>
             </div>
         </form>
     </modal>
 
-    <h1>Networks</h1>
+    <div class="header">
+        <h1>Networks</h1>
 
-    <div class="actions-collection">
-        <form class="pure-form">
-            <fieldset>
-                <button type="button" class="pure-button pure-button-primary" onclick="{ showNewForm }">
-                    <span class="oi" data-glyph="file" title="New" aria-hidden="true"></span>
-                    New
-                </button>
-            </fieldset>
-        </form>
+        <div class="actions-collection">
+            <form class="pure-form">
+                <fieldset>
+                    <button type="button" class="pure-button pure-button-primary" onclick={ onNew }>
+                        <span class="oi" data-glyph="file" title="New" aria-hidden="true"></span>
+                        New
+                    </button>
+                </fieldset>
+            </form>
+        </div>
     </div>
 
-    <table if={ rows.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Created At</th>
+    <div class="content">
+        <table if={ rows.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Created At</th>
 
-                <th class="actions">Actions</th>
-            </tr>
-        </thead>
+                    <th class="actions">Actions</th>
+                </tr>
+            </thead>
 
-        <tbody>
-            <tr each={ row, i in rows } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
-                <td><a href="#" onclick={ showEditForm }>{ row['$id'] }</a></td>
-                <td>{ render(row.title) }</td>
-                <td>{ render(row.description) }</td>
-                <td>{ render(row.created_at) }</td>
+            <tbody>
+                <tr each={ row, i in rows } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
+                    <td><a href="#" onclick={ onEdit }>{ row['$id'] }</a></td>
+                    <td>{ render(row.title) }</td>
+                    <td>{ render(row.description) }</td>
+                    <td>{ render(row.created_at) }</td>
 
-                <td class="actions actions-row">
-                    <button class="pure-button" onclick={ remove }>
-                        <span class="oi" data-glyph="x" title="Remove" aria-hidden="true"></span>
-                        Remove
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    this.mixin('render');
+                    <td class="actions actions-row">
+                        <button class="pure-button" onclick={ onRemove }>
+                            <span class="oi" data-glyph="x" title="Remove" aria-hidden="true"></span>
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     $.extend(this, {
         modal: {
@@ -77,8 +79,15 @@
             title: '',
             description: ''
         },
-        saveColumns: [ 'id', 'title', 'description' ]
+        saveColumns: [
+            'id',
+            'title',
+            'description'
+        ]
     });
 
     this.mixin('crud');
+    this.mixin('currentuser');
+    this.mixin('events');
+    this.mixin('render');
 </networks>

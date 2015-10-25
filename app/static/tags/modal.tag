@@ -1,22 +1,22 @@
 <modal>
-    <div class="overlay { hidden, ghost, dismissable }" onclick={ onclose }></div>
+    <div hidden={ opts.__hidden } class="modal-shade" onclick={ onClose }></div>
 
-    <div class="modal { hidden, ghost, dismissable }">
-        <div class="header">
-            <button if={ dismissable } type="button" class="close" aria-label="Close" onclick={ onclose }>
-                <span aria-hidden="true">&times;</span>
+    <div hidden={ opts.__hidden } class="modal">
+        <div class="modal-heading">
+            <button type="button" class="btn btn-close btn-secondary" aria-label="Close" onclick={ onClose }>
+                <span aria-ishidden="true">&times;</span>
             </button>
 
-            <h3 class="heading">{ heading }</h3>
+            <h3 class="modal-title">{ opts.heading }</h3>
         </div>
 
-        <div class="body">
+        <div class="modal-body">
             <yield />
         </div>
     </div>
 
     <style scoped>
-        .overlay {
+        .modal-shade {
             position: absolute;
             top: 0;
             left: 0;
@@ -26,9 +26,6 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.8);
             z-index: 50;
-        }
-
-        .overlay.dismissable {
             cursor: pointer;
         }
 
@@ -45,77 +42,48 @@
             z-index: 101;
         }
 
-        .modal.ghost {
-            background-color: transparent;
-            color: white;
-        }
-
-        .header {
+        .modal-heading {
             position: relative;
             text-align: center;
         }
 
-        .heading {
+        .modal-title {
             padding: 20px 20px 0 20px;
             margin: 0;
             font-size: 1.2em;
         }
 
-        .modal.ghost .heading {
-            color: white;
-        }
-
-        .close {
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            padding: 0;
-            font-size: 1.2em;
-            border: 0;
-            background-color: transparent;
-            color: #000;
-            cursor: pointer;
-            outline: none;
-        }
-
-        .modal.ghost .close {
-            color: white;
-        }
-
-        .body {
+        .modal-body {
             padding: 20px;
         }
 
-        .footer {
+        .modal-footer {
             padding: 0 20px 20px 20px;
         }
 
-        .button {
+        .btn-close {
             float: right;
-            padding: 10px;
-            margin: 0 5px 0 0;
-            border: none;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            cursor: pointer;
-            outline: none;
-            background-color: white;
-        }
-
-        .modal.ghost .button {
-            color: white;
-            background-color: transparent;
+            margin: 5px 5px 0 0;
         }
 
         .clear {
             clear: both;
         }
-
     </style>
 
-    this.hidden = opts.hidden;
-    this.heading = opts.heading;
-    this.ghost = opts.ghost;
-    this.dismissable = opts.dismissable;
-    this.onclose = opts.onclose;
+    this.on('mount', function() {
+        // Move modal to bottom of body so it renders correctly
+        $(this.root).remove().appendTo('body');
+
+        // Attach escape key to cancel
+        $(document).keyup(function(e) {
+            if(e.keyCode == 27) {
+                this.onClose();
+            }
+        }.bind(this));
+    });
+
+    onClose() {
+        RiotControl.trigger(this.opts.cancelevent);
+    }
 </modal>

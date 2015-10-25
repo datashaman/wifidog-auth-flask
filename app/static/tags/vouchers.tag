@@ -1,52 +1,56 @@
 <vouchers>
-    <h1>Vouchers</h1>
+    <div class="header">
+        <h1>Vouchers</h1>
 
-    <div class="actions-collection">
-        <form class="pure-form" onsubmit={ create }>
-            <fieldset>
-                <input if={ hasRole('super-admin') } name="network" type="text" placeholder="NetworkID" required />
-                <input if={ hasRole('super-admin') || hasRole('network-admin') } name="gateway" type="text" placeholder="GatewayID" required />
-                <input name="minutes" type="number" min="0" step="30" value="60" required />
-                <button type="submit" class="pure-button pure-button-primary">
-                    <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
-                    Create
-                </button>
-            </fieldset>
-        </form>
+        <div class="actions-collection">
+            <form class="pure-form" onsubmit={ create }>
+                <fieldset>
+                    <input if={ hasRole('super-admin') } name="network" type="text" placeholder="NetworkID" required />
+                    <input if={ hasRole('super-admin') || hasRole('network-admin') } name="gateway" type="text" placeholder="GatewayID" required />
+                    <input name="minutes" type="number" min="0" step="30" value="60" required />
+                    <button type="submit" class="pure-button pure-button-primary">
+                        <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
+                        Create
+                    </button>
+                </fieldset>
+            </form>
+        </div>
     </div>
 
-    <table if={ vouchers.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>S</th>
-                <th>Times</th>
-                <th>MAC/IP</th>
-                <th>Email</th>
-                <th>Minutes Left</th>
+    <div class="content">
+        <table if={ vouchers.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>S</th>
+                    <th>Times</th>
+                    <th>MAC/IP</th>
+                    <th>Email</th>
+                    <th>Minutes Left</th>
 
-                <th class="actions">Actions</th>
-            </tr>
-        </thead>
+                    <th class="actions">Actions</th>
+                </tr>
+            </thead>
 
-        <tbody>
-            <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
-                <td>{ row['$id'] }</td>
-                <td><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
-                <td>{ renderTimes(row) }</td>
-                <td>{ render(row.mac) } { render(row.ip) }</td>
-                <td>{ render(row.email) }</td>
-                <td>{ row.time_left ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>
+            <tbody>
+                <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
+                    <td>{ row['$id'] }</td>
+                    <td><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
+                    <td>{ renderTimes(row) }</td>
+                    <td>{ render(row.mac) } { render(row.ip) }</td>
+                    <td>{ render(row.email) }</td>
+                    <td>{ row.time_left ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>
 
-                <td class="actions actions-row">
-                    <button class="pure-button" each={ action, defn in row.available_actions } value={ action } title={ action } onclick={ handleAction }>
-                        <span if={ defn.icon } class="oi" data-glyph={ defn.icon } aria-hidden="true"></span>
-                        { action }
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                    <td class="actions actions-row">
+                        <button class="pure-button" each={ action, defn in row.available_actions } value={ action } title={ action } onclick={ handleAction }>
+                            <span if={ defn.icon } class="oi" data-glyph={ defn.icon } aria-hidden="true"></span>
+                            { action }
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     var self = this;
 

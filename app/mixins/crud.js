@@ -1,8 +1,7 @@
 riot.mixin('crud', {
     init: function() {
         RiotControl.on(this.collection + '.loaded', function (rows) {
-            this.rows = rows;
-            this.update();
+            this.update({ rows });
         }.bind(this));
 
         RiotControl.on(this.item + '.loaded', function (row) {
@@ -13,17 +12,35 @@ riot.mixin('crud', {
         }.bind(this));
 
         RiotControl.on(this.item + '.error', function (response) {
-            this.errors = {};
+            var errors = {};
             response.errors.forEach(function(error) {
-                this.errors[error.path[0]] = error.message;
+                errors[error.path[0]] = error.message;
             });
-            this.update();
+            this.update({ errors });
         }.bind(this));
 
         RiotControl.on(this.item + '.saved', function () {
             this.modal.hidden = true;
             this.update();
         }.bind(this));
+
+        RiotControl.on(this.item + '.cancel', function(e) {
+            var self = this;
+            $(this.tags.modal.form).find('[name]').each(function() {
+                var value = self.row[$(this).attr('name')];
+
+                if (typeof value == 'object') {
+                    if (typeof value['$ref'] != 'undefined') {
+                        var result = /[^\/]*$/.exec(value['$ref']);
+                        value = result[0];
+                    }
+                }
+
+                $(this).val(value);
+            });
+            self.modal.hidden = true;
+            self.update();
+        }.bind(this)),
 
         RiotControl.trigger(this.collection + '.load');
     },
@@ -32,20 +49,15 @@ riot.mixin('crud', {
         return $(e.target).closest('tr[data-id]').data('id');
     },
 
-    cancel: function(e) {
-        this.modal.hidden = true;
-        this.update();
-    },
-
-    save: function(e) {
+    onOk: function(e) {
         var modal = this.tags.modal,
             data = {};
 
         this.saveColumns.forEach(function(column) {
-            data[column] = modal[column].value;
+            data[column] = $(modal[column]).val();
         });
 
-        if (this.beforeSave !== undefined) {
+        if(this.beforeSave !== undefined) {
             this.beforeSave(data, modal);
         }
 
@@ -58,17 +70,22 @@ riot.mixin('crud', {
         return false;
     },
 
-    remove: function(e) {
+    onRemove: function(e) {
+        var id = this.getId(e);
+        console.log('onRemove', id);
         if(confirm('Are you sure?')) {
-            RiotControl.trigger(this.item + '.remove', this.getId(e));
+            RiotControl.trigger(this.item + '.remove', id);
         }
     },
 
-    showEditForm: function(e) {
-        RiotControl.trigger(this.item + '.load', this.getId(e));
+    onEdit: function(e) {
+        var id = this.getId(e);
+        console.log('onEdit', id);
+        RiotControl.trigger(this.item + '.load', id);
     },
 
-    showNewForm: function(e) {
+    onNew: function(e) {
+        console.log('onNew');
         this.row = this.defaultObject;
         this.modal.heading = 'New ' + this.item;
         this.modal.hidden = false;

@@ -1,59 +1,14 @@
-{% extends 'layouts/plain.html' %}
-
-{% block head %}
-{% endblock %}
+{% extends 'layouts/default.html' %}
 
 {% block content %}
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-var js, fjs = d.getElementsByTagName(s)[0];
-if (d.getElementById(id)) return;
-js = d.createElement(s); js.id = id;
-js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.5&appId=89526572170";
-fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
+{% include 'wifidog/_facebook.html' %}
 
-<div class="panel panel-portal">
-    <div class="panel-heading">
-        {% if gateway.url_home %}
-        <a href="{{ gateway.url_home }}">
-        {% endif %}
-        {% if gateway.logo %}
-        <img src="{{ url_for('static', filename='logos/%s' % gateway.logo) }}" />
-        {% else %}
-        {{ gateway.title }}
-        {% endif %}
-        {% if gateway.url_home %}
-        </a>
-        {% endif %}
-    </div>
-
-    <div class="panel-body">
-        {% if voucher %}
-        <ul class="flashes">
-               <li class="success"><span id="time_left">{{ voucher.time_left }}</span> minutes left</li>
-        </ul>
-        {% endif %}
-
-        {% if gateway.description %}
-        {{ gateway.description | markdown }}
-        {% endif %}
-
-        {% if gateway.url_facebook %}
-        <div class="fb-like"
-            data-href="{{ gateway.url_facebook }}"
-            data-width="300"
-            data-layout="standard"
-            data-action="like"
-            data-show-faces="true"
-            data-share="true">
-        </div>
-        {% endif %}
-    </div>
-</div>
+<portal gateway={{ gateway.id }}></portal>
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='tags/property.tag') }}" type="riot/tag"></script>
+<script src="{{ url_for('static', filename='tags/portal.tag') }}" type="riot/tag"></script>
 {% if voucher %}
 <script>
 Zepto(function($) {

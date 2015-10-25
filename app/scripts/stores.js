@@ -73,13 +73,12 @@ function CurrentUserStore() {
 
     riot.observable(self);
 
-    self.load_currentuser = function() {
+    self.on('currentuser.load', function() {
         $.getJSON(base, function(data) {
+            console.log('currentuser', 'loaded', data);
             self.trigger('currentuser.loaded', data);
         });
-    };
-
-    self.on('currentuser.load', self.load_currentuser);
+    });
 }
 
 var currentuser = new CurrentUserStore(),

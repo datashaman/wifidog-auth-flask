@@ -4,6 +4,8 @@ riot.mixin('currentuser', {
             this.currentuser = currentuser;
             this.update();
         }.bind(this));
+
+        RiotControl.trigger('currentuser.load');
     },
 
     hasRole: function(role) {

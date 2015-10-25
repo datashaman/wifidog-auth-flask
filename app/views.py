@@ -89,8 +89,8 @@ def gateways_index():
 
 @bp.route('/users')
 @login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(bp, '.users', 'Users', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=40)
+@roles_accepted('super-admin', 'network-admin')
+@register_menu(bp, '.users', 'Users', visible_when=has_a_role('super-admin', 'network-admin'), order=40)
 def users_index():
     return flask.render_template('users/index.html')
 
@@ -104,7 +104,7 @@ def vouchers_index():
 @bp.route('/voucher', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(bp, '.voucher', 'Generate Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=25)
+@register_menu(bp, '.new-voucher', 'New Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=25)
 def vouchers_new():
     form = NewVoucherForm(flask.request.form)
 
@@ -211,6 +211,10 @@ def wifidog_portal():
         voucher = None
     gateway = Gateway.query.filter_by(id=flask.request.args.get('gw_id')).first_or_404()
     return flask.render_template('wifidog/portal.html', gateway=gateway, voucher=voucher)
+
+@bp.route('/test')
+def test():
+    return flask.render_template('test.html')
 
 @bp.route('/')
 def home():
