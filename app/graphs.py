@@ -1,6 +1,3 @@
-import json
-import pydot
-
 actions = {
     'delete': {
         'interface': 'admin',
@@ -50,4 +47,6 @@ for ( source, method, destination) in (
     states[source][method] = destination
 
 if __name__ == '__main__':
+    import json
+
     print json.dumps(states, indent=4)
