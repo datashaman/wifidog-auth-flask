@@ -18,6 +18,6 @@ gevent
 lxml
 markupsafe
 pillow
-pydot
+pydot2
 pyparsing==1.5.2
 redis
