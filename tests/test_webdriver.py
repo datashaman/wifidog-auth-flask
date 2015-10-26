@@ -57,18 +57,15 @@ class SauceSampleTest(unittest.TestCase):
         self.driver.get('http://localhost:8080/login')
 
         # enter email
-        name = self.driver.find_element_by_css_selector(
-            'input[name="email"]')
+        name = self.driver.find_element_by_name('email')
         name.send_keys(FLASK_USERNAME)
 
         # enter password
-        pw = self.driver.find_element_by_css_selector(
-            'input[name="password"]')
+        pw = self.driver.find_element_by_name('password')
         pw.send_keys(FLASK_PASSWORD)
 
         # click submit
-        button = self.driver.find_element_by_css_selector(
-            'input[type="submit"]')
+        button = self.driver.find_element_by_id('submit')
         button.click()
 
     def test_login(self):
