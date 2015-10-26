@@ -53,20 +53,14 @@ class SauceSampleTest(unittest.TestCase):
         self.driver.implicitly_wait(30)
 
     def login(self):
-        # go to login page
         self.driver.get('http://localhost:8080/login')
-
-        # enter email
         name = self.driver.find_element_by_name('email')
         name.send_keys(FLASK_USERNAME)
-
-        # enter password
         pw = self.driver.find_element_by_name('password')
         pw.send_keys(FLASK_PASSWORD)
-
-        # click submit
         button = self.driver.find_element_by_id('submit')
-        button.click()
+        button.click_and_wait()
+        print 'logged in'
 
     def test_login(self):
         # login
