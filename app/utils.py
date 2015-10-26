@@ -1,6 +1,5 @@
 import flask
 
-from flask.ext.restless import ProcessingException
 from flask.ext.security import current_user
 
 def is_logged_out():
@@ -35,6 +34,9 @@ def has_a_role(*roles):
 
 def args_get(which):
     def func():
-        return flask.request.args.get(which)
+        value = flask.request.args.get(which)
+        if value == '':
+            value = None
+        return value
     return func
 

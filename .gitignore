@@ -1,6 +1,8 @@
 *.pyc
-bootstrap.sh
+bootstrap.py
 bower_components/
 build/
 node_modules/
 tmp/
+.ruby-version/
+.sass-cache/

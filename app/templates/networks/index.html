@@ -1,4 +1,6 @@
-{% extends 'layouts/admin.html' %}
+{% extends 'layouts/default.html' %}
+
+{% set title = 'Networks' %}
 
 {% block head %}
 <!--[if lt IE 9]>
@@ -11,7 +13,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='tags/modal.tag') }}" type="riot/tag"></script>
 <script src="{{ url_for('static', filename='tags/networks.tag') }}" type="riot/tag"></script>
-<script src="{{ url_for('static', filename='stores/networks.js') }}"></script>
 {% endblock %}

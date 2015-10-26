@@ -1,45 +1,34 @@
-{% extends 'layouts/login.html' %}
+{% extends 'layouts/default.html' %}
+
+{% set title = gateway.title %}
 
 {% block content %}
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-var js, fjs = d.getElementsByTagName(s)[0];
-if (d.getElementById(id)) return;
-js = d.createElement(s); js.id = id;
-js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.5&appId=89526572170";
-fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
+{% include 'wifidog/_facebook.html' %}
 
-<div class="panel panel-portal">
-    <div class="panel-heading">
-        {% if gateway.url_home %}
-        <a href="{{ gateway.url_home }}">
-        {% endif %}
-        {% if gateway.logo %}
-        <img src="{{ url_for('static', filename='logos/%s' % gateway.logo) }}" />
-        {% else %}
-        {{ gateway.title }}
-        {% endif %}
-        {% if gateway.url_home %}
-        </a>
-        {% endif %}
-    </div>
+<portal gateway={{ gateway.id }} time_left={{ voucher and voucher.time_left }}></portal>
+{% endblock %}
 
-    <div class="panel-body">
-        {% if gateway.description %}
-        {{ gateway.description | markdown }}
-        {% endif %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='tags/property.tag') }}" type="riot/tag"></script>
+<script src="{{ url_for('static', filename='tags/portal.tag') }}" type="riot/tag"></script>
+{% if voucher %}
+<script>
+Zepto(function($) {
+    var time_left = {{ voucher.time_left }};
 
-        {% if gateway.url_facebook %}
-        <div class="fb-like"
-            data-href="{{ gateway.url_facebook }}"
-            data-width="300"
-            data-layout="standard"
-            data-action="like"
-            data-show-faces="true"
-            data-share="true">
-        </div>
-        {% endif %}
-    </div>
-</div>
+    if(time_left > 0) {
+        setInterval(function() {
+            time_left--;
+            $('#time_left').html(time_left);
+        }, 60000);
+    }
+
+    if(time_left > 5) {
+        setTimeout(function() {
+            new Notification('Your session is about to expire. You have 5 minutes left.');
+        }, (time_left - 5) * 60000);
+    }
+});
+</script>
+{% endif %}
 {% endblock %}

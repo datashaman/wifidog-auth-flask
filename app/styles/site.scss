@@ -1,3 +1,6 @@
+$menu-width: 200px;
+$content-width: 1280px - $menu-width;
+
 * {
     box-sizing: border-box;
 }
@@ -8,6 +11,7 @@ html {
 }
 
 body {
+    color: #777;
     margin: 0 0 40px;
 
     & > footer {
@@ -23,38 +27,12 @@ h1 {
     font-size: x-large;
 }
 
-.layout-base {
-    .container {
-        width: 1024px;
-        margin: 0 auto;
-    }
-}
-
-.layout-login {
-    background-color: #1f8dd6;
-
-    .panel {
-        border-radius: 10px;
-        padding: 20px;
-        background-color: #ffffff;
-        box-shadow: 2px 2px 1px #333333;
-        margin: 20px auto;
-        width: 300px;
-
-        .panel-title {
-            text-align: center;
-        }
-    }
-
-    & > footer {
-        color: #ffffff;
-        text-align: center;
-        padding: 20px;
-    }
+button {
+    margin-right: 6px;
 }
 
 .panel-portal {
-    .panel-heading {
+    .panel-title {
         text-align: center;
     }
     .fb-like {
@@ -67,6 +45,10 @@ table .actions {
     text-align: right;
 }
 
+.modal .actions {
+    padding: 12px 0;
+}
+
 th, td {
     vertical-align: top;
 }
@@ -75,10 +57,9 @@ th, td {
     padding: 0;
     margin-bottom: 12px;
 
-    li {
+    li, .time-left {
         display: inline-block;
         padding: 10px;
-        margin-left: 10px;
         border-radius: 5px;
         box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
     }
@@ -89,7 +70,7 @@ th, td {
         border-color: #3b8eb5;
     }
 
-    .success, .info {
+    .success, .info, .time-left {
         color: #ffffff;
         background-color: #00b900;
         border-color: #55a12c;
@@ -108,6 +89,13 @@ th, td {
     }
 }
 
+.voucher-id {
+    font-size: 200%;
+    font-family: Georgia, Times, "Times New Roman", serif;
+    font-weight: normal;
+    text-align: justify;
+}
+
 .state {
     padding: 10px;
     margin: 5px 0;
@@ -122,4 +110,250 @@ th, td {
 .state-valid {
     color: #ffffff;
     background-color: #00b900;
+}
+
+#menu .info {
+    padding: 0.6em;
+}
+
+.pure-img-responsive {
+    max-width: 100%;
+    height: auto;
+}
+
+// Add transition to containers so they can push in and out.
+#layout,
+#menu,
+.menu-link {
+    -webkit-transition: all 0.2s ease-out;
+    -moz-transition: all 0.2s ease-out;
+    -ms-transition: all 0.2s ease-out;
+    -o-transition: all 0.2s ease-out;
+    transition: all 0.2s ease-out;
+}
+
+// This is the parent `<div>` that contains the menu and the content area.
+#layout {
+    position: relative;
+    padding-left: 0;
+
+    &.active #menu {
+        left: $menu-width;
+        width: $menu-width;
+    }
+
+    &.active .menu-link {
+        left: $menu-width;
+    }
+}
+
+// The content `<div>` is where all your content goes.
+.content {
+    padding: 0 2.5em;
+    max-width: $content-width;
+    margin-bottom: 50px;
+    line-height: 1.6em;
+}
+
+.header {
+    margin: 0;
+    color: #333;
+    padding: 1.5em 2.5em 0;
+
+    h1 {
+        margin: 0.2em 0;
+        font-size: 3em;
+        font-weight: 300;
+    }
+
+    h2 {
+        font-weight: 300;
+        color: #ccc;
+        padding: 0;
+        margin-top: 0;
+    }
+}
+
+.content-subhead {
+    margin: 50px 0 20px 0;
+    font-weight: 300;
+    color: #888;
+}
+
+// The `#menu` `<div>` is the parent `<div>` that contains the `.pure-menu` that appears on the left side of the page.
+#menu {
+    margin-left: -$menu-width;
+    width: $menu-width;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000; /* so the menu or its navicon stays above all content */
+    background: #191818;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    // All anchors inside the menu should be styled like this.
+    a {
+        color: #999;
+        border: none;
+        padding: 0.6em 0 0.6em 0.6em;
+    }
+
+    // Remove all background/borders, since we are applying them to #menu.
+    .pure-menu,
+    .pure-menu ul {
+        border: none;
+        background: transparent;
+    }
+
+    // Add that light border to separate items into groups.
+    .pure-menu ul,
+    .pure-menu .menu-item-divided {
+        border-top: 1px solid #333;
+    }
+
+    // Change color of the anchor links on hover/focus.
+    .pure-menu li a:hover,
+    .pure-menu li a:focus {
+        background: #333;
+    }
+
+    // This styles the selected menu item `<li>`.
+    .pure-menu-selected,
+    .pure-menu-heading {
+        background: #1f8dd6;
+    }
+
+    // This styles a link within a selected menu item `<li>`.
+    .pure-menu-selected a {
+        color: #fff;
+    }
+
+    // This styles the menu heading.
+    .pure-menu-heading {
+        font-size: 110%;
+        color: #fff;
+        margin: 0;
+    }
+}
+
+/*
+`.menu-link` represents the responsive menu toggle that shows/hides on
+small screens.
+ */
+.menu-link {
+    position: fixed;
+    display: block; /* show this only on small screens */
+    top: 0;
+    left: 0; /* "#menu width" */
+    font-size: 10px; /* change this value to increase/decrease button size */
+    z-index: 10;
+    height: auto;
+    padding: 1.6em;
+
+    &:hover,
+    &:focus {
+        background: #000;
+    }
+}
+
+// Hides the menu at `56em`, but modify this based on your app's needs.
+@media (min-width: 56em) {
+    .header,
+    .content {
+        padding-left: 2em;
+        padding-right: 2em;
+    }
+
+    #layout {
+        padding-left: $menu-width; /* left col width "#menu" */
+        left: 0;
+    }
+    #menu {
+        left: $menu-width;
+    }
+
+    .menu-link {
+        position: fixed;
+        left: $menu-width;
+        display: none;
+    }
+
+    #layout.active .menu-link {
+        left: $menu-width;
+    }
+}
+
+@media (max-width: 56em) {
+    /* Only apply this when the window is small. Otherwise, the following
+     * case results in extra padding on the left:
+     * Make the window small.
+     * Tap the menu to trigger the active state.
+     * Make the window large again.
+     */
+    #layout.active {
+        position: relative;
+        left: $menu-width;
+    }
+
+    tbody {
+        border: none;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tbody,
+    tr,
+    th,
+    td {
+        display: block;
+        padding: 0;
+        text-align: left;
+        white-space: normal;
+    }
+
+    table td:before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-family: sans-serif;
+    }
+
+    table#vouchers td.id {
+        font-family: Georgia, Times, "Times New Roman", serif;
+        font-size: 22px;
+    }
+
+    table#vouchers td.status .oi:after {
+        margin-left: 6px;
+        content: attr(title);
+        text-transform: uppercase;
+        font-size: 19px;
+    }
+
+    table td {
+        text-align: right;
+    }
+
+    table .actions {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+    }
+
+    .pure-table td {
+        padding: 6px 12px;
+    }
+
+    .pure-table-horizontal td {
+        border-bottom: none;
+    }
+}
+
+.actions-collection {
+    margin-bottom: 12px;
 }

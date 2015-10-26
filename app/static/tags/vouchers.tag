@@ -1,130 +1,118 @@
 <vouchers>
-    <h1>Vouchers</h1>
+    <div class="header">
+        <h1>Vouchers</h1>
 
-    <div class="actions-collection">
-        <form class="pure-form" onsubmit={ create }>
-            <fieldset>
-                <input if={ isSuperAdmin() } name="network" type="text" placeholder="NetworkID" required />
-                <input if={ isSuperAdmin() || isNetworkAdmin() } name="gateway" type="text" placeholder="GatewayID" required />
-                <input name="minutes" type="number" min="0" step="30" value="60" required />
-                <button type="submit" class="pure-button pure-button-primary">
-                    <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
-                    Create
-                </button>
-            </fieldset>
-        </form>
+        <div class="actions-collection">
+            <a href="/voucher" class="pure-button pure-button-primary">
+                <span class="oi" data-glyph="file" title="New Voucher" aria-hidden="true"></span>
+                New Voucher
+            </a>
+        </div>
     </div>
 
-    <table if={ vouchers.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>A</th>
-                <th>Minutes</th>
-                <th>Created</th>
-                <th>IP</th>
-                <th>MAC</th>
-                <th>Email</th>
-                <th>Started</th>
-                <th>Ends</th>
+    <div class="content">
+        <table if={ vouchers.length } id="vouchers" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>S</th>
+                    <th>Times</th>
+                    <th>MAC/IP</th>
+                    <th>Minutes Left</th>
 
-                <th class="actions">Actions</th>
-            </tr>
-        </thead>
+                    <th class="actions">Actions</th>
+                </tr>
+            </thead>
 
-        <tbody>
-            <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
-                <td>{ row['$id'] }</td>
-                <td>{ row.active ? 'Y' : 'N' }</td>
-                <td>{ render(row.minutes) }</td>
-                <td>{ render(row.created_at) }</td>
-                <td>{ render(row.ip) }</td>
-                <td>{ render(row.mac) }</td>
-                <td>{ render(row.email) }</td>
-                <td>{ render(row.started_at) }</td>
-                <td>{ render(calculateEndAt(row)) }</td>
+            <tbody>
+                <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
+                    <td class="id" data-label="ID">{ row['$id'] }</td>
+                    <td class="status" data-label="Status"><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
+                    <td data-label="Times">{ renderTimes(row) }</td>
+                    <td data-label="MAC/IP">{ render(row.mac) }<br />{ render(row.ip) }</td>
+                    <td data-label="Minutes Left">{ row.time_left ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>
 
-                <td class="actions actions-row">
-                    <button class="pure-button { row.active ? 'state-invalid' : 'state-valid' }" onclick={ toggleActive }>
-                        <span if={ row.active }>
-                            <span class="oi" data-glyph="x" title="Deactivate" aria-hidden="true"></span>
-                            Deactivate
-                        </span>
-                        <span if={ !row.active }>
-                            <span class="oi" data-glyph="check" title="Reactivate" aria-hidden="true"></span>
-                            Reactivate
-                        </span>
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                    <td class="actions actions-row">
+                        <button class="pure-button" each={ action, defn in row.available_actions } value={ action } title={ action } onclick={ handleAction }>
+                            <span if={ defn.icon } class="oi" data-glyph={ defn.icon } aria-hidden="true"></span>
+                            { action }
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <script>
     var self = this;
-    self.vouchers = opts.vouchers;
+
+    self.mixin('render');
+    self.mixin('currentuser');
+
+    self.vouchers = [];
+
+    self.statusIcons = {
+        new: 'file',
+        active: 'bolt',
+        finished: 'flag',
+        expired: 'circle-x',
+        deleted: 'trash',
+        blocked: 'thumb-down'
+    };
 
     RiotControl.on('vouchers.loaded', function (vouchers) {
         self.vouchers = vouchers;
         self.update();
     });
 
-    RiotControl.on('currentuser.loaded', function (currentuser) {
-        self.currentuser = currentuser;
-        self.update();
-    });
-
     RiotControl.trigger('vouchers.load');
-
-    isSuperAdmin() {
-        return self.currentuser.roles.indexOf('super-admin') > -1;
-    }
-
-    isNetworkAdmin() {
-        return self.currentuser.roles.indexOf('network-admin') > -1;
-    }
-
-    pad(number, length) {
-        var str = '' + number;
-
-        while (str.length < length) {
-            str = '0' + str;
-        }
-
-        return str;
-    }
-
-    renderDateTime(dt) {
-        if (dt) {
-            dt = new Date(dt.$date);
-            return self.pad(dt.getHours(), 2) + ':' + self.pad(dt.getMinutes(), 2);
-        }
-    }
 
     calculateEndAt(row) {
         if (row.started_at) {
             var dt = new Date(row.started_at.$date);
-            return new Date(dt.getTime() + row.minutes * 60000);
+            return {
+                $date: new Date(dt.getTime() + row.minutes * 60000)
+            };
         }
     }
 
-    getVoucherId(e) {
+    renderTimes(row) {
+        var result = self.renderTime(row.created_at);
+
+        if (row.started_at) {
+            result += ' ' + self.renderTime(row.started_at);
+            result += ' ' + self.renderTime(self.calculateEndAt(row));
+        }
+
+        return result;
+    }
+
+    handleAction(e) {
+        var action = $(e.target).val(),
+            id = self.getId(e);
+
+        console.log('voucher', action, id);
+
+        switch(action) {
+        case 'delete':
+            if(confirm('Are you sure?')) {
+                RiotControl.trigger('voucher.remove', id);
+            }
+            break;
+        default:
+            RiotControl.trigger('voucher.' + action, id);
+        }
+    }
+
+    getId(e) {
         return $(e.target).closest('tr[data-id]').data('id');
     }
 
     create(e) {
         RiotControl.trigger('vouchers.create', {
-            network: self.isSuperAdmin() ? self.network.value : self.currentuser.network,
-            gateway: self.isSuperAdmin() || self.isNetworkAdmin() ? self.gateway.value : self.currentuser.gateway,
+            network: self.hasRole('super-admin') ? self.network.value : self.currentuser.network,
+            gateway: self.hasRole('super-admin') || self.hasRole('network-admin') ? self.gateway.value : self.currentuser.gateway,
             minutes: parseInt(self.minutes.value)
         });
         return false;
     }
-
-    toggleActive(e) {
-        if(confirm('Are you sure?')) {
-            RiotControl.trigger('voucher.toggle', self.getVoucherId(e));
-        }
-    }
-    </script>
 </vouchers>

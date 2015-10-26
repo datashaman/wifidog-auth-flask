@@ -1,54 +1,66 @@
 import flask
 
-app = flask.Flask(__name__)
-app.config.from_object('config')
-
-from app.models import User, Role
-from app.resources import GatewayResource, NetworkResource, UserResource, VoucherResource
-from app.services import menu, db, manager, api, security, principals, logos, markdown
-from flask.ext.login import current_user
-from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
-from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed
-from flask.ext.security import SQLAlchemyUserDatastore
+from app.admin import VoucherAdmin
+from app.models import User, Role, db, users
+from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource, logos
+from flask.ext.login import current_user, LoginManager
 from flask.ext.uploads import configure_uploads
+from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
+from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed, Principal
+from flask.ext.security import Security
 
-import views
 
-menu.init_app(app)
-db.init_app(app)
-markdown.init_app(app)
+def create_app():
+    app = flask.Flask(__name__)
+    app.config.from_object('config')
 
-with app.app_context():
-    db.create_all()
+    init_db(app)
 
-    api.add_resource(UserResource)
-    api.add_resource(VoucherResource)
-    api.add_resource(GatewayResource)
-    api.add_resource(NetworkResource)
+    api.init_app(app)
+
+    security = Security()
+    security.init_app(app, users)
+
+    principals = Principal()
+    principals.init_app(app)
 
     configure_uploads(app, logos)
 
-manager.app = app
-api.init_app(app)
-principals.init_app(app)
+    from app.views import menu, bp
 
-datastore = SQLAlchemyUserDatastore(db, User, Role)
-security.init_app(app, datastore)
+    menu.init_app(app)
+    app.register_blueprint(bp)
 
-@identity_loaded.connect_via(app)
-def on_identity_loaded(sender, identity):
-    if not isinstance(identity, AnonymousIdentity):
-        identity.provides.add(UserNeed(identity.id))
+    if False:
+        login_manager = LoginManager(app)
 
-        for role in current_user.roles:
-            identity.provides.add(RoleNeed(role.name))
+        @login_manager.request_loader
+        def load_user_from_request(request):
+            if request.authorization:
+                email, password = request.authorization.username, request.authorization.password
+                user = User.query.filter_by(email=unicode(email)).first()
 
-@principals.identity_loader
-def read_identity_from_flask_login():
-    if current_user.is_authenticated():
-        return Identity(current_user.id)
-    return AnonymousIdentity()
+                if user is not None:
+                    if verify_password(password, user.password):
+                        return user
 
-@app.route('/')
-def home():
-    return flask.redirect(flask.url_for('security.login'))
+    @identity_loaded.connect_via(app)
+    def on_identity_loaded(sender, identity):
+        if not isinstance(identity, AnonymousIdentity):
+            identity.provides.add(UserNeed(identity.id))
+
+            for role in current_user.roles:
+                identity.provides.add(RoleNeed(role.name))
+
+    @principals.identity_loader
+    def read_identity_from_flask_login():
+        if current_user.is_authenticated():
+            return Identity(current_user.id)
+        return AnonymousIdentity()
+
+    return app
+
+def init_db(app):
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()

@@ -5,11 +5,18 @@ Flask-Potion
 Flask-Principal>=0.4.0
 Flask-Login==0.2.11
 Flask-Menu
-Flask-Misaka
 Flask-Bcrypt
-git+file:///home/marlinf/Projects/flask-restless@master#egg=Flask-Restless
 Flask-Script
 Flask-Security
 Flask-Uploads
-marshmallow
-uwsgi
+gitchangelog
+gunicorn
+lxml
+markupsafe
+pillow
+
+# Python 2.6
+# ordereddict
+
+# Python 2.7
+# functools32

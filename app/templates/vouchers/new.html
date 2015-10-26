@@ -1,24 +1,27 @@
-{% extends 'layouts/login.html' %}
+{% extends 'layouts/default.html' %}
 {% from 'helpers/form.html' import render_field %}
 
+{% set title = 'New Voucher' %}
+
 {% block content %}
-<div class="panel panel-login">
-    <h1 class="panel-title">
-        {% include 'layouts/flashes.html' %}
-    </h1>
+<div class="content">
+    <div class="panel panel-voucher">
+        <h1 class="panel-title voucher-id">
+            {{ request.args.get('id') }}
+        </h1>
 
-    <div class="panel-body">
-        <form method="post" class="pure-form pure-form-stacked">
-            {{ form.csrf_token }}
+        <div class="panel-body">
+            <form method="post" class="pure-form pure-form-stacked">
+                {{ form.csrf_token }}
 
-            <fieldset class="pure-group">
-                {{ render_field(form.gateway_id, class='pure-input-1', required=True) }}
-                {{ render_field(form.minutes, class='pure-input-1', placeholder='Minutes', required=True) }}
-            </fieldset>
+                <fieldset class="pure-group">
+                    {{ render_field(form.gateway_id, class='pure-input-1', required=True) }}
+                    {{ render_field(form.minutes, class='pure-input-1', placeholder='Minutes', required=True) }}
+                </fieldset>
 
-            <button type="submit" class="pure-input-1 pure-button pure-button-primary">Generate</button>
-        </form>
+                <button type="submit" class="pure-input-1 pure-button pure-button-primary">Generate</button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
-
