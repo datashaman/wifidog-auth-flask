@@ -49,6 +49,6 @@ dot:
 	dot -Tpng -O app/graphs.dot && eog app/graphs.dot.png
 
 deploy:
-	ssh -t cabot 'cd /var/www/auth; git pull --ff-only && PATH=/home/ubuntu/.virtualenvs/auth/bin:/usr/local/bin:/usr/bin:/bin make install'
+	ssh -t cabot 'cd /var/www/auth; git pull --ff-only && PATH=/home/ubuntu/.rbenv/shims:/home/ubuntu/.virtualenvs/auth/bin:/usr/local/bin:/usr/bin:/bin make install'
 
 .PHONY: serve install bootstrap clean remove-db reboot deploy
