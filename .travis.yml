@@ -1,14 +1,19 @@
 language: python
 
+node_js:
+- '0.12'
+
 python:
 - '2.7'
 
 install:
+- nvm install v0.12.7
 - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then pip install ordereddict; fi
 - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then pip install functools32; fi
 - pip install -r requirements.txt
 
 before_script:
+  - nvm use v0.12.7
   - npm install -g bower gulp
   - make production-install bootstrap-tests
   - make serve &
