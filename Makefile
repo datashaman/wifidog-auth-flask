@@ -9,10 +9,15 @@ nodemon-tests:
 	python manage.py bootstrap_tests
 	nodemon tests.py
 
-tests:
+bootstrap-tests:
 	rm -f data/tests.db
 	python manage.py bootstrap_tests
-	python tests.py
+
+tests:
+	python tests/test_unit.py
+
+tests-webdriver:
+	python tests/test_webdriver.py
 
 setup:
 	sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
@@ -51,4 +56,4 @@ dot:
 deploy:
 	ssh -t cabot 'source /home/ubuntu/.nvm/nvm.sh; cd /var/www/auth; nvm use; git pull --ff-only && PATH=/home/ubuntu/.nvm/versions/node/v0.12.7/bin:/home/ubuntu/.rbenv/shims:/home/ubuntu/.virtualenvs/auth/bin:/usr/local/bin:/usr/bin:/bin make install'
 
-.PHONY: serve install bootstrap clean remove-db reboot deploy
+.PHONY: serve install bootstrap clean remove-db reboot deploy tests

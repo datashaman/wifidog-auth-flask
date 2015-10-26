@@ -1,0 +1,70 @@
+
+{
+  "browser": [
+    {
+      "platform": "Windows 8",
+      "browserName": "chrome",
+      "version": "34",
+      "tags": [
+        "python",
+        "chrome",
+        "webdriver"
+      ]
+    },
+    {
+      "platform": "Windows 8",
+      "browserName": "firefox",
+      "version": "29",
+      "tags": [
+        "python",
+        "firefox",
+        "webdriver"
+      ]
+    },
+    {
+      "platform": "Windows 8.1",
+      "browserName": "internet explorer",
+      "version": "11",
+      "tags": [
+        "python",
+        "internet explorer",
+        "webdriver"
+      ]
+    },
+    {
+      "browserName": "Safari",
+      "platform": "OS X 10.9",
+      "version": "7.1",
+      "deviceName": "iPhone Simulator",
+      "device-orientation": "portrait",
+      "tags": [
+        "python",
+        "Safari",
+        "iphone"
+      ]
+    },
+    {
+      "browserName": "Safari",
+      "platform": "OS X 10.9",
+      "version": "7.1",
+      "deviceName": "iPad Simulator",
+      "device-orientation": "portrait",
+      "tags": [
+        "python",
+        "Safari",
+        "ipad"
+      ]
+    },
+    {
+      "browserName": "android",
+      "platform": "Linux",
+      "platformVersion": "4.4",
+      "deviceName": "Android",
+      "device-orientation": "portrait",
+      "tags": [
+        "python",
+        "andoid"
+      ]
+    }
+  ]
+}

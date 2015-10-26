@@ -5,6 +5,9 @@ import os
 import tempfile
 import unittest
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.sys.path.insert(0, BASE_DIR)
+
 from app import create_app, init_db
 from app.models import db, users, Role
 from flask import current_app
@@ -12,8 +15,6 @@ from flask.ext.security.utils import encrypt_password
 from lxml import etree
 from manage import create_roles, create_user, create_network, create_gateway
 from StringIO import StringIO
-
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 with open(BASE_DIR + '/data/tests.db', 'r') as tests_db:
     content = tests_db.read()
