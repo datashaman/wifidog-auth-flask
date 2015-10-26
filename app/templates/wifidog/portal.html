@@ -5,7 +5,7 @@
 {% block content %}
 {% include 'wifidog/_facebook.html' %}
 
-<portal gateway={{ gateway.id }}></portal>
+<portal gateway={{ gateway.id }} time_left={{ voucher and voucher.time_left }}></portal>
 {% endblock %}
 
 {% block scripts %}
@@ -15,14 +15,17 @@
 <script>
 Zepto(function($) {
     var time_left = {{ voucher.time_left }};
-    setInterval(function() {
-        time_left--;
-        $('#time_left').html(time_left);
-    }, 60000);
+
+    if(time_left > 0) {
+        setInterval(function() {
+            time_left--;
+            $('#time_left').html(time_left);
+        }, 60000);
+    }
 
     if(time_left > 5) {
         setTimeout(function() {
-            new Notification(time_left + ' minutes left');
+            new Notification('Your session is about to expire. You have 5 minutes left.');
         }, (time_left - 5) * 60000);
     }
 });

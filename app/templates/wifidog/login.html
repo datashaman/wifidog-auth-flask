@@ -4,6 +4,7 @@
 {% set title = 'Voucher Login' %}
 
 {% block content %}
+<div class="content">
 <div class="panel panel-login">
     <h1 class="panel-title">Login</h1>
 
@@ -18,12 +19,12 @@
 
             <fieldset class="pure-group">
                 {{ render_field(form.voucher, class='pure-input-1', placeholder='Voucher', required=True) }}
-                {{ render_field(form.email, class='pure-input-1', placeholder='Email Address', required=True) }}
             </fieldset>
 
             <button type="submit" class="pure-input-1 pure-button pure-button-primary">Go</button>
         </form>
     </div>
+</div>
 </div>
 {% endblock %}
 

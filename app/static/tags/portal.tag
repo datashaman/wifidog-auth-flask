@@ -22,6 +22,10 @@
     <div class="content { pure-form: mode == 'edit', pure-form-stacked: mode == 'edit' }">
         <h2 if={ mode == 'edit' || gateway.subhead } property="subhead" class="content-subhead">{ gateway.subhead }</h2>
 
+        <ul if={ opts.time_left } class="flashes">
+            <li class="success"><span id="time_left">{ opts.time_left }</span> minutes left</li>
+        </ul>
+
         <property name="description" type="textarea" translate="marked" value={ gateway.description }>
             { opts.value }
         </property>
