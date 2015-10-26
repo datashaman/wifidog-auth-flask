@@ -23,7 +23,7 @@ setup:
 	sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
 	sudo npm install -g bower gulp
 
-install:
+development-install:
 	bundle install
 	pip install -r requirements.txt
 	npm install
@@ -33,6 +33,17 @@ install:
 	cd bower_components/pure && npm install && node_modules/.bin/grunt
 	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
 	gulp --dev
+
+production-install:
+	bundle install --without development --deployment --jobs=3 --retry=3
+	pip install -r requirements.txt
+	npm install
+	npm prune
+	bower install
+	bower prune
+	cd bower_components/pure && npm install && node_modules/.bin/grunt
+	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
+	gulp --dev # Must fix this
 
 bootstrap:
 	python bootstrap.py
@@ -56,4 +67,4 @@ dot:
 deploy:
 	ssh -t cabot 'source /home/ubuntu/.nvm/nvm.sh; cd /var/www/auth; nvm use; git pull --ff-only && PATH=/home/ubuntu/.nvm/versions/node/v0.12.7/bin:/home/ubuntu/.rbenv/shims:/home/ubuntu/.virtualenvs/auth/bin:/usr/local/bin:/usr/bin:/bin make install'
 
-.PHONY: serve install bootstrap clean remove-db reboot deploy tests
+.PHONY: serve bootstrap clean remove-db reboot deploy tests
