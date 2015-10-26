@@ -10,21 +10,16 @@ from sauceclient import SauceClient
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0, BASE_DIR)
 
-# it's best to remove the hardcoded defaults and always get these values
-# from environment variables
-USERNAME = os.environ.get('SAUCE_USERNAME', os.environ.get('SAUCE_USERNAME'))
-ACCESS_KEY = os.environ.get('SAUCE_ACCESS_KEY', os.environ.get('SAUCE_ACCESS_KEY'))
+USERNAME = os.environ.get('SAUCE_USERNAME')
+ACCESS_KEY = os.environ.get('SAUCE_ACCESS_KEY')
+
+sauce = SauceClient(USERNAME, ACCESS_KEY)
 
 FLASK_USERNAME = 'super-admin@example.com'
 FLASK_PASSWORD = 'admin'
 
-# initialise sauce client to update jobs
-sauce = SauceClient(USERNAME, ACCESS_KEY)
-
-# load browser matrix from config.json
-config = open('%s/config.json' % os.path.dirname(os.path.abspath(__file__)))
-browserMatrix = json.load(config)
-config.close()
+with open(BASE_DIR + '/tests/config.json') as config:
+    browserMatrix = json.load(config)
 
 def on_platforms(platforms):
     def decorator(base_class):
@@ -92,3 +87,6 @@ class SauceSampleTest(unittest.TestCase):
                 sauce.jobs.update_job(self.driver.session_id, passed=False, public=True)
         finally:
             self.driver.quit()
+
+if __name__ == '__main__':
+    unittest.main()
