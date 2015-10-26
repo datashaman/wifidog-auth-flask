@@ -98,8 +98,9 @@
 
         switch(action) {
         case 'delete':
+        case 'archive':
             if(confirm('Are you sure?')) {
-                RiotControl.trigger('voucher.remove', id);
+                RiotControl.trigger('voucher.' + action, id);
             }
             break;
         default:
