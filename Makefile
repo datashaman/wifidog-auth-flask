@@ -19,6 +19,7 @@ setup:
 	sudo npm install -g bower gulp
 
 install:
+	bundle install
 	pip install -r requirements.txt
 	npm install
 	npm prune
