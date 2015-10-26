@@ -185,4 +185,11 @@ small screens.
         position: relative;
         left: $menu-width;
     }
+
+    table td:before {
+        content: attr(data-label);
+        float: left;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
 }
