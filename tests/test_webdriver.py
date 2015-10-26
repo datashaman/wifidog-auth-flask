@@ -68,7 +68,7 @@ class SauceSampleTest(unittest.TestCase):
 
         # click submit
         button = self.driver.find_element_by_css_selector(
-            'input[value="Login"]')
+            'input[type="submit"]')
         button.click()
 
     def test_login(self):
