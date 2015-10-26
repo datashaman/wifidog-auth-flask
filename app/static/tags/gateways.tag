@@ -123,10 +123,10 @@
 
             <tbody>
                 <tr each={ row, i in rows } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
-                    <td if={ hasRole('super-admin') }>{ render(row.network) }</td>
-                    <td><a href="#" onclick={ onEdit }>{ row['$id'] }</a></td>
-                    <td>{ render(row.title) }</td>
-                    <td>{ render(row.created_at) }</td>
+                    <td if={ hasRole('super-admin') } data-label="Network">{ render(row.network) }</td>
+                    <td data-label="ID"><a href="#" onclick={ onEdit }>{ row['$id'] }</a></td>
+                    <td data-label="Title">{ render(row.title) }</td>
+                    <td data-label="Created At">{ render(row.created_at) }</td>
 
                     <td class="actions actions-row">
                         <button class="pure-button" onclick={ onRemove }>
