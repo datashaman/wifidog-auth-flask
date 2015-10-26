@@ -163,7 +163,7 @@ def create_roles(quiet=True):
             print 'Roles created'
 
 @manager.command
-def expire_vouchers():
+def process_vouchers():
     # Active vouchers that should end
     vouchers = Voucher.query \
                 .filter(func.datetime(Voucher.started_at, Voucher.minutes + ' minutes') < func.current_timestamp()) \
@@ -184,6 +184,15 @@ def expire_vouchers():
     for voucher in vouchers:
         if voucher.should_expire():
             voucher.expire()
+
+    # Blocked, ended and expired vouchers that should be archived
+    vouchers = Voucher.query \
+                .filter(func.datetime(Voucher.updated_at, str(max_age) + ' minutes') < func.current_timestamp()) \
+                .filter(Voucher.status.in_([ 'blocked', 'ended', 'expired' ])) \
+                .all()
+
+    for voucher in vouchers:
+        voucher.archive()
 
     db.session.commit()
     

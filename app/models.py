@@ -131,6 +131,7 @@ class Voucher(db.Model):
     id = db.Column(db.String(20), primary_key=True, default=generate_id)
     minutes = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     started_at = db.Column(db.DateTime)
     gw_address = db.Column(db.String(15))
     gw_port = db.Column(db.Integer)
@@ -185,6 +186,10 @@ class Voucher(db.Model):
     @record_change
     def unblock(self):
         self.status = 'active'
+
+    @record_change
+    def archive(self):
+        self.status = 'archived'
 
     @property
     def available_actions(self):
