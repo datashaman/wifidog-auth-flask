@@ -29,7 +29,7 @@ riot.mixin('crud', {
             $(this.tags.modal.form).find('[name]').each(function() {
                 var value = self.row[$(this).attr('name')];
 
-                if (typeof value == 'object') {
+                if (typeof value == 'object' && value !== null) {
                     if (typeof value['$ref'] != 'undefined') {
                         var result = /[^\/]*$/.exec(value['$ref']);
                         value = result[0];
