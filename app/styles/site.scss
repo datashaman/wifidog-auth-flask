@@ -89,10 +89,7 @@ th, td {
 }
 
 .voucher-id {
-    font-size: 200%;
     font-family: Georgia, Times, "Times New Roman", serif;
-    font-weight: normal;
-    text-align: justify;
 }
 
 .state {
@@ -150,18 +147,18 @@ th, td {
 .content {
     padding: 0 2.5em;
     max-width: $content-width;
-    margin-bottom: 50px;
+    margin-bottom: 6px;
     line-height: 1.6em;
 }
 
 .header {
     margin: 0;
     color: #333;
-    padding: 1.5em 2.5em 0;
+    padding: 0 2.5em 0;
 
     h1 {
         margin: 0.2em 0;
-        font-size: 3em;
+        font-size: 2em;
         font-weight: 300;
     }
 

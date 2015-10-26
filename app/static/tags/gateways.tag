@@ -97,14 +97,10 @@
         <h1>Gateways</h1>
 
         <div class="actions-collection">
-            <form class="pure-form">
-                <fieldset>
-                    <button type="button" class="pure-button pure-button-primary" onclick={ onNew }>
-                        <span class="oi" data-glyph="file" title="New" aria-hidden="true"></span>
-                        New
-                    </button>
-                </fieldset>
-            </form>
+            <button type="button" class="pure-button pure-button-primary" onclick={ onNew }>
+                <span class="oi" data-glyph="file" title="New" aria-hidden="true"></span>
+                New
+            </button>
         </div>
     </div>
 
