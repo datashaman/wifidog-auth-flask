@@ -29,6 +29,7 @@ env:
 
 cache:
   directories:
+    - vendor/bundle
     - $HOME/.cache/bower
     - $HOME/.cache/pip
     - $HOME/.ccache
