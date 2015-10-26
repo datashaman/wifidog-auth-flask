@@ -96,17 +96,17 @@ def gateways_index():
 def users_index():
     return flask.render_template('users/index.html')
 
-@bp.route('/vouchers')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(bp, '.vouchers', 'Vouchers', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=30)
+@register_menu(bp, '.vouchers', 'Vouchers', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=5)
+@bp.route('/vouchers')
 def vouchers_index():
     return flask.render_template('vouchers/index.html')
 
-@bp.route('/voucher', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(bp, '.new-voucher', 'New Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=25)
+@register_menu(bp, '.new', 'New Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=0)
+@bp.route('/new-voucher', methods=[ 'GET', 'POST' ])
 def vouchers_new():
     form = NewVoucherForm(flask.request.form)
 
