@@ -18,6 +18,14 @@ actions = {
         'interface': 'user',
         'icon': 'enter',
     },
+    'block': {
+        'interface': 'admin',
+        'icon': 'thumb-down',
+    },
+    'unblock': {
+        'interface': 'admin',
+        'icon': 'thumb-up',
+    },
 }
 
 def available_actions(status, interface):
@@ -32,14 +40,17 @@ def available_actions(status, interface):
 
 states = {}
 
-for state in ('new', 'active', 'expired', 'ended'):
+for state in ('new', 'active', 'expired', 'ended', 'blocked'):
     states[state] = { 'delete': 'deleted' }
 
 for ( source, method, destination) in (
     ( 'new', 'expire', 'expired' ),
     ( 'new', 'extend', 'new' ),
+    ( 'new', 'block', 'blocked' ),
     ( 'active', 'extend', 'active' ),
     ( 'active', 'end', 'ended' ),
+    ( 'active', 'block', 'blocked' ),
+    ( 'blocked', 'unblock', 'active' ),
     ( 'new', 'login', 'active' ),
 ):
     if source not in states:

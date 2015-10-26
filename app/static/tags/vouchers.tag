@@ -30,7 +30,7 @@
                     <td class="status" data-label="Status"><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
                     <td data-label="Times">{ renderTimes(row) }</td>
                     <td data-label="MAC/IP">{ render(row.mac) }<br />{ render(row.ip) }</td>
-                    <td data-label="Minute Left">{ row.time_left ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>
+                    <td data-label="Minutes Left">{ row.time_left ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>
 
                     <td class="actions actions-row">
                         <button class="pure-button" each={ action, defn in row.available_actions } value={ action } title={ action } onclick={ handleAction }>
@@ -55,7 +55,8 @@
         active: 'bolt',
         finished: 'flag',
         expired: 'circle-x',
-        deleted: 'trash'
+        deleted: 'trash',
+        blocked: 'thumb-down'
     };
 
     RiotControl.on('vouchers.loaded', function (vouchers) {

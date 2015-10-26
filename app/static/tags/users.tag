@@ -24,6 +24,7 @@
                 <tr>
                     <th if={ hasRole('super-admin') }>Network</th>
                     <th if={ hasRole('super-admin') || hasRole('network-admin') }>Gateway</th>
+                    <th>Roles</th>
                     <th>Email</th>
                     <th>Created</th>
                     <th class="actions">Actions</th>
@@ -32,10 +33,11 @@
 
             <tbody>
                 <tr each={ row, i in rows } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
-                    <td if={ hasRole('super-admin') }>{ render(row.network) }</td>
-                    <td if={ hasRole('super-admin') || hasRole('network-admin') }>{ render(row.gateway) }</td>
-                    <td>{ render(row.email) }</td>
-                    <td>{ render(row.created_at) }</td>
+                    <td if={ hasRole('super-admin') } data-label="Network">{ row.network ? render(row.network) : 'Any' }</td>
+                    <td if={ hasRole('super-admin') || hasRole('network-admin') } data-label="Gateway">{ row.gateway ? render(row.gateway) : 'Any' }</td>
+                    <td data-label="Roles">{ render(row.roles) }</td>
+                    <td data-label="Email">{ render(row.email) }</td>
+                    <td data-label="Created At">{ render(row.created_at) }</td>
 
                     <td class="actions actions-row">
                         <button class="pure-button" onclick={ remove } disabled={ currentuser.id == row['$id'] } title={ currentuser.id == row['$id'] ? 'Cowardly refuse to remove current user' : '' }>

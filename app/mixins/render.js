@@ -1,5 +1,9 @@
 riot.mixin('render', {
     render: function(attribute) {
+        if(attribute == null) {
+            return '-';
+        }
+
         switch(typeof attribute) {
             case 'object':
                 if (typeof attribute.$date != 'undefined') {

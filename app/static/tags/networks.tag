@@ -52,10 +52,10 @@
 
             <tbody>
                 <tr each={ row, i in rows } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
-                    <td><a href="#" onclick={ onEdit }>{ row['$id'] }</a></td>
-                    <td>{ render(row.title) }</td>
-                    <td>{ render(row.description) }</td>
-                    <td>{ render(row.created_at) }</td>
+                    <td data-label="ID"><a href="#" onclick={ onEdit }>{ row['$id'] }</a></td>
+                    <td data-label="Title">{ render(row.title) }</td>
+                    <td data-label="Description">{ render(row.description) }</td>
+                    <td data-label="Created At">{ render(row.created_at) }</td>
 
                     <td class="actions actions-row">
                         <button class="pure-button" onclick={ onRemove }>
