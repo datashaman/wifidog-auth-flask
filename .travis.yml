@@ -1,5 +1,7 @@
 language: python
 
+sudo: false
+
 node_js:
 - '0.12'
 
@@ -30,5 +32,7 @@ env:
 
 cache:
   directories:
+    - $HOME/.cache/bower
     - $HOME/.cache/pip
     - $HOME/.ccache
+    - $HOME/.npm
