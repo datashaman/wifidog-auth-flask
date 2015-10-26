@@ -34,3 +34,4 @@ cache:
     - $HOME/.cache/pip
     - $HOME/.ccache
     - $HOME/.npm
+    - $HOME/.nvm
