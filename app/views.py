@@ -221,3 +221,7 @@ def test():
 @bp.route('/')
 def home():
     return flask.redirect(flask.url_for('security.login'))
+
+@bp.route('/debug')
+def debug():
+    return flask.session

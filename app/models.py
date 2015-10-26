@@ -158,6 +158,7 @@ class Voucher(db.Model):
     def time_left(self):
         if self.started_at:
             seconds = ((self.started_at + datetime.timedelta(minutes=self.minutes)) - datetime.datetime.utcnow()).seconds
+            seconds = min(0, seconds)
             return seconds / 60
 
     @record_change

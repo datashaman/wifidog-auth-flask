@@ -12,6 +12,7 @@ actions = {
     },
     'extend': {
         'interface': 'admin',
+        'icon': 'timer'
     },
     'login': {
         'interface': 'user',

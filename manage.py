@@ -6,7 +6,7 @@ from app.admin import VoucherAdmin
 from app.models import Role, Network, Gateway, Voucher, db, users
 from flask.ext.script import Manager, prompt, prompt_pass
 from flask.ext.security.utils import encrypt_password
-from sqlalchemy import text
+from sqlalchemy import text, func
 
 
 ROLES = {
@@ -164,13 +164,28 @@ def create_roles(quiet=True):
 
 @manager.command
 def expire_vouchers():
-    # Vouchers that are in use and have expired
-    sql = "delete from vouchers where datetime(started_at, '+' || minutes || ' minutes') < current_timestamp"
-    db.engine.execute(text(sql))
-    
-    # Old vouchers that have not been used yet
-    sql = "delete from vouchers where datetime(created_at, '+' || %d || ' minutes') < current_timestamp and started_at is null" % app.config.get('VOUCHER_MAXAGE', 120)
-    db.engine.execute(text(sql))
+    # Active vouchers that should end
+    vouchers = Voucher.query \
+                .filter(func.datetime(Voucher.started_at, Voucher.minutes + ' minutes') < func.current_timestamp()) \
+                .filter(Voucher.status == 'active') \
+                .all()
 
+    for voucher in vouchers:
+        if voucher.should_end():
+            voucher.end()
+    
+    # New vouchers that are unused and should expire
+    max_age = app.config.get('VOUCHER_MAXAGE', 120)
+    vouchers = Voucher.query \
+                .filter(func.datetime(Voucher.created_at, str(max_age) + ' minutes') < func.current_timestamp()) \
+                .filter(Voucher.status == 'new') \
+                .all()
+
+    for voucher in vouchers:
+        if voucher.should_expire():
+            voucher.expire()
+
+    db.session.commit()
+    
 if __name__ == '__main__':
     manager.run()

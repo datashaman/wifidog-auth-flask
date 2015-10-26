@@ -3,22 +3,15 @@
         <h1>Vouchers</h1>
 
         <div class="actions-collection">
-            <form class="pure-form" onsubmit={ create }>
-                <fieldset>
-                    <input if={ hasRole('super-admin') } name="network" type="text" placeholder="NetworkID" required />
-                    <input if={ hasRole('super-admin') || hasRole('network-admin') } name="gateway" type="text" placeholder="GatewayID" required />
-                    <input name="minutes" type="number" min="0" step="30" value="60" required />
-                    <button type="submit" class="pure-button pure-button-primary">
-                        <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
-                        Create
-                    </button>
-                </fieldset>
-            </form>
+            <a href="/voucher" class="pure-button pure-button-primary">
+                <span class="oi" data-glyph="file" title="New Voucher" aria-hidden="true"></span>
+                New Voucher
+            </a>
         </div>
     </div>
 
     <div class="content">
-        <table if={ vouchers.length } width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+        <table if={ vouchers.length } id="vouchers" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -33,13 +26,13 @@
 
             <tbody>
                 <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
-                    <td data-label="ID">{ row['$id'] }</td>
-                    <td data-label="Status"><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
+                    <td class="id" data-label="ID">{ row['$id'] }</td>
+                    <td class="status" data-label="Status"><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
                     <td data-label="Times">{ renderTimes(row) }</td>
                     <td data-label="MAC/IP">{ render(row.mac) }<br />{ render(row.ip) }</td>
                     <td data-label="Minute Left">{ row.time_left ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>
 
-                    <td data-label="Actions" class="actions actions-row">
+                    <td class="actions actions-row">
                         <button class="pure-button" each={ action, defn in row.available_actions } value={ action } title={ action } onclick={ handleAction }>
                             <span if={ defn.icon } class="oi" data-glyph={ defn.icon } aria-hidden="true"></span>
                             { action }
