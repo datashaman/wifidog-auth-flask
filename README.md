@@ -43,4 +43,4 @@ Bootstrap the database (stored at data/local.db):
     python manage.py create_user -e network@example.com -p password -r network-admin -n example-network
     python manage.py create_user -e gateway@example.com -p password -r gateway-admin -n example-network -g example-gateway
 
-Read the help for each command for more options.
+Read the help for each command for more options. Read the Makefile for other development tasks.
