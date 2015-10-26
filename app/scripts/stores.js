@@ -104,7 +104,7 @@ gateways.on('gateway.upload', function(id, file) {
     return xhr.send(fd);
 });
 
-[ 'expire', 'end', 'extend', 'block', 'unblock' ].forEach(function(action) {
+[ 'expire', 'end', 'extend', 'block', 'unblock', 'archive' ].forEach(function(action) {
     vouchers.on('voucher.' + action, function(id) {
         $.ajax({
             type: 'POST',

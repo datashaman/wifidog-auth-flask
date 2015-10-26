@@ -7,6 +7,7 @@
                 <span class="oi" data-glyph="file" title="New Voucher" aria-hidden="true"></span>
                 New Voucher
             </a>
+            <input type="checkbox" checked={ showArchived } onchange={ toggleArchived } /> Show Archived
         </div>
     </div>
 
@@ -17,7 +18,6 @@
                     <th>ID</th>
                     <th>S</th>
                     <th>Times</th>
-                    <th>MAC/IP</th>
                     <th>Minutes Left</th>
 
                     <th class="actions">Actions</th>
@@ -25,11 +25,10 @@
             </thead>
 
             <tbody>
-                <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
+                <tr each={ row, i in vouchers } if={ showArchived || row.status != 'archived' } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
                     <td class="id" data-label="ID">{ row['$id'] }</td>
                     <td class="status" data-label="Status"><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
                     <td data-label="Times">{ renderTimes(row) }</td>
-                    <td data-label="MAC/IP">{ render(row.mac) }<br />{ render(row.ip) }</td>
                     <td data-label="Minutes Left">{ row.time_left ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>
 
                     <td class="actions actions-row">
@@ -49,13 +48,14 @@
     self.mixin('currentuser');
 
     self.vouchers = [];
+    self.showArchived = false;
 
     self.statusIcons = {
         new: 'file',
         active: 'bolt',
         finished: 'flag',
         expired: 'circle-x',
-        deleted: 'trash',
+        archived: 'trash',
         blocked: 'thumb-down'
     };
 
@@ -65,6 +65,10 @@
     });
 
     RiotControl.trigger('vouchers.load');
+
+    toggleArchived(e) {
+        this.showArchived = !this.showArchived;
+    }
 
     calculateEndAt(row) {
         if (row.started_at) {
