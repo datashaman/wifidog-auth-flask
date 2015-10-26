@@ -4,9 +4,7 @@ serve:
 serve-production:
 	gunicorn --reload -b '127.0.0.1:8080' 'app:create_app()'
 
-nodemon-tests:
-	rm -f data/tests.db
-	python manage.py bootstrap_tests
+nodemon-tests: bootstrap-tests
 	nodemon tests.py
 
 bootstrap-tests:

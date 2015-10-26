@@ -15,6 +15,7 @@ before_script:
   - nvm use v0.12.7
   - npm install -g bower gulp
   - make production-install bootstrap-tests
+  - cp data/tests.db data/local.db
   - make serve &
 
 script: "make tests tests-webdriver"

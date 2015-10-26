@@ -15,7 +15,7 @@ ACCESS_KEY = os.environ.get('SAUCE_ACCESS_KEY')
 
 sauce = SauceClient(USERNAME, ACCESS_KEY)
 
-FLASK_USERNAME = 'super-admin@example.com'
+FLASK_EMAIL = 'super-admin@example.com'
 FLASK_PASSWORD = 'admin'
 
 with open(BASE_DIR + '/tests/config.json') as config:
@@ -55,11 +55,11 @@ class SauceSampleTest(unittest.TestCase):
     def login(self):
         self.driver.get('http://localhost:8080/login')
         name = self.driver.find_element_by_name('email')
-        name.send_keys(FLASK_USERNAME)
+        name.send_keys(FLASK_EMAIL)
         pw = self.driver.find_element_by_name('password')
         pw.send_keys(FLASK_PASSWORD)
         button = self.driver.find_element_by_id('submit')
-        button.click_and_wait()
+        button.click()
         print 'logged in'
 
     def test_login(self):
