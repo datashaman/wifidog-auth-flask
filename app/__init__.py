@@ -3,12 +3,14 @@ import flask
 from app.admin import VoucherAdmin
 from app.models import User, Role, db, users
 from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource, logos
-from flask.ext.login import current_user, LoginManager
+from flask.ext.login import current_user, LoginManager, user_logged_in
 from flask.ext.uploads import configure_uploads
 from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
 from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed, Principal
 from flask.ext.security import Security
 
+def set_flash(sender, user):
+    flask.flash('You were logged in')
 
 def create_app():
     app = flask.Flask(__name__)
@@ -57,6 +59,8 @@ def create_app():
         if current_user.is_authenticated():
             return Identity(current_user.id)
         return AnonymousIdentity()
+
+    user_logged_in.connect(set_flash, app)
 
     return app
 

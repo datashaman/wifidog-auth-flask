@@ -7,10 +7,8 @@ import json
 from selenium import webdriver
 from sauceclient import SauceClient
 
-parentdir = os.path.dirname(os.path.abspath(__file__))
-os.sys.path.insert(0, parentdir)
-
-from app import create_app, init_db
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.sys.path.insert(0, BASE_DIR)
 
 # it's best to remove the hardcoded defaults and always get these values
 # from environment variables
@@ -61,11 +59,11 @@ class SauceSampleTest(unittest.TestCase):
 
     def login(self):
         # go to login page
-        self.driver.get('http://localhost:5000/login')
+        self.driver.get('http://localhost:8080/login')
 
-        # enter user name
+        # enter email
         name = self.driver.find_element_by_css_selector(
-            'input[name="username"]')
+            'input[name="email"]')
         name.send_keys(FLASK_USERNAME)
 
         # enter password
@@ -83,7 +81,7 @@ class SauceSampleTest(unittest.TestCase):
         self.login()
 
         # login check
-        message = self.driver.find_element_by_css_selector('.flash').text
+        message = self.driver.find_element_by_css_selector('.flashes').text
         assert 'You were logged in' in message
 
     def tearDown(self):

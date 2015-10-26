@@ -9,8 +9,6 @@
     <h1 class="panel-title">Login</h1>
 
     <div class="panel-body">
-        {% include 'layouts/flashes.html' %}
-
         <form method="post" action="{{ url_for('.wifidog_login') }}" class="pure-form pure-form-stacked">
             {{ form.csrf_token }}
             {{ form.gw_address | safe }}

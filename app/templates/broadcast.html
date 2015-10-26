@@ -6,8 +6,6 @@
     <h1 class="panel-title">Broadcast</h1>
 
     <div class="panel-body">
-        {% include 'layouts/flashes.html' %}
-
         <form method="post" action="{{ url_for('app.broadcast') }}" class="pure-form pure-form-stacked">
             {{ form.csrf_token }}
 

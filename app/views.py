@@ -2,16 +2,16 @@ import flask
 import json
 import time
 
+from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
+from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
+from app.utils import is_logged_in, has_role, has_a_role
 from flask import Blueprint, current_app
 from flask.ext.menu import register_menu, Menu
 from flask.ext.security import login_required, roles_required, roles_accepted, current_user
 
+
 menu = Menu()
 bp = flask.Blueprint('app', __name__)
-
-from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
-from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
-from app.utils import is_logged_in, has_role, has_a_role
 
 if False: # Push is disabled for now
     from app.push import redis, event_stream
