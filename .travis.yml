@@ -9,7 +9,7 @@ install:
 - pip install -r requirements.txt
 
 before_script:
-  - "make bootstrap-tests"
+  - "make install bootstrap-tests"
   - "make serve &"
 
 script: "make tests tests-webdriver"
