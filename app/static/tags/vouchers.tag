@@ -7,7 +7,7 @@
                 <span class="oi" data-glyph="file" title="New Voucher" aria-hidden="true"></span>
                 New Voucher
             </a>
-            <input type="checkbox" checked={ showArchived } onchange={ toggleArchived } /> Show Archived
+            <label><input type="checkbox" checked={ showArchived } onchange={ toggleArchived } /> Show Archived</label>
         </div>
     </div>
 
