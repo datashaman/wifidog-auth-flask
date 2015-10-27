@@ -80,6 +80,7 @@ class Network(db.Model):
 
     title = db.Column(db.Unicode(40), nullable=False)
     description = db.Column(db.UnicodeText)
+    ga_tracking_id = db.Column(db.String(20))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
@@ -159,7 +160,7 @@ class Voucher(db.Model):
     def time_left(self):
         if self.started_at:
             seconds = ((self.started_at + datetime.timedelta(minutes=self.minutes)) - datetime.datetime.utcnow()).seconds
-            seconds = min(0, seconds)
+            seconds = max(0, seconds)
             return seconds / 60
 
     @record_change
