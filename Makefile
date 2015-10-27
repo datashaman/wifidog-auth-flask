@@ -65,4 +65,7 @@ dot:
 deploy:
 	ssh -t cabot 'source /home/ubuntu/.nvm/nvm.sh; cd /var/www/auth; nvm use; git pull --ff-only && PATH=/home/ubuntu/.nvm/versions/node/v0.12.7/bin:/home/ubuntu/.rbenv/shims:/home/ubuntu/.virtualenvs/auth/bin:/usr/local/bin:/usr/bin:/bin make production-install'
 
+quick-deploy:
+	ssh -t cabot 'cd /var/www/auth; git pull --ff-only'
+
 .PHONY: serve bootstrap clean remove-db reboot deploy tests
