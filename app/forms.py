@@ -20,7 +20,7 @@ class BroadcastForm(Form):
 
 class LoginVoucherForm(Form):
     voucher = TextField('Voucher', [ validators.InputRequired() ], default=args_get('voucher'))
-    # email = TextField('Email Address', [ validators.InputRequired(), validators.Email() ])
+    email = HiddenField('Email Address')
 
     gw_address = HiddenField('Gateway Address', default=args_get('gw_address'))
     gw_port = HiddenField('Gateway Port', default=args_get('gw_port'))
