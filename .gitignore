@@ -4,5 +4,7 @@ bower_components/
 build/
 node_modules/
 tmp/
+vendor/
+.bundle/
 .ruby-version/
 .sass-cache/
