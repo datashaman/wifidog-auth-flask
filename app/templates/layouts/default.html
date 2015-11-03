@@ -56,9 +56,11 @@
         </div>
 
         <div id="main">
+            {% if show_flash != False %}
             <div class="content">
             {% include 'layouts/flashes.html' %}
             </div>
+            {% endif %}
 
             {% block content %}
             {% endblock %}

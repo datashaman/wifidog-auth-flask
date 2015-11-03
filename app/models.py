@@ -135,7 +135,7 @@ class Voucher(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     started_at = db.Column(db.DateTime)
     gw_address = db.Column(db.String(15))
-    gw_port = db.Column(db.Integer)
+    gw_port = db.Column(db.String(5))
 
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('vouchers', lazy='dynamic'))

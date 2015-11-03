@@ -9,6 +9,7 @@ Flask-Bcrypt
 Flask-Script
 Flask-Security
 Flask-Uploads
+blinker
 gitchangelog
 gunicorn
 lxml
@@ -16,6 +17,7 @@ markupsafe
 pillow
 sauceclient
 selenium
+requests
 
 # Python 2.6
 # ordereddict

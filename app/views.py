@@ -4,7 +4,9 @@ import time
 
 from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
 from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
+from app.signals import voucher_logged_in
 from app.utils import is_logged_in, has_role, has_a_role
+from blinker import Namespace
 from flask import Blueprint, current_app
 from flask.ext.menu import register_menu, Menu
 from flask.ext.security import login_required, roles_required, roles_accepted, current_user
@@ -152,11 +154,11 @@ def wifidog_login():
         voucher.token = generate_token()
         db.session.commit()
 
-        flask.session['voucher_token'] = voucher.token
-
-        # flask.flash('Logged in, continue to <a href="%s">%s</a>' % (form.url.data, form.url.data), 'success')
+        voucher_logged_in.send(flask.current_app._get_current_object(), voucher=voucher)
 
         url = 'http://%s:%s/wifidog/auth?token=%s' % (voucher.gw_address, voucher.gw_port, voucher.token)
+        print url
+
         return flask.redirect(url)
 
     if flask.request.method == 'GET':
