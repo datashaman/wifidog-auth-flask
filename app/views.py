@@ -11,6 +11,7 @@ bp = flask.Blueprint('app', __name__)
 
 from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
 from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
+from app.payu import get_transaction, set_transaction, capture
 from app.utils import is_logged_in, has_role, has_a_role
 
 if False: # Push is disabled for now
@@ -225,3 +226,25 @@ def home():
 @bp.route('/debug')
 def debug():
     return flask.session
+
+@bp.route('/pay')
+def pay():
+    return_url = flask.url_for('.pay_return', _external=True)
+    cancel_url = flask.url_for('.pay_cancel', _external=True)
+    response = set_transaction('ZAR', 1000, 'Something', return_url, cancel_url)
+    return flask.redirect('%s?PayUReference=%s' % (capture, response.payUReference))
+
+@bp.route('/pay/return')
+def pay_return():
+    response = get_transaction(flask.request.args.get('PayUReference'))
+    basketAmount = '{:.2f}'.format(int(response.basket.amountInCents) / 100)
+    category = 'success' if response.successful else 'error'
+    flask.flash(response.displayMessage, category)
+    return flask.render_template('payu/transaction.html', response=response, basketAmount=basketAmount)
+
+@bp.route('/pay/cancel')
+def pay_cancel():
+    response = get_transaction(flask.request.args.get('payUReference'))
+    basketAmount = '{:.2f}'.format(int(response.basket.amountInCents) / 100)
+    flask.flash(response.displayMessage, 'warning')
+    return flask.render_template('payu/transaction.html', response=response, basketAmount=basketAmount)
