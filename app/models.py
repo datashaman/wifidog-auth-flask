@@ -322,3 +322,41 @@ class Change(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship(User, backref=backref('changes', lazy='dynamic'))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+class Order(db.Model):
+    __tablename__ = 'orders'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship(User, backref=backref('orders', lazy='dynamic'))
+
+    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', onupdate='cascade'), nullable=False)
+    network = db.relationship(Network, backref=backref('orders', lazy='dynamic'))
+
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'))
+    gateway = db.relationship(Gateway, backref=backref('orders', lazy='dynamic'))
+
+    status = db.Column(db.String(20), nullable=False, default='new')
+    currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', onupdate='cascade'), nullable=False)
+    amount_in_cents = db.Column(db.Integer, nullable=False)
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+class Transaction(db.Model):
+    __tablename__ = 'transactions'
+
+    id = db.Column(db.String(40), primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship(User, backref=backref('transactions', lazy='dynamic'))
+
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', onupdate='cascade'), nullable=False)
+    order = db.relationship(Order, backref=backref('transactions', lazy='dynamic'))
+
+    type = db.Column(db.String(20), nullable=False, default='payment')
+    payload = db.Column(db.UnicodeText)
+    status = db.Column(db.String(20), nullable=False, default='new')
+    reference = db.Column(db.String(40))
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
