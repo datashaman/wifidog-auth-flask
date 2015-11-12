@@ -12,6 +12,7 @@ capture = 'https://staging.payu.co.za/rpp.do'
 additional_information = {
     'merchantReference': '123456',
     'supportedPaymentMethods': 'CREDITCARD',
+    'redirectChannel': 'responsive',
 }
 
 safekey = '{CE62CE80-0EFD-4035-87C1-8824C5C46E7F}'
