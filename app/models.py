@@ -323,6 +323,28 @@ class Change(db.Model):
     user = db.relationship(User, backref=backref('changes', lazy='dynamic'))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
+country_currencies = db.Table('country_currencies',
+    db.Column('country_id', db.String(3), db.ForeignKey('countries.id')),
+    db.Column('currency_id', db.String(3), db.ForeignKey('currencies.id'))
+)
+
+class Country(db.Model):
+    __tablename__ = 'countries'
+
+    id = db.Column(db.String(3), primary_key=True)
+    title = db.Column(db.Unicode(40), unique=True, nullable=False)
+
+    currencies = db.relationship('Currency', secondary=country_currencies,
+            backref=db.backref('countries', lazy='dynamic'))
+
+class Currency(db.Model):
+    __tablename__ = 'currencies'
+
+    id = db.Column(db.String(3), primary_key=True)
+    title = db.Column(db.Unicode(20), unique=True, nullable=False)
+    prefix = db.Column(db.String(10))
+    suffix = db.Column(db.String(10))
+
 class Order(db.Model):
     __tablename__ = 'orders'
 
