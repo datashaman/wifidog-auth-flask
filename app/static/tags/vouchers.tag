@@ -51,7 +51,7 @@
     self.statusIcons = {
         new: 'file',
         active: 'bolt',
-        finished: 'flag',
+        ended: 'flag',
         expired: 'circle-x',
         archived: 'trash',
         blocked: 'thumb-down'

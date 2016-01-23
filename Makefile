@@ -18,7 +18,7 @@ tests-webdriver:
 	python tests/test_webdriver.py
 
 setup:
-	sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
+	sudo apt-get install python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
 	sudo npm install -g bower gulp
 
 development-install:
@@ -63,7 +63,7 @@ dot:
 	dot -Tpng -O app/graphs.dot && eog app/graphs.dot.png
 
 deploy:
-	ssh -t cabot 'source /home/ubuntu/.nvm/nvm.sh; cd /var/www/auth; nvm use; git pull --ff-only && PATH=/home/ubuntu/.nvm/versions/node/v0.12.7/bin:/home/ubuntu/.rbenv/shims:/home/ubuntu/.virtualenvs/auth/bin:/usr/local/bin:/usr/bin:/bin make production-install'
+	ssh -t ubuntu@cabot.datashaman.com 'source /home/ubuntu/.nvm/nvm.sh; cd /var/www/auth; nvm use; git pull --ff-only && PATH=/home/ubuntu/.nvm/versions/node/v0.12.7/bin:/home/ubuntu/.rbenv/shims:/home/ubuntu/.virtualenvs/auth/bin:/usr/local/bin:/usr/bin:/bin make production-install'
 
 quick-deploy:
 	ssh -t cabot 'cd /var/www/auth; git pull --ff-only'
