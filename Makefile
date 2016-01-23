@@ -15,7 +15,7 @@ tests:
 	python tests.py
 
 setup:
-	sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
+	sudo apt-get install python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
 	sudo npm install -g bower gulp
 
 install:
