@@ -5,6 +5,9 @@ import os
 import tempfile
 import unittest
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.sys.path.insert(0, BASE_DIR)
+
 from app import create_app, init_db
 from app.models import db, users, Role
 from flask import current_app
@@ -12,8 +15,6 @@ from flask.ext.security.utils import encrypt_password
 from lxml import etree
 from manage import create_roles, create_user, create_network, create_gateway
 from StringIO import StringIO
-
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 with open(BASE_DIR + '/data/tests.db', 'r') as tests_db:
     content = tests_db.read()
@@ -222,7 +223,7 @@ class TestCase(unittest.TestCase):
     def test_voucher_new_as_gateway(self):
         self.login('main-gateway1@example.com', 'admin')
 
-        response = self.client.get('/voucher', follow_redirects=True)
+        response = self.client.get('/new-voucher', follow_redirects=True)
         self.assertEquals(200, response.status_code)
 
         html = self.get_html(response)
@@ -234,7 +235,7 @@ class TestCase(unittest.TestCase):
     def test_voucher_new_as_network(self):
         self.login('main-network@example.com', 'admin')
 
-        response = self.client.get('/voucher', follow_redirects=True)
+        response = self.client.get('/new-voucher', follow_redirects=True)
         self.assertEquals(200, response.status_code)
 
         html = self.get_html(response)
@@ -248,7 +249,7 @@ class TestCase(unittest.TestCase):
     def test_voucher_new_as_super(self):
         self.login('super-admin@example.com', 'admin')
 
-        response = self.client.get('/voucher', follow_redirects=True)
+        response = self.client.get('/new-voucher', follow_redirects=True)
         self.assertEquals(200, response.status_code)
 
         html = self.get_html(response)

@@ -23,10 +23,6 @@ body {
     }
 }
 
-h1 {
-    font-size: x-large;
-}
-
 button {
     margin-right: 6px;
 }
@@ -41,7 +37,6 @@ button {
 }
 
 table .actions {
-    width: 30%;
     text-align: right;
 }
 
@@ -90,10 +85,9 @@ th, td {
 }
 
 .voucher-id {
-    font-size: 200%;
     font-family: Georgia, Times, "Times New Roman", serif;
-    font-weight: normal;
-    text-align: justify;
+    font-size: 200%;
+    margin: 3px 0 6px;
 }
 
 .state {
@@ -149,21 +143,22 @@ th, td {
 
 // The content `<div>` is where all your content goes.
 .content {
-    padding: 0 2.5em;
+    padding: 0 3em;
     max-width: $content-width;
-    margin-bottom: 50px;
+    margin-bottom: 6px;
     line-height: 1.6em;
 }
 
 .header {
     margin: 0;
     color: #333;
-    padding: 1.5em 2.5em 0;
+    padding: 0 3em 0;
 
     h1 {
-        margin: 0.2em 0;
-        font-size: 3em;
+        margin: 0.2em 0 0.4em;
+        font-size: 1.95em;
         font-weight: 300;
+        border-bottom: 1px solid #cbcbcb;
     }
 
     h2 {

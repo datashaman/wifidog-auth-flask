@@ -4,21 +4,24 @@ serve:
 serve-production:
 	gunicorn --reload -b '127.0.0.1:8080' 'app:create_app()'
 
-nodemon-tests:
-	rm -f data/tests.db
-	python manage.py bootstrap_tests
+nodemon-tests: bootstrap-tests
 	nodemon tests.py
 
-tests:
+bootstrap-tests:
 	rm -f data/tests.db
 	python manage.py bootstrap_tests
-	python tests.py
+
+tests:
+	python tests/test_unit.py
+
+tests-webdriver:
+	python tests/test_webdriver.py
 
 setup:
 	sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
 	sudo npm install -g bower gulp
 
-install:
+development-install:
 	bundle install
 	pip install -r requirements.txt
 	npm install
@@ -28,6 +31,17 @@ install:
 	cd bower_components/pure && npm install && node_modules/.bin/grunt
 	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
 	gulp --dev
+
+production-install:
+	bundle install --without development --deployment --jobs=3 --retry=3
+	pip install -r requirements.txt
+	npm install
+	npm prune
+	bower install
+	bower prune
+	cd bower_components/pure && npm install && node_modules/.bin/grunt
+	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
+	gulp --dev # Must fix this
 
 bootstrap:
 	python bootstrap.py
@@ -49,6 +63,9 @@ dot:
 	dot -Tpng -O app/graphs.dot && eog app/graphs.dot.png
 
 deploy:
-	ssh -t cabot 'source /home/ubuntu/.nvm/nvm.sh; cd /var/www/auth; nvm use; git pull --ff-only && PATH=/home/ubuntu/.nvm/versions/node/v0.12.7/bin:/home/ubuntu/.rbenv/shims:/home/ubuntu/.virtualenvs/auth/bin:/usr/local/bin:/usr/bin:/bin make install'
+	ssh -t cabot 'source /home/ubuntu/.nvm/nvm.sh; cd /var/www/auth; nvm use; git pull --ff-only && PATH=/home/ubuntu/.nvm/versions/node/v0.12.7/bin:/home/ubuntu/.rbenv/shims:/home/ubuntu/.virtualenvs/auth/bin:/usr/local/bin:/usr/bin:/bin make production-install'
 
-.PHONY: serve install bootstrap clean remove-db reboot deploy
+quick-deploy:
+	ssh -t cabot 'cd /var/www/auth; git pull --ff-only'
+
+.PHONY: serve bootstrap clean remove-db reboot deploy tests

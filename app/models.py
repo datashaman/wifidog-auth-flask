@@ -80,6 +80,7 @@ class Network(db.Model):
 
     title = db.Column(db.Unicode(40), nullable=False)
     description = db.Column(db.UnicodeText)
+    ga_tracking_id = db.Column(db.String(20))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
@@ -131,9 +132,10 @@ class Voucher(db.Model):
     id = db.Column(db.String(20), primary_key=True, default=generate_id)
     minutes = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     started_at = db.Column(db.DateTime)
     gw_address = db.Column(db.String(15))
-    gw_port = db.Column(db.Integer)
+    gw_port = db.Column(db.String(5))
 
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('vouchers', lazy='dynamic'))
@@ -158,7 +160,7 @@ class Voucher(db.Model):
     def time_left(self):
         if self.started_at:
             seconds = ((self.started_at + datetime.timedelta(minutes=self.minutes)) - datetime.datetime.utcnow()).seconds
-            seconds = min(0, seconds)
+            seconds = max(0, seconds)
             return seconds / 60
 
     @record_change
@@ -185,6 +187,10 @@ class Voucher(db.Model):
     @record_change
     def unblock(self):
         self.status = 'active'
+
+    @record_change
+    def archive(self):
+        self.status = 'archived'
 
     @property
     def available_actions(self):

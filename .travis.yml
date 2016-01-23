@@ -1,8 +1,38 @@
 language: python
+
+sudo: false
+
 python:
-  - "2.7"
+- '2.7'
+
 install:
-    - if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then pip install ordereddict; fi
-    - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then pip install functools32; fi
-    - pip install -r requirements.txt
-script: "make tests"
+- nvm install v0.12.7
+- if [[ $TRAVIS_PYTHON_VERSION == 2.6 ]]; then pip install ordereddict; fi
+- if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then pip install functools32; fi
+- pip install -r requirements.txt
+
+before_script:
+  - nvm use v0.12.7
+  - npm install -g bower gulp
+  - make production-install bootstrap-tests
+  - cp data/tests.db data/local.db
+  - make serve &
+
+script: "make tests tests-webdriver"
+
+addons:
+  sauce_connect: true
+
+env:
+  global:
+  - secure: HnCnIx4m0dv63avtMGfLT2rFNfcHir3AfZhvTUYo/wYR9UrwFvNiHR2U2wF9rI1EjFACeytJvDKdZzocbjbDq0rZ8BIOVkOERVZeY/Esa91fToD66/U2pxzQuJLv3uy8lsVFtXk+y7I07ZZ1EXycdyUbcvOCNDXwTLNRjlB/MGgYMVSCgHow1ozN00MhUJ9ZHHSIuJPgqtw9lO7wgDGupfhnsJwDdVOleU7j5Z9wiyGmyZXPPk5MU/GmrwzDu1REJXjafpGuwpi1wkB4RxV4eHuI9uWYFH9+kZoRcISu7KIi63cEWl81/7p8Q/IA9D5Owd4SGPC1krVyrO0kHBNp6LBgWAGrrjPAoIBIPR3jO2wNGVRiR3P5PDDJY1/dINSjM3L7fbM+e2bgWB32SjdtdLN81WQ8DiiouTRTAOjpjs4k7oSzsUgEhGUOB1zMGS088pCozHVqGDi2uODCQlrJ8ebetUpwxPYevDby7VM5ojTYdJwKoNYQCb2ZyUENU2ITq+0iP2P8UEn1hfwKUDA4TRTHDcIHieg/DynMAyqqBpY0k2AbLh4QdjOYb7iJ0jyjq1VGuNDg5TAQH4gdryCvgif9DAN1b2KuN8wbRuEOFXzTJZSApZsv6qOxO70BsY7lzckqqcxSQehUPTNw2OHkgpGXwUIJCvjUtt/1rhDyJlU=
+  - secure: FLcoLbK821shPI6wI77zpVneD5r+hLJDfYUq4b3Erfqy3LqiBWnwl002rWDPvv3gmz1u6Vo3jq2LAaal5vaCOS1yCrHDZo4RcDuPOBF2eY9m/5JEsfiLbLNa2z85cYPiZ3KDTpbxVXAwjkVVixNjqcyOmAykSO2V0790KPThvYJ4vY/D64ei5cQGrzZK0NGOOEHhE7CpyznbNbIVf3Z2fuN7cPY2VdBOTm85qkVJeSOippFjOXhKVVii6YUi/ihtiQUn7SRv/iWtjlCeswBISbDKGhRtob1iDuf2hyB1+s2GQX35hCmXje2ng4rK+WsgnDmN+SQhOzeD3wNWqr1ds+piUPOZ1A6B+bV5OGrCcUCi6r979zeOdLKVdo2O+D68aDCndOmICdvrH60z3fuMtEIJWs2S4emO1AWWyf6tD+JeOxvP+XQoMVlVEasQZDwm90G9B3QwoQR3YEBa4MSKoT+XXOQl0LDclgf72bVYLdRwEbLDekc9hNAIeUeuQwD2mLPV1SrrZQtaGzXJVHbfUFME1EtQyMq3ivpwFkAE8U6Ch9rRYRkDxRMNNjiAtBxiB0eSMbitThhFExBuUqToLA1zo1cBEcibrJijsFLQYvrbTT17yXmz9Azl47rOSD9jEHH0H2OTgbQ78cxAGi6ioAqjsuJDIbsIQwDD875Xn8A=
+
+cache:
+  directories:
+    - vendor/bundle
+    - $HOME/.cache/bower
+    - $HOME/.cache/pip
+    - $HOME/.ccache
+    - $HOME/.npm
+    - $HOME/.nvm

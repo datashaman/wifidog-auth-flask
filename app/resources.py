@@ -50,6 +50,11 @@ class Manager(PrincipalManager):
         return query
 
 class VoucherManager(Manager):
+    def instances(self, where=None, sort=None):
+        query = super(VoucherManager, self).instances(where, sort)
+        query.filter(Voucher.status != 'archived')
+        return query
+
     def extend(self, voucher):
         voucher.extend()
         db.session.commit()
@@ -60,6 +65,10 @@ class VoucherManager(Manager):
 
     def unblock(self, voucher):
         voucher.unblock()
+        db.session.commit()
+
+    def archive(self, voucher):
+        voucher.archive()
         db.session.commit()
 
 class UserResource(PrincipalResource):
@@ -179,7 +188,7 @@ class VoucherResource(PrincipalResource):
             'read': gateway_or_above,
             'create': gateway_or_above,
             'update': gateway_or_above,
-            'delete': gateway_or_above,
+            'delete': 'no',
         }
         read_only_fields = ('created_at', 'available_actions', 'time_left')
 
@@ -200,6 +209,10 @@ class VoucherResource(PrincipalResource):
     @ItemRoute.POST
     def unblock(self, voucher):
         self.manager.unblock(voucher)
+
+    @ItemRoute.POST
+    def archive(self, voucher):
+        self.manager.archive(voucher)
 
 @signals.before_create.connect_via(GatewayResource)
 @signals.before_create.connect_via(UserResource)

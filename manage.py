@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+import hmac
+
 from app import create_app, init_db
 from app.admin import VoucherAdmin
 from app.models import Role, Network, Gateway, Voucher, db, users
 from flask.ext.script import Manager, prompt, prompt_pass
 from flask.ext.security.utils import encrypt_password
+from hashlib import md5
 from sqlalchemy import text, func
 
 
@@ -163,7 +166,7 @@ def create_roles(quiet=True):
             print 'Roles created'
 
 @manager.command
-def expire_vouchers():
+def process_vouchers():
     # Active vouchers that should end
     vouchers = Voucher.query \
                 .filter(func.datetime(Voucher.started_at, Voucher.minutes + ' minutes') < func.current_timestamp()) \
@@ -185,7 +188,20 @@ def expire_vouchers():
         if voucher.should_expire():
             voucher.expire()
 
+    # Blocked, ended and expired vouchers that should be archived
+    vouchers = Voucher.query \
+                .filter(func.datetime(Voucher.updated_at, str(max_age) + ' minutes') < func.current_timestamp()) \
+                .filter(Voucher.status.in_([ 'blocked', 'ended', 'expired' ])) \
+                .all()
+
+    for voucher in vouchers:
+        voucher.archive()
+
     db.session.commit()
+
+@manager.command
+def generate_key():
+    print hmac.new("datashaman:something", "something", md5).hexdigest()
     
 if __name__ == '__main__':
     manager.run()

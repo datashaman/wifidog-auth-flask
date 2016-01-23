@@ -16,7 +16,9 @@ function scripts(src, dest) {
 }
 
 function sass(src) {
-    return plugins.rubySass(src).on('error', plugins.rubySass.logError);
+    return plugins.rubySass(src, {
+        bundleExec: true
+    }).on('error', plugins.rubySass.logError);
 }
 
 function riot(src, dest) {

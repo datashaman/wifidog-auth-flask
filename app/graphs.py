@@ -1,5 +1,5 @@
 actions = {
-    'delete': {
+    'archive': {
         'interface': 'admin',
         'icon': 'x',
     },
@@ -41,7 +41,7 @@ def available_actions(status, interface):
 states = {}
 
 for state in ('new', 'active', 'expired', 'ended', 'blocked'):
-    states[state] = { 'delete': 'deleted' }
+    states[state] = { 'archive': 'archived' }
 
 for ( source, method, destination) in (
     ( 'new', 'expire', 'expired' ),
@@ -54,7 +54,7 @@ for ( source, method, destination) in (
     ( 'new', 'login', 'active' ),
 ):
     if source not in states:
-        states[source] = { 'delete': 'deleted' }
+        states[source] = { 'archive': 'archived' }
 
     states[source][method] = destination
 

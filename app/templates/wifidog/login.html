@@ -4,30 +4,24 @@
 {% set title = 'Voucher Login' %}
 
 {% block content %}
-<div class="content">
-<div class="panel panel-login">
-    <h1 class="panel-title">Login</h1>
-
-    <div class="panel-body">
-        {% include 'layouts/flashes.html' %}
-
-        <form method="post" action="{{ url_for('.wifidog_login') }}" class="pure-form pure-form-stacked">
-            {{ form.csrf_token }}
-            {{ form.gw_address | safe }}
-            {{ form.gw_port | safe }}
-            {{ form.gateway_id | safe }}
-            {{ form.mac | safe }}
-            {{ form.url | safe }}
-
-            <fieldset class="pure-group">
-                {{ render_field(form.voucher, class='pure-input-1', placeholder='Voucher', required=True) }}
-                <!--{{ render_field(form.email, class='pure-input-1', placeholder='Email', required=False) }}-->
-            </fieldset>
-
-            <button type="submit" class="pure-input-1 pure-button pure-button-primary">Go</button>
-        </form>
-    </div>
+<div class="header">
+    <h1>Login</h1>
 </div>
+
+<div class="content">
+    <form method="post" action="{{ url_for('.wifidog_login') }}" class="pure-form pure-form-stacked">
+        {{ form.csrf_token }}
+        {{ form.gw_address | safe }}
+        {{ form.gw_port | safe }}
+        {{ form.gateway_id | safe }}
+        {{ form.mac | safe }}
+        {{ form.url | safe }}
+
+        <fieldset class="pure-group">
+            {{ render_field(form.voucher, class='pure-input-1', placeholder='Voucher', required=True) }}
+        </fieldset>
+
+        <button type="submit" class="pure-input-1 pure-button pure-button-primary">Go</button>
+    </form>
 </div>
 {% endblock %}
-

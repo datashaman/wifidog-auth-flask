@@ -2,16 +2,18 @@ import flask
 import json
 import time
 
+from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
+from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
+from app.signals import voucher_logged_in
+from app.utils import is_logged_in, has_role, has_a_role
+from blinker import Namespace
 from flask import Blueprint, current_app
 from flask.ext.menu import register_menu, Menu
 from flask.ext.security import login_required, roles_required, roles_accepted, current_user
 
+
 menu = Menu()
 bp = flask.Blueprint('app', __name__)
-
-from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
-from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
-from app.utils import is_logged_in, has_role, has_a_role
 
 if False: # Push is disabled for now
     from app.push import redis, event_stream
@@ -96,17 +98,17 @@ def gateways_index():
 def users_index():
     return flask.render_template('users/index.html')
 
-@bp.route('/vouchers')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(bp, '.vouchers', 'Vouchers', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=30)
+@register_menu(bp, '.vouchers', 'Vouchers', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=5)
+@bp.route('/vouchers')
 def vouchers_index():
     return flask.render_template('vouchers/index.html')
 
-@bp.route('/voucher', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(bp, '.new-voucher', 'New Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=25)
+@register_menu(bp, '.new', 'New Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=0)
+@bp.route('/new-voucher', methods=[ 'GET', 'POST' ])
 def vouchers_new():
     form = NewVoucherForm(flask.request.form)
 
@@ -152,11 +154,11 @@ def wifidog_login():
         voucher.token = generate_token()
         db.session.commit()
 
-        flask.session['voucher_token'] = voucher.token
-
-        # flask.flash('Logged in, continue to <a href="%s">%s</a>' % (form.url.data, form.url.data), 'success')
+        voucher_logged_in.send(flask.current_app._get_current_object(), voucher=voucher)
 
         url = 'http://%s:%s/wifidog/auth?token=%s' % (voucher.gw_address, voucher.gw_port, voucher.token)
+        print url
+
         return flask.redirect(url)
 
     if flask.request.method == 'GET':
