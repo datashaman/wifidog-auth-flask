@@ -3,7 +3,7 @@
         <h1>Vouchers</h1>
 
         <div class="actions-collection">
-            <a href="/voucher" class="pure-button pure-button-primary">
+            <a href="/new-voucher" class="pure-button pure-button-primary">
                 <span class="oi" data-glyph="file" title="New Voucher" aria-hidden="true"></span>
                 New Voucher
             </a>
@@ -98,8 +98,9 @@
 
         switch(action) {
         case 'delete':
+        case 'archive':
             if(confirm('Are you sure?')) {
-                RiotControl.trigger('voucher.remove', id);
+                RiotControl.trigger('voucher.' + action, id);
             }
             break;
         default:

@@ -4,11 +4,15 @@
 {% set title = 'New Voucher' %}
 
 {% block content %}
+<div class="header">
+    <h1>New Voucher</h1>
+</div>
+
 <div class="content">
     <div class="panel panel-voucher">
-        <h1 class="panel-title voucher-id">
+        <div class="voucher-id">
             {{ request.args.get('id') }}
-        </h1>
+        </div>
 
         <div class="panel-body">
             <form method="post" class="pure-form pure-form-stacked">

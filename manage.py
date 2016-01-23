@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+import hmac
+
 from app import create_app, init_db
 from app.admin import VoucherAdmin
 from app.models import Role, Network, Gateway, Voucher, db, users
 from flask.ext.script import Manager, prompt, prompt_pass
 from flask.ext.security.utils import encrypt_password
+from hashlib import md5
 from sqlalchemy import text, func
 
 
@@ -195,6 +198,10 @@ def process_vouchers():
         voucher.archive()
 
     db.session.commit()
+
+@manager.command
+def generate_key():
+    print hmac.new("datashaman:something", "something", md5).hexdigest()
     
 if __name__ == '__main__':
     manager.run()
