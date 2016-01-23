@@ -154,14 +154,20 @@ class Voucher(db.Model):
         return self.created_at + datetime.timedelta(minutes=current_app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow()
 
     def should_end(self):
-        return self.started_at + datetime.timedelta(minutes=self.minutes) < datetime.datetime.utcnow()
+        if self.started_at:
+            return self.started_at + datetime.timedelta(minutes=self.minutes) < datetime.datetime.utcnow()
+        else:
+            return False
 
     @property
     def time_left(self):
         if self.started_at:
-            seconds = ((self.started_at + datetime.timedelta(minutes=self.minutes)) - datetime.datetime.utcnow()).seconds
-            seconds = max(0, seconds)
-            return seconds / 60
+            if self.should_end():
+                return 0
+            else:
+                seconds = ((self.started_at + datetime.timedelta(minutes=self.minutes)) - datetime.datetime.utcnow()).seconds
+                seconds = max(0, seconds)
+                return seconds / 60
 
     @record_change
     def extend(self):
