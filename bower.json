@@ -1,4 +1,5 @@
 {
+  "name": "wifidog-auth-flask",
   "private": true,
   "devDependencies": {
     "es5-shim": "~4.1.14",
