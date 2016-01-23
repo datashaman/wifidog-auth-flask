@@ -22,7 +22,7 @@ function Store(item, collection) {
     };
 
     self.load_collection = function() {
-        $.getJSON(base)
+        $.getJSON(base, { per_page: 100 })
             .done(function(data) {
                 console.log(collection, 'loaded', data);
                 self.trigger(collection + '.loaded', data);

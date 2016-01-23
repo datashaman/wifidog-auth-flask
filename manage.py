@@ -169,7 +169,6 @@ def create_roles(quiet=True):
 def process_vouchers():
     # Active vouchers that should end
     vouchers = Voucher.query \
-                .filter(func.datetime(Voucher.started_at, Voucher.minutes + ' minutes') < func.current_timestamp()) \
                 .filter(Voucher.status == 'active') \
                 .all()
 
@@ -180,7 +179,6 @@ def process_vouchers():
     # New vouchers that are unused and should expire
     max_age = app.config.get('VOUCHER_MAXAGE', 120)
     vouchers = Voucher.query \
-                .filter(func.datetime(Voucher.created_at, str(max_age) + ' minutes') < func.current_timestamp()) \
                 .filter(Voucher.status == 'new') \
                 .all()
 

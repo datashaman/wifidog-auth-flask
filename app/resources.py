@@ -51,8 +51,9 @@ class Manager(PrincipalManager):
 
 class VoucherManager(Manager):
     def instances(self, where=None, sort=None):
+        sort = (('status', False), ('created_at', True))
         query = super(VoucherManager, self).instances(where, sort)
-        query.filter(Voucher.status != 'archived')
+        query = query.filter(Voucher.status != 'archived')
         return query
 
     def extend(self, voucher):

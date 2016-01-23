@@ -7,7 +7,6 @@
                 <span class="oi" data-glyph="file" title="New Voucher" aria-hidden="true"></span>
                 New Voucher
             </a>
-            <label><input type="checkbox" checked={ showArchived } onchange={ toggleArchived } /> Show Archived</label>
         </div>
     </div>
 
@@ -25,11 +24,11 @@
             </thead>
 
             <tbody>
-                <tr each={ row, i in vouchers } if={ showArchived || row.status != 'archived' } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
+                <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
                     <td class="id" data-label="ID">{ row['$id'] }</td>
                     <td class="status" data-label="Status"><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
                     <td data-label="Times">{ renderTimes(row) }</td>
-                    <td data-label="Minutes Left">{ row.time_left ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>
+                    <td data-label="Minutes Left">{ row.status == 'active' ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>
 
                     <td class="actions actions-row">
                         <button class="pure-button" each={ action, defn in row.available_actions } value={ action } title={ action } onclick={ handleAction }>
@@ -48,7 +47,6 @@
     self.mixin('currentuser');
 
     self.vouchers = [];
-    self.showArchived = false;
 
     self.statusIcons = {
         new: 'file',
@@ -65,10 +63,6 @@
     });
 
     RiotControl.trigger('vouchers.load');
-
-    toggleArchived(e) {
-        this.showArchived = !this.showArchived;
-    }
 
     calculateEndAt(row) {
         if (row.started_at) {
