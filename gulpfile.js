@@ -46,7 +46,11 @@ var isProduction = true,
         'app/scripts/notifications.js',
         'app/scripts/stores.js',
         'app/scripts/ui.js',
-        'app/mixins/**/*.js'
+        'app/mixins/crud.js',
+        'app/mixins/currentuser.js',
+        'app/mixins/events.js',
+        'app/mixins/networks.js',
+        'app/mixins/render.js'
     ];
 
 if(gutil.env.dev === true) {

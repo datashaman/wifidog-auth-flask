@@ -1,7 +1,7 @@
 riot.mixin('crud', {
     init: function() {
         RiotControl.on(this.collection + '.loaded', function (rows) {
-            this.update({ rows });
+            this.update({ rows: rows });
         }.bind(this));
 
         RiotControl.on(this.item + '.loaded', function (row) {
@@ -16,7 +16,7 @@ riot.mixin('crud', {
             response.errors.forEach(function(error) {
                 errors[error.path[0]] = error.message;
             });
-            this.update({ errors });
+            this.update({ errors: errors });
         }.bind(this));
 
         RiotControl.on(this.item + '.saved', function () {
