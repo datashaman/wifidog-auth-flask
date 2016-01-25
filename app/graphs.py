@@ -46,7 +46,6 @@ for state in ('new', 'active', 'expired', 'ended', 'blocked'):
 for ( source, method, destination) in (
     ( 'new', 'expire', 'expired' ),
     ( 'new', 'extend', 'new' ),
-    ( 'new', 'block', 'blocked' ),
     ( 'active', 'extend', 'active' ),
     ( 'active', 'end', 'ended' ),
     ( 'active', 'block', 'blocked' ),
