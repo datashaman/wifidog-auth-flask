@@ -18,6 +18,7 @@ pillow
 sauceclient
 selenium
 requests
+influxdb
 
 # Python 2.6
 # ordereddict
