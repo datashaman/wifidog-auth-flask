@@ -63,7 +63,7 @@ dot:
 	dot -Tpng -O app/graphs.dot && eog app/graphs.dot.png
 
 deploy:
-	ssh -t ubuntu@cabot.datashaman.com 'source /home/ubuntu/.nvm/nvm.sh; cd /var/www/auth; nvm use; git pull --ff-only && PATH=/home/ubuntu/.nvm/versions/node/v0.12.7/bin:/home/ubuntu/.rbenv/shims:/home/ubuntu/.virtualenvs/auth/bin:/usr/local/bin:/usr/bin:/bin make production-install'
+	fab -H ubuntu@cabot.datashaman.com deploy
 
 quick-deploy:
 	ssh -t cabot 'cd /var/www/auth; git pull --ff-only'

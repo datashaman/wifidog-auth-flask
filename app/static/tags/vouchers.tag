@@ -18,6 +18,7 @@
                     <th>S</th>
                     <th>Times</th>
                     <th>Minutes Left</th>
+                    <th style="text-align:right">Traffic (MB)</th>
 
                     <th class="actions">Actions</th>
                 </tr>
@@ -29,6 +30,7 @@
                     <td class="status" data-label="Status"><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
                     <td data-label="Times">{ renderTimes(row) }</td>
                     <td data-label="Minutes Left">{ row.status == 'active' ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>
+                    <td data-label="Traffic" style="text-align:right">{ renderBytes(row.incoming) } in; { renderBytes(row.outgoing) } out; { renderBytes(row.incoming + row.outgoing) } both</td>
 
                     <td class="actions actions-row">
                         <button class="pure-button" each={ action, defn in row.available_actions } value={ action } title={ action } onclick={ handleAction }>
@@ -82,6 +84,10 @@
         }
 
         return result;
+    }
+
+    renderBytes(bytes) {
+        return Math.floor(bytes / 1024 / 1024);
     }
 
     handleAction(e) {

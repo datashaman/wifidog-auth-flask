@@ -1,4 +1,4 @@
-<portal about="/api/gateway/{{ gateway.id }}">
+<portal about="/api/gateway/{ gateway.id }">
     <ul class="actions">
         <button if={ mode == 'display' && isAdmin() } onclick={ onEdit }>Edit</button>
         <button if={ mode == 'edit' } onclick={ onDisplay }>Display</button>
