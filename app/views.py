@@ -10,7 +10,10 @@ from blinker import Namespace
 from flask import Blueprint, current_app
 from flask.ext.menu import register_menu, Menu
 from flask.ext.security import login_required, roles_required, roles_accepted, current_user
+from influxdb import InfluxDBClient
 
+
+influx = InfluxDBClient(database='auth')
 
 menu = Menu()
 bp = flask.Blueprint('app', __name__)
@@ -184,6 +187,25 @@ def wifidog_ping():
     )
     db.session.add(ping)
     db.session.commit()
+
+    def generate_point(measurement):
+        return {
+            "measurement": measurement,
+            "tags": {
+                "source": "ping",
+                "network_id": ping.gateway.network_id,
+                "gateway_id": ping.gateway_id,
+                "user_agent": ping.user_agent,
+            },
+            "time": ping.created_at,
+            "fields": {
+                "value": getattr(ping, measurement),
+            }
+        }
+
+    points = [generate_point(m) for m in [ 'sys_uptime', 'sys_memfree', 'sys_load', 'wifidog_uptime' ]]
+    influx.write_points(points)
+
     return ('Pong', 200)
 
 @bp.route('/wifidog/auth/')
@@ -204,6 +226,28 @@ def wifidog_auth():
     db.session.add(auth)
     db.session.commit()
 
+    def generate_point(measurement):
+        return {
+            "measurement": measurement,
+            "tags": {
+                "source": "auth",
+                "network_id": auth.gateway.network_id,
+                "gateway_id": auth.gateway_id,
+                "user_agent": auth.user_agent,
+                "stage": auth.stage,
+                "ip": auth.ip,
+                "mac": auth.mac,
+                "token": auth.token,
+            },
+            "time": auth.created_at,
+            "fields": {
+                "value": getattr(auth, measurement),
+            }
+        }
+
+    points = [generate_point(m) for m in [ 'incoming', 'outgoing' ]]
+    influx.write_points(points)
+
     return ("Auth: %s\nMessages: %s\n" % (auth.status, auth.messages), 200)
 
 @bp.route('/wifidog/portal/')
@@ -215,10 +259,6 @@ def wifidog_portal():
         voucher = None
     gateway = Gateway.query.filter_by(id=flask.request.args.get('gw_id')).first_or_404()
     return flask.render_template('wifidog/portal.html', gateway=gateway, voucher=voucher)
-
-@bp.route('/test')
-def test():
-    return flask.render_template('test.html')
 
 @bp.route('/')
 def home():

@@ -199,8 +199,8 @@ class TestCase(unittest.TestCase):
         vouchers = json.loads(response.data)
         self.assertEquals(2, len(vouchers))
 
-        self.assertEquals('main-1-1', vouchers[0]['$id'])
-        self.assertEquals('main-1-2', vouchers[1]['$id'])
+        self.assertEquals('main-1-2', vouchers[0]['$id'])
+        self.assertEquals('main-1-1', vouchers[1]['$id'])
 
     def test_api_vouchers_index_as_network(self):
         self.login('main-network@example.com', 'admin')
