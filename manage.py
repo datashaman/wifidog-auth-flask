@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 import hmac
+import json
 
 from app import create_app, init_db
 from app.admin import VoucherAdmin
@@ -200,6 +201,23 @@ def process_vouchers():
 @manager.command
 def generate_key():
     print hmac.new("datashaman:something", "something", md5).hexdigest()
+
+
+@manager.command
+def measurements():
+    (incoming, outgoing) = db.session.query(func.sum(Voucher.incoming), func.sum(Voucher.outgoing)).first()
+
+    measurements = {
+            'vouchers': {
+                'active': Voucher.query.filter_by(status='active').count(),
+                'blocked': Voucher.query.filter_by(status='blocked').count(),
+                'incoming': incoming,
+                'outgoing': outgoing,
+                'both': incoming + outgoing,
+            }
+    }
+
+    return json.dumps(measurements)
     
 if __name__ == '__main__':
     manager.run()
