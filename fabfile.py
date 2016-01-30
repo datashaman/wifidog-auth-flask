@@ -22,3 +22,4 @@ def deploy():
 
         sudo('supervisorctl reread')
         sudo('supervisorctl update')
+        sudo('supervisorctl restart auth')
