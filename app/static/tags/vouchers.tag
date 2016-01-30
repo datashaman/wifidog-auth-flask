@@ -28,7 +28,7 @@
             <tbody>
                 <tr each={ row, i in vouchers } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
                     <td class="id" data-label="ID">{ row['$id'] }</td>
-                    <td class="name" data-label="Name">{ row.name }</td>
+                    <td class="name" data-label="Name">{ row.name ? row.name : '-' }</td>
                     <td class="status" data-label="Status"><span class="oi" data-glyph={ statusIcons[row.status] } title={ row.status } aria-hidden="true"></span></td>
                     <td data-label="Times">{ renderTimes(row) }</td>
                     <td data-label="Minutes Left">{ row.status == 'active' ? render(row.time_left) + '/' : '' }{ render(row.minutes) }</td>

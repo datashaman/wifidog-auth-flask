@@ -280,6 +280,13 @@ small screens.
     }
 }
 
+table#vouchers {
+    .name {
+        font-weight: bold;
+        color: #000000;
+    }
+}
+
 @media (max-width: 56em) {
     /* Only apply this when the window is small. Otherwise, the following
      * case results in extra padding on the left:
@@ -318,16 +325,18 @@ small screens.
         font-family: sans-serif;
     }
 
-    table#vouchers td.id {
-        font-family: Georgia, Times, "Times New Roman", serif;
-        font-size: 22px;
-    }
+    table#vouchers {
+        td.id {
+            font-family: Georgia, Times, "Times New Roman", serif;
+            font-size: 22px;
+        }
 
-    table#vouchers td.status .oi:after {
-        margin-left: 6px;
-        content: attr(title);
-        text-transform: uppercase;
-        font-size: 19px;
+        td.status .oi:after {
+            margin-left: 6px;
+            content: attr(title);
+            text-transform: uppercase;
+            font-size: 19px;
+        }
     }
 
     table td {
