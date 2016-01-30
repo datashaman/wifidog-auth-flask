@@ -69,9 +69,6 @@ dot:
 	dot -Tpng -O app/graphs.dot && eog app/graphs.dot.png
 
 deploy:
-	fab -H ubuntu@cabot.datashaman.com deploy
-
-quick-deploy:
-	ssh -t cabot 'cd /var/www/auth; git pull --ff-only'
+	fab -H ubuntu@auth.datashaman.com deploy
 
 .PHONY: serve bootstrap clean remove-db reboot deploy tests
