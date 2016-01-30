@@ -10,7 +10,9 @@ commit = 'develop'
 def deploy():
     with cd('/var/www/auth'):
         run('git remote update -p')
+
         run('git checkout %s' % commit)
+        run('git pull --ff-only')
 
         with prefix('source /home/ubuntu/.virtualenvs/auth/bin/activate'):
             with prefix('source /home/ubuntu/.nvm/nvm.sh'), prefix('nvm use'):
