@@ -136,6 +136,7 @@ class GatewayResource(PrincipalResource):
         id = fields.String(min_length=3, max_length=20)
         network = fields.ToOne('networks')
         title = fields.String(min_length=3)
+        login_ask_name = fields.Boolean(default=False)
 
     @ItemRoute.POST
     def logo(self, gateway):

@@ -5,6 +5,7 @@ Flask-Potion==0.8.1
 Flask-Principal>=0.4.0
 Flask-Login==0.2.11
 Flask-Menu
+Flask-Migrate
 Flask-Bcrypt
 Flask-Script
 Flask-Security

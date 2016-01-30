@@ -43,6 +43,12 @@ production-install:
 	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
 	gulp --dev # Must fix this
 
+db-migrate:
+	python manage.py db migrate
+
+db-upgrade:
+	python manage.py db upgrade
+
 bootstrap:
 	python bootstrap.py
 

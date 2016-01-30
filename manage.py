@@ -9,6 +9,7 @@ from app.admin import VoucherAdmin
 from app.models import Role, Network, Gateway, Voucher, db, users
 from flask.ext.script import Manager, prompt, prompt_pass
 from flask.ext.security.utils import encrypt_password
+from flask.ext.migrate import Migrate, MigrateCommand
 from hashlib import md5
 from sqlalchemy import text, func
 
@@ -20,7 +21,11 @@ ROLES = {
 }
 
 app = create_app()
+
 manager = Manager(app)
+migrate = Migrate(app, db)
+
+manager.add_command('db', MigrateCommand)
 
 @manager.command
 def bootstrap_tests():
@@ -205,7 +210,7 @@ def generate_key():
 
 @manager.command
 def measurements():
-    (incoming, outgoing) = db.session.query(func.sum(Voucher.incoming), func.sum(Voucher.outgoing)).first()
+    (incoming, outgoing) = db.session.query(func.sum(Voucher.incoming), func.sum(Voucher.outgoing)).filter(Voucher.status == 'active').first()
 
     measurements = {
             'vouchers': {

@@ -9,6 +9,7 @@
                     <li class="pure-menu-item { 'pure-menu-selected': parent.modal.active == 'contact' }"><a href="#" onclick={ parent.showTab('contact') } class="pure-menu-link">Contact</a></li>
                     <li class="pure-menu-item { 'pure-menu-selected': parent.modal.active == 'social' }"><a href="#" onclick={ parent.showTab('social') } class="pure-menu-link">Social</a></li>
                     <li class="pure-menu-item { 'pure-menu-selected': parent.modal.active == 'logo' }"><a href="#" onclick={ parent.showTab('logo') } class="pure-menu-link">Logo</a></li>
+                    <li class="pure-menu-item { 'pure-menu-selected': parent.modal.active == 'advanced' }"><a href="#" onclick={ parent.showTab('advanced') } class="pure-menu-link">Advanced</a></li>
                 </ul>
             </div>
 
@@ -86,6 +87,19 @@
                 </div>
             </div>
 
+            <div if={ parent.modal.active == 'advanced' } id="tab-advanced" class="tab-content">
+                <div class="pure-g">
+                    <div class="pure-u-1">
+                        <label for="login_ask_name" class="pure-checkbox">
+                            <input type="checkbox" id="login_ask_name" name="login_ask_name" checked={ opts.row.login_ask_name == 1 } />
+                            Ask for name on login?
+                        </label>
+                        <div if={ opt.errors.login_ask_name } class="state state-invalid">{ opt.errors.login_ask_name }</div>
+                    </div>
+                </div>
+            </div>
+
+
             <div class="actions">
                 <button type="submit" class="pure-button pure-button-primary" onclick={ parent.onOk }>Ok</button>
                 <button type="button" class="pure-button" onclick={ parent.triggerEvent('gateway.cancel') }>Cancel</button>
@@ -159,8 +173,12 @@
             'contact_email',
             'contact_phone',
             'url_home',
-            'url_facebook'
+            'url_facebook',
+            'login_ask_name'
         ],
+        checkboxes: [
+            'login_ask_name',
+        ]
     });
 
     this.mixin('crud');
@@ -168,6 +186,11 @@
     this.mixin('events');
     this.mixin('networks');
     this.mixin('render');
+
+    toggleCheckbox(e) {
+        console.log('here');
+        console.log(this.refs.login_ask_name.value);
+    }
 
     beforeSave(data, modal) {
         data.network = this.hasRole('super-admin') ? modal.network.value : this.currentuser.network;

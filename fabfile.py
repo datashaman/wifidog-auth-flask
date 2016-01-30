@@ -9,3 +9,4 @@ def deploy():
         run('git remote update -p')
         run('git checkout %s' % commit)
         run('make production-install')
+        run('make db-upgrade')
