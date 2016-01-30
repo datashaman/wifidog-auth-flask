@@ -14,7 +14,6 @@ def default_minutes():
 class NewVoucherForm(Form):
     gateway_id = SelectField('Gateway')
     minutes = IntegerField('Minutes', [ validators.InputRequired(), validators.NumberRange(min=0) ], default=default_minutes)
-    name = StringField('Name')
 
 class BroadcastForm(Form):
     message = StringField('Message', [ validators.InputRequired() ])
