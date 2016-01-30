@@ -228,7 +228,7 @@ def wifidog_auth():
 
     def generate_point(measurement):
         return {
-            "measurement": measurement,
+            "measurement": 'auth_' % measurement,
             "tags": {
                 "source": "auth",
                 "network_id": auth.gateway.network_id,
