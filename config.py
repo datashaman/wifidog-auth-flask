@@ -1,7 +1,7 @@
 import os
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-APP_VERSION = '0.5.0'
+APP_VERSION = '0.6.0'
 CSRF_SESSION_KEY = 'ABigSecretIsHardToFind'
 DATABASE_CONNECTION_OPTIONS = {}
 DEBUG = True
