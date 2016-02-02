@@ -28,6 +28,12 @@ Zepto(function($) {
             new Notification('Your session is about to expire. You have 5 minutes left.');
         }, (time_left - 5) * 60000);
     }
+
+    if(time_left > 10) {
+        setTimeout(function() {
+            new Notification('Your session is about to expire. You have 10 minutes left.');
+        }, (time_left - 10) * 60000);
+    }
 });
 </script>
 {% endif %}
