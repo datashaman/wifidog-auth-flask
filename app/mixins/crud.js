@@ -53,9 +53,18 @@ riot.mixin('crud', {
         var modal = this.tags.modal,
             data = {};
 
+		this.checkboxes = this.checkboxes || [];
+
         this.saveColumns.forEach(function(column) {
-            data[column] = $(modal[column]).val();
-        });
+			var value;
+            if (this.checkboxes.indexOf(column) > -1) {
+				value = $(modal[column]).is(':checked');
+			} else {
+				value = $(modal[column]).val();
+			}
+			data[column] = value;
+        	console.log('Set ' + column + ' to ' + value);
+        }.bind(this));
 
         if(this.beforeSave !== undefined) {
             this.beforeSave(data, modal);

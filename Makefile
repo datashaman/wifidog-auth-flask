@@ -43,6 +43,12 @@ production-install:
 	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
 	gulp --dev # Must fix this
 
+db-migrate:
+	python manage.py db migrate
+
+db-upgrade:
+	python manage.py db upgrade
+
 bootstrap:
 	python bootstrap.py
 
@@ -63,9 +69,6 @@ dot:
 	dot -Tpng -O app/graphs.dot && eog app/graphs.dot.png
 
 deploy:
-	ssh -t ubuntu@cabot.datashaman.com 'source /home/ubuntu/.nvm/nvm.sh; cd /var/www/auth; nvm use; git pull --ff-only && PATH=/home/ubuntu/.nvm/versions/node/v0.12.7/bin:/home/ubuntu/.rbenv/shims:/home/ubuntu/.virtualenvs/auth/bin:/usr/local/bin:/usr/bin:/bin make production-install'
-
-quick-deploy:
-	ssh -t cabot 'cd /var/www/auth; git pull --ff-only'
+	fab -H ubuntu@auth.datashaman.com deploy
 
 .PHONY: serve bootstrap clean remove-db reboot deploy tests

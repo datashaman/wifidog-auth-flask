@@ -9,9 +9,12 @@
 {% endif %}
 {% endmacro %}
 
-{% macro render_group(field, label=None) %}
+{% macro render_group(field) %}
 <div class="pure-control-group">
-    <label for="{{ field.name }}">{{ label or field.label }}</label>
-    {{ render_field(field, required=field.flags.required) }}
+    {% if kwargs['required'] %}<b>{% endif %}{{ label or field.label }}{% if kwargs['required'] %}</b>{% endif %}
+    {{ render_field(field, **kwargs) }}
+    {% if field.description %}
+    <span class="description">{{ field.description }}</span>
+    {% endif %}
 </div>
 {% endmacro %}

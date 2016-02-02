@@ -104,6 +104,8 @@ class Gateway(db.Model):
 
     logo = db.Column(db.String(255))
 
+    login_ask_name = db.Column(db.Boolean(), default=False)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
 def record_change(f):
@@ -124,6 +126,7 @@ def record_change(f):
             change.user_id = current_user.id
 
         db.session.add(change)
+
     return func
 
 class Voucher(db.Model):
@@ -143,6 +146,7 @@ class Voucher(db.Model):
     mac = db.Column(db.String(20))
     ip = db.Column(db.String(15))
     url = db.Column(db.Unicode(255))
+    name = db.Column(db.Unicode(255))
     email = db.Column(db.Unicode(255))
     token = db.Column(db.String(255))
     incoming = db.Column(db.BigInteger, default=0)
