@@ -19,8 +19,8 @@ class BroadcastForm(Form):
     message = StringField('Message', [ validators.InputRequired() ])
 
 class LoginVoucherForm(Form):
-    voucher = StringField('Voucher', [ validators.InputRequired() ], default=args_get('voucher'))
-    name = StringField('Name')
+    voucher = StringField('* Voucher', [ validators.InputRequired() ], default=args_get('voucher'), description='The voucher code you were given at the counter')
+    name = StringField('Your Name', description='Optional, so we know what to call you')
 
     gw_address = HiddenField('Gateway Address', default=args_get('gw_address'))
     gw_port = HiddenField('Gateway Port', default=args_get('gw_port'))

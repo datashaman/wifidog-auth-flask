@@ -1,5 +1,5 @@
 {% extends 'layouts/default.html' %}
-{% from 'helpers/form.html' import render_field %}
+{% from 'helpers/form.html' import render_group %}
 
 {% set title = 'Voucher Login' %}
 
@@ -9,7 +9,7 @@
 </div>
 
 <div class="content">
-    <form method="post" action="{{ url_for('.wifidog_login') }}" class="pure-form pure-form-stacked">
+    <form method="post" action="{{ url_for('.wifidog_login') }}" class="pure-form pure-form-aligned">
         {{ form.csrf_token }}
         {{ form.gw_address | safe }}
         {{ form.gw_port | safe }}
@@ -17,9 +17,9 @@
         {{ form.mac | safe }}
         {{ form.url | safe }}
 
-        <fieldset class="pure-group">
-            {{ render_field(form.voucher, class='pure-input-1', placeholder='Voucher', required=True) }}
-            {{ render_field(form.name, class='pure-input-1', placeholder='Name') }}
+        <fieldset>
+            {{ render_group(form.voucher, required=True) }}
+            {{ render_group(form.name) }}
         </fieldset>
 
         <button type="submit" class="pure-input-1 pure-button pure-button-primary">Go</button>
