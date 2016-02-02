@@ -1,5 +1,5 @@
 $menu-width: 200px;
-$content-width: 1280px - $menu-width;
+$content-width: 1600px - $menu-width;
 
 * {
     box-sizing: border-box;
@@ -355,6 +355,10 @@ table#vouchers {
 
     .pure-table-horizontal td {
         border-bottom: none;
+    }
+
+    .pure-button-primary {
+        width: 100%;
     }
 }
 

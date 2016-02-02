@@ -9,6 +9,8 @@
 </div>
 
 <div class="content">
+    <p><strong>Note:</strong> A voucher give you Internet access on one device only.</p>
+
     <form method="post" action="{{ url_for('.wifidog_login') }}" class="pure-form pure-form-aligned">
         {{ form.csrf_token }}
         {{ form.gw_address | safe }}
@@ -20,9 +22,10 @@
         <fieldset>
             {{ render_group(form.voucher, required=True) }}
             {{ render_group(form.name) }}
+            <div class="pure-controls">
+                <button type="submit" class="pure-button pure-button-primary">Go</button>
+            </div>
         </fieldset>
-
-        <button type="submit" class="pure-input-1 pure-button pure-button-primary">Go</button>
     </form>
 </div>
 {% endblock %}
