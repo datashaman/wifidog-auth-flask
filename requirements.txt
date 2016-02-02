@@ -16,10 +16,11 @@ gunicorn
 lxml
 markupsafe
 pillow
+requests
 sauceclient
 selenium
-requests
 influxdb
+suds-jurko
 
 # Python 2.6
 # ordereddict
