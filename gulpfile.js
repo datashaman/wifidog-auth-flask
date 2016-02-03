@@ -36,7 +36,7 @@ var isProduction = true,
         'app/styles/**/*.scss'
     ],
     siteTags = [
-        'app/static/tags/**/*.tag'
+        'app/tags/**/*.tag'
     ],
     ieScripts = [
         'bower_components/es5-shim/es5-shim.js',
@@ -55,7 +55,7 @@ var isProduction = true,
         'app/mixins/events.js',
         'app/mixins/networks.js',
         'app/mixins/render.js',
-        'app/static/tags/**/*.js'
+        'app/tags/**/*.js'
     ];
 
 if(gutil.env.dev === true) {
@@ -65,9 +65,6 @@ if(gutil.env.dev === true) {
 gulp.task('styles', function() {
     return es.concat(gulp.src(vendorStyles), sass(siteStyles))
                 .pipe(plugins.concat('screen.min.css'))
-                // .pipe(plugins.uncss({
-                	// html: [ 'app/templates/**/*.html' ]
-				// }))
                 .pipe(plugins.autoprefixer('last 2 versions', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4', 'Firefox >= 4'))
                 // .pipe(isProduction ? plugins.combineMediaQueries({ log: true }) : gutil.noop())
                 .pipe(isProduction ? plugins.cssnano() : gutil.noop())
@@ -87,9 +84,9 @@ gulp.task('scripts', [ 'tags' ], function() {
 
 gulp.task('tags', function() {
 	return gulp.src([
-		'app/static/tags/**/*.tag'
+		'app/tags/**/*.tag'
 	]).pipe(plugins.riot())
-	  .pipe(gulp.dest('./app/static/tags'));
+	  .pipe(gulp.dest('./app/tags'));
 });
 
 gulp.task('fonts', function() {
