@@ -1,3 +1,4 @@
+import os
 from fabric import *
 from fabric.contrib.files import *
 
@@ -19,6 +20,14 @@ def deploy():
                 run('make production-install')
 
             run('make db-upgrade')
+
+        # Load host-based environment variables into env
+        with open('fabric/env/%s' % env.host) as env_file:
+            env.environment = {}
+
+            for line in env_file:
+                (key, value) = line.strip().split('=', 1)
+                env.environment[key] = value
 
         upload_template('fabric/supervisor/auth.conf', '/etc/supervisor/conf.d', template_dir=dirname, context=env, use_sudo=True, use_jinja=True)
 

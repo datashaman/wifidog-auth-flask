@@ -1,25 +1,26 @@
+blinker
 Flask
-Flask-SQLAlchemy>=2.0
-Flask-WTF
-Flask-Potion==0.8.1
-Flask-Principal>=0.4.0
+Flask-Bcrypt
+Flask-DotEnv
 Flask-Login==0.2.11
 Flask-Menu
 Flask-Migrate
-Flask-Bcrypt
+Flask-Potion==0.8.1
+Flask-Principal>=0.4.0
 Flask-Script
 Flask-Security
+Flask-SQLAlchemy>=2.0
 Flask-Uploads
-blinker
+Flask-WTF
 gitchangelog
 gunicorn
+influxdb
 lxml
 markupsafe
 pillow
+requests
 sauceclient
 selenium
-requests
-influxdb
 
 # Python 2.6
 # ordereddict
