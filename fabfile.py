@@ -15,6 +15,8 @@ def deploy():
         run('git checkout %s' % commit)
         run('git pull --ff-only')
 
+        upload_template('fabric/env/%s' % env.host, '.env', template_dir=dirname, context=env, use_sudo=True, use_jinja=True)
+
         with prefix('source /home/ubuntu/.virtualenvs/auth/bin/activate'):
             with prefix('source /home/ubuntu/.nvm/nvm.sh'), prefix('nvm use'):
                 run('make production-install')
