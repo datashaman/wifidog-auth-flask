@@ -1,3 +1,11 @@
+<script>
+dataLayer = [
+{% if current_user.is_authenticated() %}
+{ uid: {{ current_user.id  }} }
+{% endif %}
+];
+</script>
+
 <!-- Google Tag Manager -->
 <noscript><iframe
     src="//www.googletagmanager.com/ns.html?id=GTM-P8M3S3"
