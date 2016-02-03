@@ -12,7 +12,8 @@ function errorHandler(error) {
 }
 
 function scripts(src, dest) {
-    return gulp.src(src).pipe(plugins.concat(dest));
+    return gulp.src(src)
+		.pipe(plugins.concat(dest));
 }
 
 function sass(src) {
@@ -34,13 +35,16 @@ var isProduction = true,
     siteStyles = [
         'app/styles/**/*.scss'
     ],
+    siteTags = [
+        'app/static/tags/**/*.tag'
+    ],
     ieScripts = [
         'bower_components/es5-shim/es5-shim.js',
         'bower_components/html5shiv/html5shiv.js'
     ],
     siteScripts = [
         'bower_components/zepto/dist/zepto.js',
-        'bower_components/riot/riot+compiler.js',
+        'bower_components/riot/riot.js',
         'bower_components/riotcontrol/riotcontrol.js',
         'bower_components/marked/lib/marked.js',
         'app/scripts/notifications.js',
@@ -50,7 +54,8 @@ var isProduction = true,
         'app/mixins/currentuser.js',
         'app/mixins/events.js',
         'app/mixins/networks.js',
-        'app/mixins/render.js'
+        'app/mixins/render.js',
+        'app/static/tags/**/*.js'
     ];
 
 if(gutil.env.dev === true) {
@@ -60,21 +65,31 @@ if(gutil.env.dev === true) {
 gulp.task('styles', function() {
     return es.concat(gulp.src(vendorStyles), sass(siteStyles))
                 .pipe(plugins.concat('screen.min.css'))
+                // .pipe(plugins.uncss({
+                	// html: [ 'app/templates/**/*.html' ]
+				// }))
                 .pipe(plugins.autoprefixer('last 2 versions', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4', 'Firefox >= 4'))
                 // .pipe(isProduction ? plugins.combineMediaQueries({ log: true }) : gutil.noop())
-                .pipe(isProduction ? plugins.cssmin() : gutil.noop())
+                .pipe(isProduction ? plugins.cssnano() : gutil.noop())
                 .pipe(plugins.size())
                 .pipe(gulp.dest('./app/static/styles'))
                 .pipe(browserSync.stream());
 });
 
-gulp.task('scripts', function() {
+gulp.task('scripts', [ 'tags' ], function() {
     return es.concat(
-        scripts(ieScripts, 'ie.min.js'),
-        scripts(siteScripts, 'site.min.js')
-        ).pipe(isProduction ? plugins.uglify() : gutil.noop()).on('error', errorHandler)
+			scripts(ieScripts, 'ie.min.js'),
+			scripts(siteScripts, 'site.min.js'))
+	     .pipe(isProduction ? plugins.uglify() : gutil.noop()).on('error', errorHandler)
          .pipe(plugins.size())
          .pipe(gulp.dest('./app/static/scripts'));
+});
+
+gulp.task('tags', function() {
+	return gulp.src([
+		'app/static/tags/**/*.tag'
+	]).pipe(plugins.riot())
+	  .pipe(gulp.dest('./app/static/tags'));
 });
 
 gulp.task('fonts', function() {
