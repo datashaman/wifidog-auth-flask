@@ -5,12 +5,13 @@ import uuid
 from app.admin import VoucherAdmin
 from app.models import User, Role, db, users
 from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource, logos
+from app.services import influx_db, security
+from flask import g
 from flask.ext.dotenv import DotEnv
 from flask.ext.login import current_user, LoginManager
 from flask.ext.uploads import configure_uploads
 from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
 from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed, Principal
-from flask.ext.security import Security
 
 def create_app():
     app = flask.Flask(__name__)
@@ -24,7 +25,6 @@ def create_app():
 
     api.init_app(app)
 
-    security = Security()
     security.init_app(app, users)
 
     principals = Principal()
@@ -36,6 +36,8 @@ def create_app():
 
     from app.signals import init_signals
     init_signals(app)
+
+    influx_db.init_app(app)
 
     menu.init_app(app)
     app.register_blueprint(bp)

@@ -2,6 +2,7 @@ blinker
 Flask
 Flask-Bcrypt
 Flask-DotEnv
+Flask-InfluxDB
 Flask-Login==0.2.11
 Flask-Menu
 Flask-Migrate
