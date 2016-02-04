@@ -17,6 +17,7 @@ from random import choice
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import backref
+from sqlalchemy.schema import PrimaryKeyConstraint, UniqueConstraint
 
 import constants
 
@@ -63,13 +64,17 @@ class User(db.Model, UserMixin):
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'))
     gateway = db.relationship('Gateway', backref=backref('users', lazy='dynamic'))
 
-    email = db.Column(db.Unicode(255), unique=True, nullable=False)
+    email = db.Column(db.Unicode(255), nullable=False)
     password = db.Column(db.String(255), nullable=False)
 
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+
+    __table_args__ = (
+        UniqueConstraint('network_id', 'email'),
+    )
 
 users = SQLAlchemyUserDatastore(db, User, Role)
 
@@ -132,7 +137,8 @@ def record_change(f):
 class Voucher(db.Model):
     __tablename__ = 'vouchers'
 
-    id = db.Column(db.String(20), primary_key=True, default=generate_id)
+    id = db.Column(db.Integer, primary_key=True)
+
     minutes = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
@@ -142,6 +148,8 @@ class Voucher(db.Model):
 
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('vouchers', lazy='dynamic'))
+
+    code = db.Column(db.String(20), default=generate_id, nullable=False)
 
     mac = db.Column(db.String(20))
     ip = db.Column(db.String(15))
@@ -153,6 +161,10 @@ class Voucher(db.Model):
     outgoing = db.Column(db.BigInteger, default=0)
 
     status = db.Column(db.String(20), nullable=False, default='new')
+
+    __table_args__ = (
+            UniqueConstraint('gateway_id', 'code'),
+    )
 
     def should_expire(self):
         return self.created_at + datetime.timedelta(minutes=current_app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow()
@@ -221,7 +233,7 @@ class Auth(db.Model):
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('auths', lazy='dynamic'))
 
-    voucher_id = db.Column(db.String(20), db.ForeignKey('vouchers.id', onupdate='cascade'))
+    voucher_id = db.Column(db.Integer, db.ForeignKey('vouchers.id', onupdate='cascade'))
     voucher = db.relationship(Voucher, backref=backref('auths', lazy='dynamic'))
 
     status = db.Column(db.Integer)
@@ -345,6 +357,69 @@ class Currency(db.Model):
     prefix = db.Column(db.String(10))
     suffix = db.Column(db.String(10))
 
+product_categories = db.Table('product_categories',
+    db.Column('product_id', db.Integer, db.ForeignKey('products.id')),
+    db.Column('category_id', db.Integer, db.ForeignKey('categories.id')),
+)
+
+class Category(db.Model):
+    __tablename__ = 'categories'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    parent_id = db.Column(db.Integer, db.ForeignKey('categories.id', onupdate='cascade'), nullable=True)
+    children = db.relationship('Category', backref=backref('sub_categories', remote_side=[id]))
+
+    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', onupdate='cascade'), nullable=False)
+    network = db.relationship(Network, backref=backref('categories', lazy='dynamic'))
+
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'))
+    gateway = db.relationship(Gateway, backref=backref('categories', lazy='dynamic'))
+
+    code = db.Column(db.Unicode(10), nullable=False)
+    title = db.Column(db.Unicode(40), nullable=False)
+
+    description = db.Column(db.UnicodeText)
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+
+    __table_args__ = (
+            UniqueConstraint('network_id', 'gateway_id', 'parent_id', 'code'),
+            UniqueConstraint('network_id', 'gateway_id', 'parent_id', 'title'),
+    )
+
+class Product(db.Model):
+    __tablename__ = 'products'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', onupdate='cascade'), nullable=False)
+    network = db.relationship(Network, backref=backref('products', lazy='dynamic'))
+
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'))
+    gateway = db.relationship(Gateway, backref=backref('products', lazy='dynamic'))
+
+    categories = db.relationship(Category, secondary=product_categories, backref=db.backref('products', lazy='dynamic'))
+
+    code = db.Column(db.Unicode(10), nullable=False)
+    title = db.Column(db.Unicode(40), nullable=False)
+
+    description = db.Column(db.UnicodeText)
+
+    currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', onupdate='cascade'))
+    currency = db.relationship(Currency, backref=backref('products', lazy='dynamic'))
+
+    price = db.Column(db.Integer) # Cents
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+
+    __table_args__ = (
+            UniqueConstraint('network_id', 'gateway_id', 'code'),
+            UniqueConstraint('network_id', 'gateway_id', 'title'),
+    )
+
 class Order(db.Model):
     __tablename__ = 'orders'
 
@@ -360,10 +435,32 @@ class Order(db.Model):
     gateway = db.relationship(Gateway, backref=backref('orders', lazy='dynamic'))
 
     status = db.Column(db.String(20), nullable=False, default='new')
+
     currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', onupdate='cascade'), nullable=False)
-    amount_in_cents = db.Column(db.Integer, nullable=False)
+    currency = db.relationship(Currency, backref=backref('orders', lazy='dynamic'))
+
+    price = db.Column(db.Integer, nullable=False) # Cents
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+
+class OrderItem(db.Model):
+    __tablename__ = 'order_items'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id', onupdate='cascade'), nullable=False)
+    product = db.relationship(Product, backref=backref('order_items', lazy='dynamic'))
+
+    description = db.Column(db.Unicode(40))
+
+    units = db.Column(db.Integer, default=1, nullable=False)
+
+    price_per_unit = db.Column(db.Integer, nullable=False) # Cents
+    price = db.Column(db.Integer, nullable=False) # Cents
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
 
 class Transaction(db.Model):
     __tablename__ = 'transactions'
@@ -373,11 +470,13 @@ class Transaction(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship(User, backref=backref('transactions', lazy='dynamic'))
 
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', onupdate='cascade'), nullable=False)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', onupdate='cascade'))
     order = db.relationship(Order, backref=backref('transactions', lazy='dynamic'))
 
     type = db.Column(db.String(20), nullable=False, default='payment')
+
     payload = db.Column(db.UnicodeText)
+
     status = db.Column(db.String(20), nullable=False, default='new')
     reference = db.Column(db.String(40))
 

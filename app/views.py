@@ -141,7 +141,7 @@ def vouchers_new():
         db.session.add(voucher)
         db.session.commit()
 
-        return flask.redirect(flask.url_for('.vouchers_new', id=voucher.id))
+        return flask.redirect(flask.url_for('.vouchers_new', code=voucher.code))
 
     return flask.render_template('vouchers/new.html', form=form)
 
@@ -150,8 +150,8 @@ def wifidog_login():
     form = LoginVoucherForm(flask.request.form)
 
     if form.validate_on_submit():
-        voucher_id = form.voucher.data.upper()
-        voucher = Voucher.query.get(voucher_id)
+        voucher_code = form.voucher_code.data.upper()
+        voucher = Voucher.query.filter_by(code=voucher_code).first_or_404()
 
         form.populate_obj(voucher)
         voucher.token = generate_token()

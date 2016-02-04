@@ -66,12 +66,12 @@ def bootstrap_tests():
     create_voucher(u'other-gateway2', 60, 'other-2-2', quiet=True)
 
 @manager.command
-def create_voucher(gateway, minutes=60, id=None, quiet=True):
+def create_voucher(gateway, minutes=60, code=None, quiet=True):
     voucher = Voucher()
 
-    # Allow explicit setting of ID (for tests)
-    if id is not None:
-        voucher.id = id
+    # Allow explicit setting of code (for tests)
+    if code is not None:
+        voucher.code = code
 
     voucher.gateway_id = gateway
     voucher.minutes = minutes
@@ -80,7 +80,7 @@ def create_voucher(gateway, minutes=60, id=None, quiet=True):
     db.session.commit()
 
     if not quiet:
-        print 'Voucher created: %s' % voucher.id
+        print 'Voucher created: %s:%s' % (voucher.id, voucher.code)
 
 @manager.command
 def create_network(id, title, description=None, quiet=True):

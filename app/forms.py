@@ -19,7 +19,7 @@ class BroadcastForm(Form):
     message = StringField('Message', [ validators.InputRequired() ])
 
 class LoginVoucherForm(Form):
-    voucher = StringField('* Voucher', [ validators.InputRequired() ], default=args_get('voucher'), description='The voucher code you were given at the counter')
+    voucher_code = StringField('* Voucher Code', [ validators.InputRequired() ], default=args_get('voucher'), description='The voucher code you were given at the counter')
     name = StringField('Your Name', description='Optional, so we know what to call you')
 
     gw_address = HiddenField('Gateway Address', default=args_get('gw_address'))
@@ -29,8 +29,8 @@ class LoginVoucherForm(Form):
     url = HiddenField('URL', default=args_get('url'))
 
     def validate_voucher(form, field):
-        voucher_id = field.data.upper()
-        voucher = Voucher.query.get(voucher_id)
+        voucher_code = field.data.upper()
+        voucher = Voucher.query.filter_by(code=voucher_code).first()
 
         if voucher is None:
             raise validators.ValidationError('Voucher does not exist')

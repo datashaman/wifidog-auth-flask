@@ -16,6 +16,13 @@ function scripts(src, dest) {
 		.pipe(plugins.concat(dest));
 }
 
+function tags(src) {
+    return gulp.src(src)
+		.pipe(plugins.riot({
+			compact: isProduction
+		}));
+}
+
 function sass(src) {
     return plugins.rubySass(src, {
         bundleExec: true
@@ -36,7 +43,7 @@ var isProduction = true,
         'app/styles/**/*.scss'
     ],
     siteTags = [
-        'app/tags/**/*.tag'
+        'app/assets/tags/**/*.tag'
     ],
     ieScripts = [
         'bower_components/es5-shim/es5-shim.js',
@@ -55,7 +62,6 @@ var isProduction = true,
         'app/mixins/events.js',
         'app/mixins/networks.js',
         'app/mixins/render.js',
-        'app/tags/**/*.js'
     ];
 
 if(gutil.env.dev === true) {
@@ -73,20 +79,14 @@ gulp.task('styles', function() {
                 .pipe(browserSync.stream());
 });
 
-gulp.task('scripts', [ 'tags' ], function() {
+gulp.task('scripts', function() {
     return es.concat(
+			tags(siteTags),
 			scripts(ieScripts, 'ie.min.js'),
 			scripts(siteScripts, 'site.min.js'))
 	     .pipe(isProduction ? plugins.uglify() : gutil.noop()).on('error', errorHandler)
          .pipe(plugins.size())
          .pipe(gulp.dest('./app/static/scripts'));
-});
-
-gulp.task('tags', function() {
-	return gulp.src([
-		'app/tags/**/*.tag'
-	]).pipe(plugins.riot())
-	  .pipe(gulp.dest('./app/tags'));
 });
 
 gulp.task('fonts', function() {
