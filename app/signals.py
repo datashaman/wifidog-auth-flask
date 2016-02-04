@@ -14,9 +14,13 @@ def send_hit(t, data):
     hit = {
         'v': 1,
         'tid': flask.current_app.config['GOOGLE_ANALYTICS_TRACKING_ID'],
-        'cid': flask.request.cookies.get('cid'),
         't': 'event',
     }
+
+    cid = flask.request.cookies.get('cid')
+
+    if cid is not None:
+        hit['cid'] = cid
 
     if current_user.is_authenticated():
         hit['uid'] = current_user.id
@@ -36,11 +40,11 @@ def send_event(category, action, label=None, value=None):
 
 def on_user_logged_in(sender, user):
     flask.flash('You were logged in')
-    send_event('security', 'login')
+    send_event('auth', 'login')
 
 def on_user_logged_out(sender, user):
     flask.flash('You were logged out')
-    send_event('security', 'logout')
+    send_event('auth', 'logout')
 
 def on_voucher_generated(sender, voucher):
     send_event('voucher', 'generate')
