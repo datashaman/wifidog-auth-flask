@@ -2,7 +2,8 @@ import flask
 import requests
 
 from blinker import Namespace
-from flask.ext.login import user_logged_in, user_logged_out
+from flask import current_app
+from flask.ext.login import current_user, user_logged_in, user_logged_out
 
 signals = Namespace()
 
@@ -10,22 +11,28 @@ voucher_generated = signals.signal('voucher_generated')
 voucher_logged_in = signals.signal('voucher_logged_in')
 
 def send_hit(t, data):
-    data.update({
+    hit = {
         'v': 1,
         'tid': flask.current_app.config['GOOGLE_ANALYTICS_TRACKING_ID'],
         'cid': flask.request.cookies.get('cid'),
         't': 'event',
-    })
+    }
+
+    if current_user.is_authenticated():
+        hit['uid'] = current_user.id
+
+    data.update(hit)
 
     requests.post('http://www.google-analytics.com/collect', data=data)
 
 def send_event(category, action, label=None, value=None):
-    send_hit('event', {
-        'ec': category,
-        'ea': action,
-        'el': label,
-        'ev': value,
-    })
+    if not current_app.config['TESTING']:
+        send_hit('event', {
+            'ec': category,
+            'ea': action,
+            'el': label,
+            'ev': value,
+        })
 
 def on_user_logged_in(sender, user):
     flask.flash('You were logged in')

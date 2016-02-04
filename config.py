@@ -2,17 +2,12 @@ import os
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 APP_VERSION = '0.6.0'
-CSRF_SESSION_KEY = 'ABigSecretIsHardToFind'
 DATABASE_CONNECTION_OPTIONS = {}
 DEBUG = True
-FACEBOOK_APP_ID= '89526572170'
-GOOGLE_ANALYTICS_TRACKING_ID = os.environ.get('GOOGLE_ANALYTICS_TRACKING_ID', '')
 HOST = '0.0.0.0'
 PORT = 8080
 PUSH_ENABLED = False
-SECRET_KEY = 'AnotherBigSecretIsAlsoHardToFind'
 SECURITY_PASSWORD_HASH = 'sha512_crypt'
-SECURITY_PASSWORD_SALT = 'ThisIsNotALoveSong'
 SECURITY_POST_LOGIN_VIEW = 'app.vouchers_index'
 SECURITY_POST_LOGOUT_VIEW = 'login'
 SECURITY_REGISTERABLE=False

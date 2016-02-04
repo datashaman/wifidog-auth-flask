@@ -1,7 +1,9 @@
 *.pyc
+app/tags/**/*.js
 bootstrap.py
 bower_components/
 build/
+logs/
 node_modules/
 tmp/
 vendor/

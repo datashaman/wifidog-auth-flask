@@ -5,6 +5,7 @@ import uuid
 from app.admin import VoucherAdmin
 from app.models import User, Role, db, users
 from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource, logos
+from flask.ext.dotenv import DotEnv
 from flask.ext.login import current_user, LoginManager
 from flask.ext.uploads import configure_uploads
 from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
@@ -13,6 +14,10 @@ from flask.ext.security import Security
 
 def create_app():
     app = flask.Flask(__name__)
+
+    env = DotEnv()
+    env.init_app(app)
+
     app.config.from_object('config')
 
     init_db(app)

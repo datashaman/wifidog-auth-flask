@@ -4,6 +4,9 @@ serve:
 serve-production:
 	gunicorn --reload -b '127.0.0.1:8080' 'app:create_app()'
 
+browser-sync:
+	browser-sync start --proxy http://127.0.0.1:8080 --files="app/**"
+
 nodemon-tests: bootstrap-tests
 	nodemon tests.py
 
@@ -41,7 +44,7 @@ production-install:
 	bower prune
 	cd bower_components/pure && npm install && node_modules/.bin/grunt
 	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
-	gulp --dev # Must fix this
+	gulp
 
 db-migrate:
 	python manage.py db migrate
