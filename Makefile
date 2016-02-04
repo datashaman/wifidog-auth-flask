@@ -4,6 +4,9 @@ serve:
 serve-production:
 	gunicorn --reload -b '127.0.0.1:8080' 'app:create_app()'
 
+browser-sync:
+	browser-sync start --proxy http://127.0.0.1:8080 --files="app/**"
+
 nodemon-tests: bootstrap-tests
 	nodemon tests.py
 
