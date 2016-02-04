@@ -93,7 +93,8 @@ var currentuser = new CurrentUserStore(),
     gateways = new Store('gateway'),
     networks = new Store('network'),
     users = new Store('user'),
-    vouchers = new Store('voucher');
+    vouchers = new Store('voucher'),
+    categories = new Store('category');
 
 gateways.on('gateway.upload', function(id, file) {
     var xhr = new XMLHttpRequest(),

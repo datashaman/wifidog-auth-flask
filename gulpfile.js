@@ -16,11 +16,12 @@ function scripts(src, dest) {
 		.pipe(plugins.concat(dest));
 }
 
-function tags(src) {
+function tags(src, dest) {
     return gulp.src(src)
 		.pipe(plugins.riot({
 			compact: isProduction
-		}));
+		}))
+		.pipe(plugins.concat(dest));
 }
 
 function sass(src) {
@@ -40,7 +41,7 @@ var isProduction = true,
         'bower_components/open-iconic/font/css/open-iconic.css'
     ],
     siteStyles = [
-        'app/styles/**/*.scss'
+        'app/assets/styles/**/*.scss'
     ],
     siteTags = [
         'app/assets/tags/**/*.tag'
@@ -54,14 +55,18 @@ var isProduction = true,
         'bower_components/riot/riot.js',
         'bower_components/riotcontrol/riotcontrol.js',
         'bower_components/marked/lib/marked.js',
-        'app/scripts/notifications.js',
-        'app/scripts/stores.js',
-        'app/scripts/ui.js',
-        'app/mixins/crud.js',
-        'app/mixins/currentuser.js',
-        'app/mixins/events.js',
-        'app/mixins/networks.js',
-        'app/mixins/render.js',
+
+        'app/assets/scripts/notifications.js',
+        'app/assets/scripts/stores.js',
+        'app/assets/scripts/ui.js',
+
+        'app/assets/mixins/crud.js',
+        'app/assets/mixins/currentuser.js',
+        'app/assets/mixins/events.js',
+        'app/assets/mixins/networks.js',
+        'app/assets/mixins/render.js',
+
+        'tmp/tags/**/*.js'
     ];
 
 if(gutil.env.dev === true) {
@@ -79,14 +84,23 @@ gulp.task('styles', function() {
                 .pipe(browserSync.stream());
 });
 
-gulp.task('scripts', function() {
+gulp.task('scripts', [ 'tags' ], function() {
     return es.concat(
-			tags(siteTags),
 			scripts(ieScripts, 'ie.min.js'),
 			scripts(siteScripts, 'site.min.js'))
 	     .pipe(isProduction ? plugins.uglify() : gutil.noop()).on('error', errorHandler)
          .pipe(plugins.size())
          .pipe(gulp.dest('./app/static/scripts'));
+});
+
+gulp.task('tags', function() {
+	return gulp.src([
+		'app/assets/tags/**/*.tag'
+	])
+		.pipe(plugins.riot({
+			compact: isProduction
+		}))
+		.pipe(gulp.dest('./tmp/tags'));
 });
 
 gulp.task('fonts', function() {

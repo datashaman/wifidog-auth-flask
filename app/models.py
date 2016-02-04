@@ -381,6 +381,8 @@ class Category(db.Model):
 
     description = db.Column(db.UnicodeText)
 
+    status = db.Column(db.String(20), nullable=False, default='new')
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
 

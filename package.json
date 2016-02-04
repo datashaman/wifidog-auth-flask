@@ -21,6 +21,7 @@
     "gulp-uglify": "~1.4.1",
     "gulp-util": "~3.0.6",
     "nodemon": "^1.8.1",
-    "promise": "~7.0.4"
+    "promise": "~7.0.4",
+    "riot": "^2.3.15"
   }
 }

@@ -110,6 +110,13 @@ def vouchers_index():
 
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+@register_menu(bp, '.categories', 'Categories', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=99)
+@bp.route('/categories')
+def categories_index():
+    return flask.render_template('categories/index.html')
+
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(bp, '.new', 'New Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=0)
 @bp.route('/new-voucher', methods=[ 'GET', 'POST' ])
 def vouchers_new():
