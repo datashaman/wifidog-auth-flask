@@ -3,7 +3,7 @@ import flask
 import os
 
 from app.graphs import states, actions
-from app.models import Network, User, Gateway, Voucher, db
+from app.models import Network, User, Gateway, Voucher, Category, Product, Currency, db
 from flask.ext.login import current_user, login_required
 from flask.ext.potion import Api, fields, signals
 from flask.ext.potion.routes import Relation, Route, ItemRoute
@@ -84,7 +84,7 @@ class UserResource(PrincipalResource):
             'update': gateway_or_above,
             'delete': gateway_or_above,
         }
-        read_only_fields = ('created_at',)
+        read_only_fields = ('created_at', 'updated_at')
         write_only_fields = ('password',)
 
     class Schema:
@@ -130,7 +130,7 @@ class GatewayResource(PrincipalResource):
             'update': network_or_above,
             'delete': network_or_above,
         }
-        read_only_fields = ('created_at',)
+        read_only_fields = ('created_at', 'updated_at')
 
     class Schema:
         id = fields.String(min_length=3, max_length=20)
@@ -172,7 +172,7 @@ class NetworkResource(PrincipalResource):
             'update': super_admin_only,
             'delete': super_admin_only,
         }
-        read_only_fields = ('created_at',)
+        read_only_fields = ('created_at', 'updated_at')
 
     class Schema:
         id = fields.String(min_length=3, max_length=20)
@@ -192,7 +192,7 @@ class VoucherResource(PrincipalResource):
             'update': gateway_or_above,
             'delete': 'no',
         }
-        read_only_fields = ('created_at', 'available_actions', 'time_left')
+        read_only_fields = ('created_at', 'updated_at', 'available_actions', 'time_left')
 
     class Schema:
         network = fields.ToOne('networks')
@@ -216,9 +216,70 @@ class VoucherResource(PrincipalResource):
     def archive(self, voucher):
         self.manager.archive(voucher)
 
+class CategoryResource(PrincipalResource):
+    class Meta:
+        manager = Manager
+
+        model = Category
+        include_id = True
+        id_converter = 'string'
+        id_field_class = fields.String
+        permissions = {
+            'read': gateway_or_above,
+            'create': gateway_or_above,
+            'update': gateway_or_above,
+            'delete': 'no',
+        }
+        read_only_fields = ('created_at', 'updated_at')
+
+    class Schema:
+        network = fields.ToOne('networks')
+        gateway = fields.ToOne('gateways')
+
+class ProductResource(PrincipalResource):
+    class Meta:
+        manager = Manager
+
+        model = Product
+        include_id = True
+        id_converter = 'string'
+        id_field_class = fields.String
+        permissions = {
+            'read': gateway_or_above,
+            'create': gateway_or_above,
+            'update': gateway_or_above,
+            'delete': 'no',
+        }
+        read_only_fields = ('created_at', 'updated_at')
+
+    class Schema:
+        network = fields.ToOne('networks')
+        gateway = fields.ToOne('gateways')
+        currency = fields.ToOne('currencies')
+
+class CurrencyResource(PrincipalResource):
+    class Meta:
+        manager = Manager
+
+        model = Currency
+        include_id = True
+        id_converter = 'string'
+        id_field_class = fields.String
+        permissions = {
+            'read': gateway_or_above,
+            'create': super_admin_only,
+            'update': super_admin_only,
+            'delete': 'no',
+        }
+
+    class Schema:
+        id = fields.String(min_length=3, max_length=3)
+
 @signals.before_create.connect_via(GatewayResource)
 @signals.before_create.connect_via(UserResource)
 @signals.before_create.connect_via(VoucherResource)
+@signals.before_create.connect_via(CategoryResource)
+@signals.before_create.connect_via(ProductResource)
 def set_scope(sender, item):
     if current_user.has_role('network-admin') or current_user.has_role('gateway-admin'):
         item.network_id = current_user.network_id
@@ -230,3 +291,6 @@ api.add_resource(UserResource)
 api.add_resource(VoucherResource)
 api.add_resource(GatewayResource)
 api.add_resource(NetworkResource)
+api.add_resource(CategoryResource)
+api.add_resource(ProductResource)
+api.add_resource(CurrencyResource)

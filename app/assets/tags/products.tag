@@ -1,10 +1,10 @@
-<categories>
-    <modal heading={ modal.heading } hidden={ modal.hidden } cancelevent="category.cancel" row={ row } errors={ errors }>
+<products>
+    <modal heading={ modal.heading } hidden={ modal.hidden } cancelevent="product.cancel" row={ row } errors={ errors }>
         <form id="form" class="pure-form pure-form-stacked" onsubmit={ doNothing }>
             <input type="hidden" id="original_id" value={ opts.row['$id'] } />
 
             <div if={ parent.hasRole('super-admin') }>
-                <label for="id">Network</label>
+                <label for="network">Network</label>
                 <select id="network" name="network" class="pure-input-1">
                     <option each={ parent.networks } value={ id } selected={ id == network_id }>{ title }</option>
                 </select>
@@ -12,7 +12,7 @@
             </div>
 
             <div if={ parent.hasRole('super-admin') || parent.hasRole('network-admin') }>
-                <label for="id">Gateway</label>
+                <label for="gateway">Gateway</label>
                 <select id="gateway" name="gateway" class="pure-input-1">
                     <option each={ parent.gateways } value={ id } selected={ id == gateway_id }>{ title }</option>
                 </select>
@@ -31,15 +31,21 @@
             <textarea id="description" class="pure-input-1" name="description">{ opts.row.description }</textarea>
             <div if={ opts.errors.description } class="state state-invalid">{ opts.errors.description }</div>
 
+            <label for="currency">Currency</label>
+            <select id="currency" name="currency" class="pure-input-1">
+                <option each={ parent.currencies } value={ id } selected={ id == currency_id }>{ title }</option>
+            </select>
+            <div if={ opt.errors.currency } class="state state-invalid">{ opt.errors.currency }</div>
+
             <div class="actions">
                 <button type="submit" class="pure-button pure-button-primary" onclick={ parent.onOk }>Ok</button>
-                <button type="button" class="pure-button" onclick={ parent.triggerEvent('category.cancel') }>Cancel</button>
+                <button type="button" class="pure-button" onclick={ parent.triggerEvent('product.cancel') }>Cancel</button>
             </div>
         </form>
     </modal>
 
     <div class="header">
-        <h1>Categories</h1>
+        <h1>Products</h1>
 
         <div class="actions-collection">
             <button type="button" class="pure-button pure-button-primary" onclick={ onNew }>
@@ -83,8 +89,8 @@
         modal: {
             hidden: true
         },
-        item: 'category',
-        collection: 'categories',
+        item: 'product',
+        collection: 'products',
         defaultObject: {
             code: '',
             title: '',
@@ -95,7 +101,8 @@
             'gateway',
             'code',
             'title',
-            'description'
+            'description',
+            'currency'
         ]
     });
 
@@ -104,5 +111,6 @@
     this.mixin('events');
     this.mixin('networks');
     this.mixin('gateways');
+    this.mixin('currencies');
     this.mixin('render');
-</categories>
+</products>

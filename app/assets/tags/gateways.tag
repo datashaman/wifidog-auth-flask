@@ -1,7 +1,7 @@
 <gateways>
     <modal hidden={ modal.hidden } heading={ modal.heading } cancelevent="gateway.cancel" row={ row } errors={ errors }>
         <form id="form" class="pure-form pure-form-stacked" onsubmit={ doNothing }>
-            <input type="hidden" id="original_id" class="pure-input-1" value={ opts.row['$id'] } />
+            <input type="hidden" id="original_id" value={ opts.row['$id'] } />
 
             <div class="pure-menu pure-menu-horizontal">
                 <ul class="pure-menu-list">

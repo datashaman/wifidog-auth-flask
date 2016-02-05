@@ -56,16 +56,8 @@ var isProduction = true,
         'bower_components/riotcontrol/riotcontrol.js',
         'bower_components/marked/lib/marked.js',
 
-        'app/assets/scripts/notifications.js',
-        'app/assets/scripts/stores.js',
-        'app/assets/scripts/ui.js',
-
-        'app/assets/mixins/crud.js',
-        'app/assets/mixins/currentuser.js',
-        'app/assets/mixins/events.js',
-        'app/assets/mixins/networks.js',
-        'app/assets/mixins/render.js',
-
+        'app/assets/scripts/**/*.js',
+        'app/assets/mixins/**/*.js',
         'tmp/tags/**/*.js'
     ];
 

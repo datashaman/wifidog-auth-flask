@@ -6,18 +6,20 @@ from app.admin import VoucherAdmin
 from app.models import User, Role, db, users
 from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource, logos
 from app.services import influx_db, security
-from flask import g
 from flask.ext.dotenv import DotEnv
 from flask.ext.login import current_user, LoginManager
 from flask.ext.uploads import configure_uploads
 from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
 from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed, Principal
 
-def create_app():
+def create_app(config=None):
     app = flask.Flask(__name__)
 
-    env = DotEnv()
-    env.init_app(app)
+    if config is None:
+        env = DotEnv()
+        env.init_app(app)
+    else:
+        app.config.update(config)
 
     app.config.from_object('config')
 

@@ -24,15 +24,22 @@ class TestCase(unittest.TestCase):
         super(TestCase, self).__init__(*args, **kwargs)
 
     def setUp(self):
-        self.app = create_app()
-
-        self.app.config['TESTING'] = True
-        self.app.config['WTF_CSRF_ENABLED'] = False
-
         self.fd, self.filename = tempfile.mkstemp()
         os.write(self.fd, content)
 
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + self.filename
+        self.app = create_app({
+            'CSRF_SESSION_KEY': 'ABigSecretIsHardToFind',
+            'GOOGLE_ANALYTICS_TRACKING_ID': None,
+            'GTM_CONTAINER_ID': None,
+            'INFLUXDB_USER': None,
+            'INFLUXDB_PASSWORD': None,
+            'SECRET_KEY': 'AnotherBigSecretIsAlsoHardToFind',
+            'SECURITY_PASSWORD_SALT': 'ThisIsNotALoveSong',
+            'TESTING': True,
+            'WTF_CSRF_ENABLED': False,
+            'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + self.filename,
+        })
+
         init_db(self.app)
 
         self.client = self.app.test_client()

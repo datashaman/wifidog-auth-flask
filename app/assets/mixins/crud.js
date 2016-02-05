@@ -94,7 +94,6 @@ riot.mixin('crud', {
     },
 
     onNew: function(e) {
-        console.log('onNew');
         this.row = this.defaultObject;
         this.modal.heading = 'New ' + this.item;
         this.modal.hidden = false;

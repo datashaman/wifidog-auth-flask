@@ -117,6 +117,20 @@ def categories_index():
 
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+@register_menu(bp, '.products', 'Products', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=99)
+@bp.route('/products')
+def products_index():
+    return flask.render_template('products/index.html')
+
+@login_required
+@roles_accepted('super-admin')
+@register_menu(bp, '.currencies', 'Currencies', visible_when=has_a_role('super-admin'), order=99)
+@bp.route('/currencies')
+def currencies_index():
+    return flask.render_template('currencies/index.html')
+
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(bp, '.new', 'New Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=0)
 @bp.route('/new-voucher', methods=[ 'GET', 'POST' ])
 def vouchers_new():
