@@ -10,7 +10,7 @@ if os.path.isfile(dotenv_path):
     load_dotenv(dotenv_path)
 
 APP_VERSION = '0.6.0'
-CSRF_SESSION_KEY = os.environ.get('CSRF_SESSION_KEY')
+CSRF_SESSION_KEY = os.environ.get('CSRF_SESSION_KEY', 'secret')
 DATABASE_CONNECTION_OPTIONS = {}
 DEBUG = True
 GOOGLE_ANALYTICS_TRACKING_ID = os.environ.get('GOOGLE_ANALYTICS_TRACKING_ID')
@@ -21,9 +21,9 @@ INFLUXDB_USER = os.environ.get('INFLUXDB_USER')
 INFLUXDB_PASSWORD = os.environ.get('INFLUXDB_PASSWORD')
 PORT = 8080
 PUSH_ENABLED = False
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'secret')
 SECURITY_PASSWORD_HASH = 'sha512_crypt'
-SECURITY_PASSWORD_SALT = os.environ.get('SECURITY_PASSWORD_SALT')
+SECURITY_PASSWORD_SALT = os.environ.get('SECURITY_PASSWORD_SALT', 'secret')
 SECURITY_POST_LOGIN_VIEW = 'app.vouchers_index'
 SECURITY_POST_LOGOUT_VIEW = 'login'
 SECURITY_REGISTERABLE=False

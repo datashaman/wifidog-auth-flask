@@ -28,13 +28,6 @@ class TestCase(unittest.TestCase):
         os.write(self.fd, content)
 
         config = {
-            'CSRF_SESSION_KEY': 'ABigSecretIsHardToFind',
-            'GOOGLE_ANALYTICS_TRACKING_ID': None,
-            'GTM_CONTAINER_ID': None,
-            'INFLUXDB_USER': None,
-            'INFLUXDB_PASSWORD': None,
-            'SECRET_KEY': 'AnotherBigSecretIsAlsoHardToFind',
-            'SECURITY_PASSWORD_SALT': 'ThisIsNotALoveSong',
             'TESTING': True,
             'WTF_CSRF_ENABLED': False,
             'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + self.filename,
