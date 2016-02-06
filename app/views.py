@@ -11,11 +11,10 @@ from app.utils import is_logged_in, has_role, has_a_role
 
 from blinker import Namespace
 from flask import Blueprint, current_app
-from flask.ext.menu import register_menu, Menu
+from flask.ext.menu import register_menu
 from flask.ext.security import login_required, roles_required, roles_accepted, current_user
 
 
-menu = Menu()
 bp = flask.Blueprint('app', __name__)
 
 if False: # Push is disabled for now
@@ -306,6 +305,7 @@ def pay_cancel():
 
 @bp.route('/')
 def home():
+    print flask.url_for('security.login')
     return flask.redirect(flask.url_for('security.login'))
 
 @bp.route('/debug')

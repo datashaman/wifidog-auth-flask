@@ -1,7 +1,7 @@
+asbool
 blinker
 Flask
 Flask-Bcrypt
-Flask-DotEnv
 Flask-InfluxDB
 Flask-Login==0.2.11
 Flask-Menu
@@ -19,9 +19,11 @@ influxdb
 lxml
 markupsafe
 pillow
+python-dotenv
 requests
 sauceclient
 selenium
+suds
 
 # Python 2.6
 # ordereddict
