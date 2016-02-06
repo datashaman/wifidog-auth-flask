@@ -14,7 +14,7 @@ install:
 before_script:
   - nvm use v4.1.2
   - npm install -g bower gulp
-  - cp .env.tests .env
+  - ln -s .env.tests .env
   - make production-install bootstrap-tests
   - make serve &
 

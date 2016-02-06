@@ -22,7 +22,7 @@ def send_hit(t, data):
     if cid is not None:
         hit['cid'] = cid
 
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         hit['uid'] = current_user.id
 
     data.update(hit)

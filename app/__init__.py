@@ -22,8 +22,6 @@ def create_app(config=None):
     if config is not None:
         app.config.update(**config)
 
-    init_signals(app)
-
     db.init_app(app)
     api.init_app(app)
     influx_db.init_app(app)
@@ -34,21 +32,9 @@ def create_app(config=None):
     principal = Principal()
     principal.init_app(app)
 
+    init_signals(app)
     configure_uploads(app, logos)
     app.register_blueprint(bp)
-
-    if False:
-        login_manager = LoginManager(app)
-
-        @login_manager.request_loader
-        def load_user_from_request(request):
-            if request.authorization:
-                email, password = request.authorization.username, request.authorization.password
-                user = User.query.filter_by(email=unicode(email)).first()
-
-                if user is not None:
-                    if verify_password(password, user.password):
-                        return user
 
     @identity_loaded.connect_via(app)
     def on_identity_loaded(sender, identity):

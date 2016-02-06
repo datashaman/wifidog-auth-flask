@@ -127,7 +127,7 @@ def record_change(f):
         change.destination = self.status
         change.args = json.dumps(kwargs)
 
-        if current_user.is_authenticated():
+        if current_user.is_authenticated:
             change.user_id = current_user.id
 
         db.session.add(change)

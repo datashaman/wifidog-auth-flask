@@ -1,4 +1,4 @@
-*.db
+/*.db
 *.pyc
 app/tags/**/*.js
 bootstrap.py

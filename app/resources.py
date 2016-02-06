@@ -96,7 +96,7 @@ class UserResource(PrincipalResource):
 
     @Route.GET
     def current(self):
-        if current_user.is_authenticated():
+        if current_user.is_authenticated:
             return {
                 'id': current_user.id,
                 'email': current_user.email,

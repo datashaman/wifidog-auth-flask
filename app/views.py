@@ -307,6 +307,10 @@ def pay_cancel():
 def home():
     return flask.redirect(flask.url_for('security.login'))
 
+@bp.route('/config')
+def config():
+    return current_app.config['SQLALCHEMY_DATABASE_URI']
+
 @bp.route('/debug')
 def debug():
     return flask.session

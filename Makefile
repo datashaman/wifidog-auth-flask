@@ -14,14 +14,10 @@ bootstrap-tests:
 	rm -f tests.db
 	python manage.py bootstrap_tests
 
-link-tests-env:
-	rm -f .env
-	ln -s .env.tests .env
-
-tests: link-tests-env
+tests:
 	python tests/test_unit.py
 
-tests-webdriver: link-tests-env
+tests-webdriver:
 	python tests/test_webdriver.py
 
 setup:

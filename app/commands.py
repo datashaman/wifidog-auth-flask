@@ -23,10 +23,8 @@ ROLES = {
 
 @manager.command
 def bootstrap_tests():
-    filename = current_app.config['BASE_DIR'] + '/tests.db'
-    current_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + filename
+    current_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../tests.db'
 
-    db.init_app(current_app)
     db.create_all()
 
     create_roles(quiet=True)
@@ -269,3 +267,7 @@ def measurements():
     }
 
     return json.dumps(measurements)
+
+@manager.command
+def db_create_all():
+    db.create_all()
