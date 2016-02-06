@@ -28,8 +28,6 @@ class TestCase(unittest.TestCase):
         os.write(self.fd, content)
 
         config = {
-            'TESTING': True,
-            'WTF_CSRF_ENABLED': False,
             'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + self.filename,
         }
 
