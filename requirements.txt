@@ -3,7 +3,7 @@ blinker
 Flask
 Flask-Bcrypt
 Flask-InfluxDB
-Flask-Login==0.2.11
+Flask-Login
 Flask-Menu
 Flask-Migrate
 Flask-Potion==0.8.1

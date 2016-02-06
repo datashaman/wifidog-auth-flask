@@ -1,6 +1,6 @@
 <script>
 dataLayer = [
-{% if current_user.is_authenticated() %}
+{% if current_user.is_authenticated %}
 { uid: {{ current_user.id  }} }
 {% endif %}
 ];

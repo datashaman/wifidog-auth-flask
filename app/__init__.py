@@ -20,9 +20,8 @@ def create_app(config=None):
     app.config.from_object('config')
 
     if config is not None:
-        app.config.update(config)
+        app.config.update(**config)
 
-    init_db(app)
     init_signals(app)
 
     api.init_app(app)
@@ -60,7 +59,7 @@ def create_app(config=None):
 
     @principal.identity_loader
     def read_identity_from_flask_login():
-        if current_user.is_authenticated():
+        if current_user.is_authenticated:
             return Identity(current_user.id)
         return AnonymousIdentity()
 
@@ -73,8 +72,3 @@ def create_app(config=None):
         return response
 
     return app
-
-def init_db(app):
-    db.init_app(app)
-    with app.app_context():
-        db.create_all()

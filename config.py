@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 dotenv_path = os.path.join(BASE_DIR, '.env')
-load_dotenv(dotenv_path)
+if os.path.isfile(dotenv_path):
+    load_dotenv(dotenv_path)
 
 APP_VERSION = '0.6.0'
 CSRF_SESSION_KEY = os.environ.get('CSRF_SESSION_KEY')

@@ -42,7 +42,7 @@
                     {%- endif -%}
                     {%- endfor -%}
 
-                    {% if current_user.is_authenticated() %}
+                    {% if current_user.is_authenticated %}
                     <li class="pure-menu-item">
                         <a href="/logout" class="pure-menu-link">Logout</a>
                     </li>

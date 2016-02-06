@@ -8,12 +8,12 @@ import unittest
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0, BASE_DIR)
 
-from app import create_app, init_db
+from app import create_app
+from app.commands import create_roles, create_user, create_network, create_gateway
 from app.models import db, users, Role
 from flask import current_app
 from flask.ext.security.utils import encrypt_password
 from lxml import etree
-from manage import create_roles, create_user, create_network, create_gateway
 from StringIO import StringIO
 
 with open(BASE_DIR + '/data/tests.db', 'r') as tests_db:
@@ -27,7 +27,7 @@ class TestCase(unittest.TestCase):
         self.fd, self.filename = tempfile.mkstemp()
         os.write(self.fd, content)
 
-        self.app = create_app({
+        config = {
             'CSRF_SESSION_KEY': 'ABigSecretIsHardToFind',
             'GOOGLE_ANALYTICS_TRACKING_ID': None,
             'GTM_CONTAINER_ID': None,
@@ -38,9 +38,14 @@ class TestCase(unittest.TestCase):
             'TESTING': True,
             'WTF_CSRF_ENABLED': False,
             'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + self.filename,
-        })
+        }
 
-        init_db(self.app)
+        self.app = create_app(config)
+
+        db.init_app(self.app)
+
+        with self.app.app_context():
+            db.create_all()
 
         self.client = self.app.test_client()
 
