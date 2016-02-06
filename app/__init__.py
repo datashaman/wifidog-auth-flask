@@ -24,6 +24,7 @@ def create_app(config=None):
 
     init_signals(app)
 
+    db.init_app(app)
     api.init_app(app)
     influx_db.init_app(app)
     menu.init_app(app)

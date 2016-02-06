@@ -11,7 +11,7 @@ nodemon-tests: bootstrap-tests
 	nodemon tests.py
 
 bootstrap-tests:
-	rm -f data/tests.db
+	rm -f tests.db
 	python manage.py bootstrap_tests
 
 link-tests-env:
@@ -60,7 +60,7 @@ bootstrap:
 	python bootstrap.py
 
 remove-db:
-	rm -f data/local.db
+	rm -f local.db
 
 reboot: remove-db bootstrap
 

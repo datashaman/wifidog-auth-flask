@@ -23,7 +23,7 @@ ROLES = {
 
 @manager.command
 def bootstrap_tests():
-    filename = current_app.config['BASE_DIR'] + '/data/tests.db'
+    filename = current_app.config['BASE_DIR'] + '/tests.db'
     current_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + filename
 
     db.init_app(current_app)
