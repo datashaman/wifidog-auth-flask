@@ -100,38 +100,38 @@ def gateways_index():
 def users_index():
     return flask.render_template('users/index.html')
 
+@bp.route('/vouchers')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(bp, '.vouchers', 'Vouchers', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=5)
-@bp.route('/vouchers')
 def vouchers_index():
     return flask.render_template('vouchers/index.html')
 
+@bp.route('/categories')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(bp, '.categories', 'Categories', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=99)
-@bp.route('/categories')
 def categories_index():
     return flask.render_template('categories/index.html')
 
+@bp.route('/products')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(bp, '.products', 'Products', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=99)
-@bp.route('/products')
 def products_index():
     return flask.render_template('products/index.html')
 
+@bp.route('/currencies')
 @login_required
 @roles_accepted('super-admin')
 @register_menu(bp, '.currencies', 'Currencies', visible_when=has_a_role('super-admin'), order=99)
-@bp.route('/currencies')
 def currencies_index():
     return flask.render_template('currencies/index.html')
 
+@bp.route('/new-voucher', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(bp, '.new', 'New Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=0)
-@bp.route('/new-voucher', methods=[ 'GET', 'POST' ])
 def vouchers_new():
     form = NewVoucherForm(flask.request.form)
 
@@ -305,7 +305,6 @@ def pay_cancel():
 
 @bp.route('/')
 def home():
-    print flask.url_for('security.login')
     return flask.redirect(flask.url_for('security.login'))
 
 @bp.route('/debug')

@@ -68,14 +68,15 @@ def bootstrap_tests():
     create_country('ZA', u'South Africa', quiet=True)
     create_currency('ZA', 'ZAR', u'South African Rand', u'R', quiet=True)
 
-    create_product(u'main-network', None, u'90 Minute Voucher', 'ZAR', 3000, 'available')
+    create_product(u'main-network', None, u'90MIN', u'90 Minute Voucher', 'ZAR', 3000, 'available')
 
 @manager.command
-def create_product(network_id, gateway_id, title, currency_id, price, status='new', quiet=True):
+def create_product(network_id, gateway_id, code, title, currency_id, price, status='new', quiet=True):
     product = Product()
 
     product.network_id = network_id
     product.gateway_id = gateway_id
+    product.code = code
     product.title = title
     product.currency_id = currency_id
     product.price = price
