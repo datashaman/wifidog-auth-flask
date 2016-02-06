@@ -6,7 +6,7 @@ import json
 
 from app import create_app, init_db
 from app.admin import VoucherAdmin
-from app.models import Role, Network, Gateway, Voucher, db, users
+from app.models import Role, Network, Gateway, Voucher, Country, Currency, Product, db, users
 from flask.ext.script import Manager, prompt, prompt_pass
 from flask.ext.security.utils import encrypt_password
 from flask.ext.migrate import Migrate, MigrateCommand
@@ -64,6 +64,57 @@ def bootstrap_tests():
     create_voucher(u'other-gateway1', 60, 'other-1-2', quiet=True)
     create_voucher(u'other-gateway2', 60, 'other-2-1', quiet=True)
     create_voucher(u'other-gateway2', 60, 'other-2-2', quiet=True)
+
+    create_country('ZA', u'South Africa', quiet=True)
+    create_currency('ZA', 'ZAR', u'South African Rand', u'R', quiet=True)
+
+    create_product(u'main-network', None, u'90 Minute Voucher', 'ZAR', 3000, 'available')
+
+@manager.command
+def create_product(network_id, gateway_id, title, currency_id, price, status='new', quiet=True):
+    product = Product()
+
+    product.network_id = network_id
+    product.gateway_id = gateway_id
+    product.title = title
+    product.currency_id = currency_id
+    product.price = price
+    product.status = status
+
+    db.session.add(product)
+    db.session.commit()
+
+    if not quiet:
+        print 'Product created: %s - %s' % (product.id, product.title)
+
+@manager.command
+def create_country(id, title, quiet=True):
+    country = Country()
+
+    country.id = id
+    country.title = title
+
+    db.session.add(country)
+    db.session.commit()
+
+    if not quiet:
+        print 'Country created: %s' % country.id
+
+@manager.command
+def create_currency(country_id, id, title, prefix=None, suffix=None, quiet=True):
+    currency = Currency()
+
+    currency.country_id = country_id
+    currency.id = id
+    currency.title = title
+    currency.prefix = prefix
+    currency.suffix = suffix
+
+    db.session.add(currency)
+    db.session.commit()
+
+    if not quiet:
+        print 'Currency created: %s' % currency.id
 
 @manager.command
 def create_voucher(gateway, minutes=60, code=None, quiet=True):
