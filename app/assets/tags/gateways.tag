@@ -96,6 +96,13 @@
                         </label>
                         <div if={ opt.errors.login_ask_name } class="state state-invalid">{ opt.errors.login_ask_name }</div>
                     </div>
+                    <div class="pure-u-1">
+                        <label for="login_require_name" class="pure-checkbox">
+                            <input type="checkbox" id="login_require_name" name="login_require_name" checked={ opts.row.login_require_name == 1 } />
+                            Require name on login?
+                        </label>
+                        <div if={ opt.errors.login_require_name } class="state state-invalid">{ opt.errors.login_require_name }</div>
+                    </div>
                 </div>
             </div>
 
@@ -174,10 +181,12 @@
             'contact_phone',
             'url_home',
             'url_facebook',
-            'login_ask_name'
+            'login_ask_name',
+            'login_require_name'
         ],
         checkboxes: [
             'login_ask_name',
+            'login_require_name'
         ]
     });
 
@@ -186,11 +195,6 @@
     this.mixin('events');
     this.mixin('networks');
     this.mixin('render');
-
-    toggleCheckbox(e) {
-        console.log('here');
-        console.log(this.refs.login_ask_name.value);
-    }
 
     beforeSave(data, modal) {
         data.network = this.hasRole('super-admin') ? modal.network.value : this.currentuser.network;
