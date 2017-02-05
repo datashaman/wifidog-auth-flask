@@ -5,14 +5,14 @@ import time
 from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
 from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
 from app.payu import get_transaction, set_transaction, capture
-from app.services import influx_db
+# from app.services import influx_db
 from app.signals import voucher_logged_in
 from app.utils import is_logged_in, has_role, has_a_role
 
 from blinker import Namespace
 from flask import Blueprint, current_app
-from flask.ext.menu import register_menu
-from flask.ext.security import login_required, roles_required, roles_accepted, current_user
+from flask_menu import register_menu
+from flask_security import login_required, roles_required, roles_accepted, current_user
 
 
 bp = flask.Blueprint('app', __name__)
@@ -224,8 +224,8 @@ def wifidog_ping():
             }
         }
 
-    points = [generate_point(m) for m in [ 'sys_uptime', 'sys_memfree', 'sys_load', 'wifidog_uptime' ]]
-    influx_db.connection.write_points(points)
+    # points = [generate_point(m) for m in [ 'sys_uptime', 'sys_memfree', 'sys_load', 'wifidog_uptime' ]]
+    # influx_db.connection.write_points(points)
 
     return ('Pong', 200)
 
@@ -266,8 +266,8 @@ def wifidog_auth():
             }
         }
 
-    points = [generate_point(m) for m in [ 'incoming', 'outgoing' ]]
-    influx_db.connection.write_points(points)
+    # points = [generate_point(m) for m in [ 'incoming', 'outgoing' ]]
+    # influx_db.connection.write_points(points)
 
     return ("Auth: %s\nMessages: %s\n" % (auth.status, auth.messages), 200)
 

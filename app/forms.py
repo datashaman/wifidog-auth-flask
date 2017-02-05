@@ -1,6 +1,6 @@
 from app.utils import args_get
 from flask import current_app
-from flask.ext.wtf import Form
+from flask_wtf import FlaskForm
 from wtforms.ext.sqlalchemy.orm import model_form
 from wtforms import HiddenField, PasswordField, StringField, TextAreaField, IntegerField, SelectField, validators
 
@@ -11,14 +11,14 @@ import constants
 def default_minutes():
     return current_app.config.get('VOUCHER_DEFAULT_MINUTES')
 
-class NewVoucherForm(Form):
+class NewVoucherForm(FlaskForm):
     gateway_id = SelectField('Gateway')
     minutes = IntegerField('Minutes', [ validators.InputRequired(), validators.NumberRange(min=0) ], default=default_minutes)
 
-class BroadcastForm(Form):
+class BroadcastForm(FlaskForm):
     message = StringField('Message', [ validators.InputRequired() ])
 
-class LoginVoucherForm(Form):
+class LoginVoucherForm(FlaskForm):
     voucher_code = StringField('* Voucher Code', [ validators.InputRequired() ], default=args_get('voucher'), description='The voucher code you were given at the counter')
     name = StringField('Your Name', description='Optional, so we know what to call you')
 
@@ -38,7 +38,7 @@ class LoginVoucherForm(Form):
         if voucher.status != 'new':
             raise validators.ValidationError('Voucher is %s' % voucher.status)
 
-class NetworkForm(Form):
+class NetworkForm(FlaskForm):
     id = StringField('ID', [ validators.InputRequired() ])
 
     title = StringField('Title', [ validators.InputRequired(), validators.Length(min=5, max=20) ])

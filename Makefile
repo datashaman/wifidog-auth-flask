@@ -11,10 +11,11 @@ nodemon-tests: bootstrap-tests
 	nodemon tests.py
 
 bootstrap-tests:
-	rm -f tests.db
+	rm -f data/tests.db
 	python manage.py bootstrap_tests
 
 tests:
+	touch data/tests.db
 	python tests/test_unit.py
 
 tests-webdriver:
@@ -22,28 +23,28 @@ tests-webdriver:
 
 setup:
 	sudo apt-get install python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
-	sudo npm install -g bower gulp
+	sudo npm install -g bower gulp yarn
 
 development-install:
 	bundle install
 	pip install -r requirements.txt
-	npm install
+	yarn install
 	npm prune
 	bower install
 	bower prune
-	cd bower_components/pure && npm install && node_modules/.bin/grunt
-	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
+	cd bower_components/pure && yarn install && node_modules/.bin/grunt
+	cd bower_components/zepto && yarn install && MODULES="zepto ajax callbacks deferred event" yarn run dist
 	gulp --dev
 
 production-install:
 	bundle install --without development --deployment --jobs=3 --retry=3
 	pip install -r requirements.txt
-	npm install
+	yarn install
 	npm prune
 	bower install
 	bower prune
-	cd bower_components/pure && npm install && node_modules/.bin/grunt
-	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
+	cd bower_components/pure && yarn install && node_modules/.bin/grunt
+	cd bower_components/zepto && yarn install && MODULES="zepto ajax callbacks deferred event" yarn run dist
 	gulp
 
 db-migrate:

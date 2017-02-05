@@ -1,9 +1,11 @@
 /*.db
 *.pyc
+app/static/tags/
 app/tags/**/*.js
 bootstrap.py
 bower_components/
-build/
+/build/
+/data/
 logs/
 node_modules/
 tmp/

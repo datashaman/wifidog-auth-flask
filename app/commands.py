@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+import datetime
 import hmac
 import json
 
@@ -9,8 +10,8 @@ from app.admin import VoucherAdmin
 from app.models import Role, Network, Gateway, Voucher, Country, Currency, Product, db, users
 from app.services import manager
 from flask import current_app
-from flask.ext.script import prompt, prompt_pass
-from flask.ext.security.utils import encrypt_password
+from flask_script import prompt, prompt_pass
+from flask_security.utils import encrypt_password
 from hashlib import md5
 from sqlalchemy import text, func
 
@@ -23,7 +24,7 @@ ROLES = {
 
 @manager.command
 def bootstrap_tests():
-    current_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../tests.db'
+    current_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../data/tests.db'
 
     db.create_all()
 
@@ -226,6 +227,7 @@ def process_vouchers():
     for voucher in vouchers:
         if voucher.should_end():
             voucher.end()
+            db.session.add(voucher)
     
     # New vouchers that are unused and should expire
     max_age = current_app.config.get('VOUCHER_MAXAGE', 120)
@@ -236,15 +238,17 @@ def process_vouchers():
     for voucher in vouchers:
         if voucher.should_expire():
             voucher.expire()
+            db.session.add(voucher)
 
     # Blocked, ended and expired vouchers that should be archived
     vouchers = Voucher.query \
-                .filter(func.datetime(Voucher.updated_at, str(max_age) + ' minutes') < func.current_timestamp()) \
+                .filter(Voucher.updated_at + datetime.timedelta(minutes=max_age) < func.current_timestamp()) \
                 .filter(Voucher.status.in_([ 'blocked', 'ended', 'expired' ])) \
                 .all()
 
     for voucher in vouchers:
         voucher.archive()
+        db.session.add(voucher)
 
     db.session.commit()
 

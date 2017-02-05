@@ -53,7 +53,7 @@ var isProduction = true,
     siteScripts = [
         'bower_components/zepto/dist/zepto.js',
         'bower_components/riot/riot.js',
-        'bower_components/riotcontrol/riotcontrol.js',
+        'bower_components/riot-control/riotcontrol.js',
         'bower_components/marked/lib/marked.js',
 
         'app/assets/scripts/**/*.js',

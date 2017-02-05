@@ -10,7 +10,6 @@ if os.path.isfile(dotenv_path):
     load_dotenv(dotenv_path)
 
 APP_VERSION = '0.6.0'
-CSRF_SESSION_KEY = os.environ.get('CSRF_SESSION_KEY', 'secret')
 DATABASE_CONNECTION_OPTIONS = {}
 DEBUG = True
 GOOGLE_ANALYTICS_TRACKING_ID = os.environ.get('GOOGLE_ANALYTICS_TRACKING_ID')
@@ -37,5 +36,6 @@ UPLOADS_DEFAULT_URL = '/static'
 VOUCHER_DEFAULT_MINUTES = 90
 VOUCHER_MAXAGE = 60 * 24
 WTF_CSRF_ENABLED = asbool(os.environ.get('WTF_CSRF_ENABLED', True))
+WTF_CSRF_SECRET_KEY = os.environ.get('WTF_CSRF_SECRET_KEY', 'secret')
 
 print os.environ.get('SQLALCHEMY_DATABASE_URI')

@@ -12,11 +12,11 @@ from app import create_app
 from app.commands import create_roles, create_user, create_network, create_gateway
 from app.models import db, users, Role
 from flask import current_app
-from flask.ext.security.utils import encrypt_password
+from flask_security.utils import encrypt_password
 from lxml import etree
 from StringIO import StringIO
 
-with open(BASE_DIR + '/tests.db', 'r') as tests_db:
+with open(BASE_DIR + '/data/tests.db', 'r') as tests_db:
     content = tests_db.read()
 
 class TestCase(unittest.TestCase):

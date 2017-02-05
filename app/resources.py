@@ -4,12 +4,12 @@ import os
 
 from app.graphs import states, actions
 from app.models import Network, User, Gateway, Voucher, Category, Product, Currency, db
-from flask.ext.login import current_user, login_required
-from flask.ext.potion import Api, fields, signals
-from flask.ext.potion.routes import Relation, Route, ItemRoute
-from flask.ext.potion.contrib.principals import PrincipalResource, PrincipalManager
-from flask.ext.security import current_user
-from flask.ext.uploads import UploadSet, IMAGES
+from flask_login import current_user, login_required
+from flask_potion import Api, fields, signals
+from flask_potion.routes import Relation, Route, ItemRoute
+from flask_potion.contrib.principals import PrincipalResource, PrincipalManager
+from flask_security import current_user
+from flask_uploads import UploadSet, IMAGES
 from PIL import Image
 
 super_admin_only = 'super-admin'

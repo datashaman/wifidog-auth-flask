@@ -9,10 +9,10 @@ from app.services import influx_db, menu, security
 from app.signals import init_signals
 from app.views import bp
 
-from flask.ext.login import current_user, LoginManager
-from flask.ext.uploads import configure_uploads
-from flask.ext.potion.contrib.principals.needs import HybridRelationshipNeed
-from flask.ext.principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed, Principal
+from flask_login import current_user, LoginManager
+from flask_uploads import configure_uploads
+from flask_potion.contrib.principals.needs import HybridRelationshipNeed
+from flask_principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed, Principal
 
 def create_app(config=None):
     app = flask.Flask(__name__)

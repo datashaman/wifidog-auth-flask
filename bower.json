@@ -8,7 +8,7 @@
     "open-iconic": "~1.1.1",
     "pure": "purecss#~0.6.0",
     "riot": "~2",
-    "riotcontrol": "riotcontrol#*",
+    "riot-control": "riot-control#*",
     "zepto": "zeptojs#~1.1.6"
   }
 }

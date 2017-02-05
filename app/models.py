@@ -9,9 +9,9 @@ import flask
 
 from app.graphs import states, available_actions
 from flask import current_app
-from flask.ext.potion import fields
-from flask.ext.security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore, Security
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_potion import fields
+from flask_security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore, Security
+from flask_sqlalchemy import SQLAlchemy
 from random import choice
 
 from sqlalchemy import event
@@ -110,6 +110,7 @@ class Gateway(db.Model):
     logo = db.Column(db.String(255))
 
     login_ask_name = db.Column(db.Boolean(), default=False)
+    login_require_name = db.Column(db.Boolean(), default=False)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
