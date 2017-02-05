@@ -37,5 +37,3 @@ VOUCHER_DEFAULT_MINUTES = 90
 VOUCHER_MAXAGE = 60 * 24
 WTF_CSRF_ENABLED = asbool(os.environ.get('WTF_CSRF_ENABLED', True))
 WTF_CSRF_SECRET_KEY = os.environ.get('WTF_CSRF_SECRET_KEY', 'secret')
-
-print os.environ.get('SQLALCHEMY_DATABASE_URI')
