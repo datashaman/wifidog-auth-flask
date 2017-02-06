@@ -8,12 +8,12 @@ import unittest
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0, BASE_DIR)
 
-from app import create_app, init_db
+from app import create_app
+from app.commands import create_roles, create_user, create_network, create_gateway
 from app.models import db, users, Role
 from flask import current_app
-from flask.ext.security.utils import encrypt_password
+from flask_security.utils import encrypt_password
 from lxml import etree
-from manage import create_roles, create_user, create_network, create_gateway
 from StringIO import StringIO
 
 with open(BASE_DIR + '/data/tests.db', 'r') as tests_db:
@@ -24,16 +24,19 @@ class TestCase(unittest.TestCase):
         super(TestCase, self).__init__(*args, **kwargs)
 
     def setUp(self):
-        self.app = create_app()
-
-        self.app.config['TESTING'] = True
-        self.app.config['WTF_CSRF_ENABLED'] = False
-
         self.fd, self.filename = tempfile.mkstemp()
         os.write(self.fd, content)
 
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + self.filename
-        init_db(self.app)
+        config = {
+            'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + self.filename,
+        }
+
+        self.app = create_app(config)
+
+        db.init_app(self.app)
+
+        with self.app.app_context():
+            db.create_all()
 
         self.client = self.app.test_client()
 
@@ -199,13 +202,13 @@ class TestCase(unittest.TestCase):
         vouchers = json.loads(response.data)
         self.assertEquals(2, len(vouchers))
 
-        self.assertEquals('main-1-2', vouchers[0]['$id'])
-        self.assertEquals('main-1-1', vouchers[1]['$id'])
+        self.assertEquals('main-1-2', vouchers[0]['code'])
+        self.assertEquals('main-1-1', vouchers[1]['code'])
 
     def test_api_vouchers_index_as_network(self):
         self.login('main-network@example.com', 'admin')
 
-        response = self.client.get('/api/vouchers?sort={"$id":false}')
+        response = self.client.get('/api/vouchers?sort={"code":false}')
         self.assertEquals(200, response.status_code)
 
         vouchers = json.loads(response.data)

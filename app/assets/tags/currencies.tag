@@ -1,7 +1,7 @@
-<networks>
-    <modal heading={ modal.heading } hidden={ modal.hidden } cancelevent="network.cancel" row={ row }>
+<currencies>
+    <modal heading={ modal.heading } hidden={ modal.hidden } cancelevent="currency.cancel" row={ row }>
         <form id="form" class="pure-form pure-form-stacked" onsubmit={ doNothing }>
-            <input type="hidden" id="original_id" class="pure-input-1" value={ opts.row['$id'] } />
+            <input type="hidden" id="original_id" value={ opts.row['$id'] } />
 
             <label for="id">ID</label>
             <input type="text" id="id" name="id" class="pure-input-1" value="{ opts.row['$id'] }" />
@@ -11,19 +11,23 @@
             <input type="text" id="title" name="title" class="pure-input-1" value={ opts.row.title } />
             <div if={ opts.errors.title } class="state state-invalid">{ opts.errors.title }</div>
 
-            <label for="description">Description</label>
-            <textarea id="description" class="pure-input-1" name="description">{ opts.row.description }</textarea>
-            <div if={ opts.errors.description } class="state state-invalid">{ opts.errors.description }</div>
+            <label for="prefix">Prefix</label>
+            <input type="text" id="prefix" name="prefix" class="pure-input-1" value={ opts.row.prefix } />
+            <div if={ opts.errors.prefix } class="state state-invalid">{ opts.errors.prefix }</div>
+
+            <label for="suffix">Suffix</label>
+            <input type="text" id="suffix" name="suffix" class="pure-input-1" value={ opts.row.suffix } />
+            <div if={ opts.errors.suffix } class="state state-invalid">{ opts.errors.suffix }</div>
 
             <div class="actions">
                 <button type="submit" class="pure-button pure-button-primary" onclick={ parent.onOk }>Ok</button>
-                <button type="button" class="pure-button" onclick={ parent.triggerEvent('network.cancel') }>Cancel</button>
+                <button type="button" class="pure-button" onclick={ parent.triggerEvent('currency.cancel') }>Cancel</button>
             </div>
         </form>
     </modal>
 
     <div class="header">
-        <h1>Networks</h1>
+        <h1>currencies</h1>
 
         <div class="actions-collection">
             <button type="button" class="pure-button pure-button-primary" onclick={ onNew }>
@@ -39,9 +43,8 @@
                 <tr>
                     <th>ID</th>
                     <th>Title</th>
-                    <th>Description</th>
-                    <th>Created At</th>
-
+                    <th>Prefix</th>
+                    <th>Suffix</th>
                     <th class="actions">Actions</th>
                 </tr>
             </thead>
@@ -50,8 +53,8 @@
                 <tr each={ row, i in rows } data-id={ row['$id'] } class={ pure-table-odd: i % 2 }>
                     <td data-label="ID"><a href="#" onclick={ onEdit }>{ row['$id'] }</a></td>
                     <td data-label="Title">{ render(row.title) }</td>
-                    <td data-label="Description">{ render(row.description) }</td>
-                    <td data-label="Created At">{ render(row.created_at) }</td>
+                    <td data-label="Prefix">{ render(row.prefix) }</td>
+                    <td data-label="Suffix">{ render(row.suffix) }</td>
 
                     <td class="actions actions-row">
                         <button class="pure-button" onclick={ onRemove }>
@@ -68,17 +71,19 @@
         modal: {
             hidden: true
         },
-        item: 'network',
-        collection: 'networks',
+        item: 'currency',
+        collection: 'currencies',
         defaultObject: {
             id: '',
             title: '',
-            description: ''
+            prefix: '',
+            suffix: ''
         },
         saveColumns: [
             'id',
             'title',
-            'description'
+            'prefix',
+            'suffix'
         ]
     });
 
@@ -86,4 +91,4 @@
     this.mixin('currentuser');
     this.mixin('events');
     this.mixin('render');
-</networks>
+</currencies>

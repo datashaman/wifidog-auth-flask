@@ -4,18 +4,17 @@ import time
 
 from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
 from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
+from app.payu import get_transaction, set_transaction, capture
+# from app.services import influx_db
 from app.signals import voucher_logged_in
 from app.utils import is_logged_in, has_role, has_a_role
+
 from blinker import Namespace
 from flask import Blueprint, current_app
-from flask.ext.menu import register_menu, Menu
-from flask.ext.security import login_required, roles_required, roles_accepted, current_user
-from influxdb import InfluxDBClient
+from flask_menu import register_menu
+from flask_security import login_required, roles_required, roles_accepted, current_user
 
 
-influx = InfluxDBClient(database='auth')
-
-menu = Menu()
 bp = flask.Blueprint('app', __name__)
 
 if False: # Push is disabled for now
@@ -101,17 +100,38 @@ def gateways_index():
 def users_index():
     return flask.render_template('users/index.html')
 
+@bp.route('/vouchers')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(bp, '.vouchers', 'Vouchers', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=5)
-@bp.route('/vouchers')
 def vouchers_index():
     return flask.render_template('vouchers/index.html')
 
+@bp.route('/categories')
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+@register_menu(bp, '.categories', 'Categories', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=99)
+def categories_index():
+    return flask.render_template('categories/index.html')
+
+@bp.route('/products')
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+@register_menu(bp, '.products', 'Products', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=99)
+def products_index():
+    return flask.render_template('products/index.html')
+
+@bp.route('/currencies')
+@login_required
+@roles_accepted('super-admin')
+@register_menu(bp, '.currencies', 'Currencies', visible_when=has_a_role('super-admin'), order=99)
+def currencies_index():
+    return flask.render_template('currencies/index.html')
+
+@bp.route('/new-voucher', methods=[ 'GET', 'POST' ])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(bp, '.new', 'New Voucher', visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'), order=0)
-@bp.route('/new-voucher', methods=[ 'GET', 'POST' ])
 def vouchers_new():
     form = NewVoucherForm(flask.request.form)
 
@@ -141,7 +161,7 @@ def vouchers_new():
         db.session.add(voucher)
         db.session.commit()
 
-        return flask.redirect(flask.url_for('.vouchers_new', id=voucher.id))
+        return flask.redirect(flask.url_for('.vouchers_new', code=voucher.code))
 
     return flask.render_template('vouchers/new.html', form=form)
 
@@ -150,8 +170,8 @@ def wifidog_login():
     form = LoginVoucherForm(flask.request.form)
 
     if form.validate_on_submit():
-        voucher_id = form.voucher.data.upper()
-        voucher = Voucher.query.get(voucher_id)
+        voucher_code = form.voucher_code.data.upper()
+        voucher = Voucher.query.filter_by(code=voucher_code).first_or_404()
 
         form.populate_obj(voucher)
         voucher.token = generate_token()
@@ -159,8 +179,9 @@ def wifidog_login():
 
         voucher_logged_in.send(flask.current_app._get_current_object(), voucher=voucher)
 
+        # flask.flash('Logged in, continue to <a href="%s">%s</a>' % (form.url.data, form.url.data), 'success')
+
         url = 'http://%s:%s/wifidog/auth?token=%s' % (voucher.gw_address, voucher.gw_port, voucher.token)
-        print url
 
         return flask.redirect(url)
 
@@ -203,8 +224,8 @@ def wifidog_ping():
             }
         }
 
-    points = [generate_point(m) for m in [ 'sys_uptime', 'sys_memfree', 'sys_load', 'wifidog_uptime' ]]
-    influx.write_points(points)
+    # points = [generate_point(m) for m in [ 'sys_uptime', 'sys_memfree', 'sys_load', 'wifidog_uptime' ]]
+    # influx_db.connection.write_points(points)
 
     return ('Pong', 200)
 
@@ -245,8 +266,8 @@ def wifidog_auth():
             }
         }
 
-    points = [generate_point(m) for m in [ 'incoming', 'outgoing' ]]
-    influx.write_points(points)
+    # points = [generate_point(m) for m in [ 'incoming', 'outgoing' ]]
+    # influx_db.connection.write_points(points)
 
     return ("Auth: %s\nMessages: %s\n" % (auth.status, auth.messages), 200)
 
@@ -260,9 +281,35 @@ def wifidog_portal():
     gateway = Gateway.query.filter_by(id=flask.request.args.get('gw_id')).first_or_404()
     return flask.render_template('wifidog/portal.html', gateway=gateway, voucher=voucher)
 
+@bp.route('/pay')
+def pay():
+    return_url = flask.url_for('.pay_return', _external=True)
+    cancel_url = flask.url_for('.pay_cancel', _external=True)
+    response = set_transaction('ZAR', 1000, 'Something', return_url, cancel_url)
+    return flask.redirect('%s?PayUReference=%s' % (capture, response.payUReference))
+
+@bp.route('/pay/return')
+def pay_return():
+    response = get_transaction(flask.request.args.get('PayUReference'))
+    basketAmount = '{:.2f}'.format(int(response.basket.amountInCents) / 100)
+    category = 'success' if response.successful else 'error'
+    flask.flash(response.displayMessage, category)
+    return flask.render_template('payu/transaction.html', response=response, basketAmount=basketAmount)
+
+@bp.route('/pay/cancel')
+def pay_cancel():
+    response = get_transaction(flask.request.args.get('payUReference'))
+    basketAmount = '{:.2f}'.format(int(response.basket.amountInCents) / 100)
+    flask.flash(response.displayMessage, 'warning')
+    return flask.render_template('payu/transaction.html', response=response, basketAmount=basketAmount)
+
 @bp.route('/')
 def home():
     return flask.redirect(flask.url_for('security.login'))
+
+@bp.route('/config')
+def config():
+    return current_app.config['SQLALCHEMY_DATABASE_URI']
 
 @bp.route('/debug')
 def debug():

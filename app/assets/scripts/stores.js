@@ -10,6 +10,8 @@ function Store(item, collection) {
     riot.observable(self);
 
     self.load_item = function(id) {
+    	console.log(item + '.load');
+
         $.ajax({
             url: base + '/' + id,
             dataType: 'json'
@@ -22,6 +24,8 @@ function Store(item, collection) {
     };
 
     self.load_collection = function() {
+    	console.log(collection + '.load');
+
         $.getJSON(base, { per_page: 100 })
             .done(function(data) {
                 console.log(collection, 'loaded', data);
@@ -33,6 +37,8 @@ function Store(item, collection) {
     self.on(collection + '.load', self.load_collection);
 
     self.on(collection + '.create', function(attributes) {
+    	console.log(collection + '.create', attributes);
+
         $.ajax({
             url: base,
             type: 'POST',
@@ -93,7 +99,10 @@ var currentuser = new CurrentUserStore(),
     gateways = new Store('gateway'),
     networks = new Store('network'),
     users = new Store('user'),
-    vouchers = new Store('voucher');
+    vouchers = new Store('voucher'),
+    categories = new Store('category', 'categories'),
+    products = new Store('product'),
+    currencies = new Store('currency', 'currencies');
 
 gateways.on('gateway.upload', function(id, file) {
     var xhr = new XMLHttpRequest(),
@@ -124,3 +133,6 @@ RiotControl.addStore(gateways);
 RiotControl.addStore(networks);
 RiotControl.addStore(users);
 RiotControl.addStore(vouchers);
+RiotControl.addStore(categories);
+RiotControl.addStore(products);
+RiotControl.addStore(currencies);

@@ -20,8 +20,10 @@
         {{ form.url | safe }}
 
         <fieldset>
-            {{ render_group(form.voucher, required=True) }}
-            {{ render_group(form.name) }}
+            {{ render_group(form.voucher_code, required=True) }}
+            {% if gateway.login_ask_name %}
+                {{ render_group(form.name, required=gateway.login_require_name) }}
+            {% endif %}
             <div class="pure-controls">
                 <button type="submit" class="pure-button pure-button-primary">Go</button>
             </div>

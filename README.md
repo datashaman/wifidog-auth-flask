@@ -32,6 +32,12 @@ Build the static files (see gulpfile.js for details):
 
 	gulp
 
+Copy the sample .env file to its correct place (and edit it to suit your needs):
+
+    cp .env.example .env
+
+Sensitive config is kept in the .env file, non-sensitive config is in config.py.
+
 Bootstrap the database (stored at data/local.db):
 
     python manage.py create_roles

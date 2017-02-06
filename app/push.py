@@ -1,6 +1,6 @@
 from app.utils import has_role
 from flask import Blueprint
-from flask.ext.menu import register_menu
+from flask_menu import register_menu
 from redis import StrictRedis, ConnectionError
 
 from gevent import monkey
