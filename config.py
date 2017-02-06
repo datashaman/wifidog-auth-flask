@@ -9,7 +9,7 @@ dotenv_path = os.path.join(BASE_DIR, '.env')
 if os.path.isfile(dotenv_path):
     load_dotenv(dotenv_path)
 
-APP_VERSION = '0.6.0'
+APP_VERSION = '0.7.0'
 DATABASE_CONNECTION_OPTIONS = {}
 DEBUG = True
 GOOGLE_ANALYTICS_TRACKING_ID = os.environ.get('GOOGLE_ANALYTICS_TRACKING_ID')
