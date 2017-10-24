@@ -46,7 +46,7 @@ def create_app(config=None):
 
     @principal.identity_loader
     def read_identity_from_flask_login():
-        if hasattr(current_user, 'id'):
+        if not isinstance(current_user, AnonymousUser):
             return Identity(current_user.id)
         return AnonymousIdentity()
 
