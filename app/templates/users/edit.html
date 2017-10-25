@@ -1,0 +1,13 @@
+{% extends 'layouts/default.html' %}
+{% import 'helpers/render.html' as render %}
+
+{% set page_title = 'Edit User' %}
+
+{% block content %}
+    <div class="content">
+        <form method="post" action={{ url_for('.users_edit', id=instance.id) }} class="pure-form pure-form-aligned">
+            {{ form.csrf_token }}
+            {% include 'users/_form.html' %}
+        </form>
+    </div>
+{% endblock %}

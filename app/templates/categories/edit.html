@@ -1,0 +1,13 @@
+{% extends 'layouts/default.html' %}
+{% import 'helpers/render.html' as render %}
+
+{% set page_title = 'Edit Category' %}
+
+{% block content %}
+    <div class="content">
+        <form method="post" action={{ url_for('.categories_edit', id=instance.id) }} class="pure-form pure-form-aligned">
+            {{ form.csrf_token }}
+            {% include 'categories/_form.html' %}
+        </form>
+    </div>
+{% endblock %}

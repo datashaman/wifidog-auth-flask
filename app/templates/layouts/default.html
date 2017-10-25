@@ -18,7 +18,7 @@
 
 <body class="layout-default">
     {% include 'layouts/gtm.html' %}
-    
+
     <div id="layout">
         <a href="#menu" id="menuLink" class="menu-link">
             <i class="oi" data-glyph="menu" title="Menu" aria-hidden="true"></i>
@@ -57,10 +57,31 @@
 
         <div id="main">
             {% if show_flash != False %}
-            <div class="content">
-            {% include 'layouts/flashes.html' %}
-            </div>
+                <div class="content">
+                    {% include 'layouts/flashes.html' %}
+                </div>
             {% endif %}
+
+            {% block header %}
+                <div class="header">
+                    {% if current_user.is_authenticated %}
+                        <div class="logged-in">
+                            Logged in as <em>{{ current_user }}</em>.
+                        </div>
+                    {% endif %}
+
+                    <h1>{{ page_title }}</h1>
+
+                    {% if new_url %}
+                        <div class="actions-collection">
+                            <a href="{{ new_url }}" class="pure-button pure-button-primary">
+                                <span class="oi" data-glyph="file" title="{{ new_title }}" aria-hidden="true"></span>
+                                {{ new_title }}
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endblock %}
 
             {% block content %}
             {% endblock %}
@@ -79,8 +100,6 @@
         {% endif %}
 
         setupNotifications();
-
-        riot.mount('*');
     });
     </script>
 

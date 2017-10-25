@@ -1,4 +1,4 @@
-$menu-width: 200px;
+$menu-width: 240px;
 $content-width: 1600px - $menu-width;
 
 * {
@@ -368,4 +368,9 @@ table#vouchers {
 
 form .description {
     font-size: smaller;
+}
+
+.logged-in {
+    align: right;
+    float: right;
 }

@@ -1,25 +1,26 @@
+from __future__ import absolute_import
+from __future__ import division
+
 import base64
 import datetime
 import json
 import re
 import string
-import uuid
 
 import flask
 
-from app.graphs import states, available_actions
+from app.graphs import available_actions
 from flask import current_app
-from flask_potion import fields
-from flask_security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore, Security
+from flask_security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore
 from flask_sqlalchemy import SQLAlchemy
 from random import choice
 
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import backref
-from sqlalchemy.schema import PrimaryKeyConstraint, UniqueConstraint
+from sqlalchemy.schema import UniqueConstraint
 
-import constants
+from app import constants
 
 @event.listens_for(Engine, 'connect')
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -29,15 +30,12 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 
 db = SQLAlchemy()
 
-chars = string.letters + string.digits
+chars = string.ascii_lowercase + string.digits
 
-def generate_token():
-    return uuid.uuid4().hex
-
-def generate_id():
+def generate_code():
     source = ''.join(choice(chars) for _ in range(4))
-    encoded = base64.b32encode(source)
-    result = unicode(re.sub(r'=*$', '', encoded))
+    encoded = base64.b32encode(source.encode()).decode()
+    result = re.sub(r'=*$', '', encoded)
     return result
 
 roles_users = db.Table('roles_users',
@@ -52,6 +50,9 @@ class Role(db.Model, RoleMixin):
 
     name = db.Column(db.Unicode(20), unique=True)
     description = db.Column(db.Unicode(40))
+
+    def __str__(self):
+        return self.description
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -76,6 +77,9 @@ class User(db.Model, UserMixin):
         UniqueConstraint('network_id', 'email'),
     )
 
+    def __str__(self):
+        return self.email
+
 users = SQLAlchemyUserDatastore(db, User, Role)
 
 class Network(db.Model):
@@ -88,6 +92,9 @@ class Network(db.Model):
     ga_tracking_id = db.Column(db.String(20))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+    def __str__(self):
+        return self.title
 
 class Gateway(db.Model):
     __tablename__ = 'gateways'
@@ -113,6 +120,9 @@ class Gateway(db.Model):
     login_require_name = db.Column(db.Boolean(), default=False)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+    def __str__(self):
+        return self.title
 
 def record_change(f):
     def func(self, **kwargs):
@@ -150,7 +160,7 @@ class Voucher(db.Model):
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('vouchers', lazy='dynamic'))
 
-    code = db.Column(db.String(20), default=generate_id, nullable=False)
+    code = db.Column(db.String(20), default=generate_code, nullable=False)
 
     mac = db.Column(db.String(20))
     ip = db.Column(db.String(15))
@@ -218,6 +228,9 @@ class Voucher(db.Model):
     @property
     def available_actions(self):
         return available_actions(self.status, 'admin')
+
+    def __str__(self):
+        return self.code
 
 class Auth(db.Model):
     __tablename__ = 'auths'
@@ -358,6 +371,9 @@ class Currency(db.Model):
     prefix = db.Column(db.String(10))
     suffix = db.Column(db.String(10))
 
+    def __str__(self):
+        return self.title
+
 product_categories = db.Table('product_categories',
     db.Column('product_id', db.Integer, db.ForeignKey('products.id')),
     db.Column('category_id', db.Integer, db.ForeignKey('categories.id')),
@@ -392,6 +408,9 @@ class Category(db.Model):
             UniqueConstraint('network_id', 'gateway_id', 'parent_id', 'title'),
     )
 
+    def __str__(self):
+        return self.title
+
 class Product(db.Model):
     __tablename__ = 'products'
 
@@ -422,6 +441,9 @@ class Product(db.Model):
             UniqueConstraint('network_id', 'gateway_id', 'code'),
             UniqueConstraint('network_id', 'gateway_id', 'title'),
     )
+
+    def __str__(self):
+        return self.title
 
 class Order(db.Model):
     __tablename__ = 'orders'

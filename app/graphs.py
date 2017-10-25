@@ -1,3 +1,7 @@
+from __future__ import absolute_import
+
+import six
+
 actions = {
     'archive': {
         'interface': 'admin',
@@ -31,7 +35,7 @@ actions = {
 def available_actions(status, interface):
     if status in states:
         result = {}
-        for action, defn in actions.iteritems():
+        for action, defn in six.iteritems(actions):
             if action in states[status] and defn['interface'] == interface:
                 result[action] = defn
         return result
@@ -59,4 +63,4 @@ for ( source, method, destination) in (
 
 if __name__ == '__main__':
     import json
-    print json.dumps(states, indent=4)
+    print(json.dumps(states, indent=4))

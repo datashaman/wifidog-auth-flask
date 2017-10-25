@@ -1,5 +1,5 @@
 {% extends 'layouts/default.html' %}
-{% from 'helpers/form.html' import render_group %}
+{% from 'helpers/form.html' import group %}
 
 {% set title = 'Voucher Login' %}
 
@@ -20,9 +20,9 @@
         {{ form.url | safe }}
 
         <fieldset>
-            {{ render_group(form.voucher_code, required=True) }}
+            {{ group(form.voucher_code, required=True) }}
             {% if gateway.login_ask_name %}
-                {{ render_group(form.name, required=gateway.login_require_name) }}
+                {{ group(form.name, required=gateway.login_require_name) }}
             {% endif %}
             <div class="pure-controls">
                 <button type="submit" class="pure-button pure-button-primary">Go</button>

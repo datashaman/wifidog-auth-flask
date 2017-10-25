@@ -8,7 +8,7 @@ Bandwidth-based vouchering coming soon.
 Setup required (for Ubuntu or Debian):
 
     sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev libxml2-dev libxslt-dev redis-server
-    sudo npm install -g bower gulp
+    sudo npm install -g gulp
 
 Logout and login to activate virtualenvwrapper then:
 
@@ -24,9 +24,8 @@ Go into the folder and install the dependencies (you should be in your virtualen
     setvirtualenvproject
     pip install -r requirements.txt
     npm install
-    bower install
-	cd bower_components/purecss && npm install && node_modules/.bin/grunt
-	cd bower_components/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
+	cd node_modules/purecss && npm install && node_modules/.bin/grunt
+	cd node_modules/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
 
 Build the static files (see gulpfile.js for details):
 

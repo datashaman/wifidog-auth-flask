@@ -1,66 +1,69 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import datetime
-import hmac
-import json
+from __future__ import absolute_import
 
-from app import create_app
-from app.admin import VoucherAdmin
+import csv
+import datetime
+import json
+import six
+
+from app.constants import ROLES
 from app.models import Role, Network, Gateway, Voucher, Country, Currency, Product, db, users
 from app.services import manager
 from flask import current_app
 from flask_script import prompt, prompt_pass
 from flask_security.utils import encrypt_password
-from hashlib import md5
-from sqlalchemy import text, func
+from sqlalchemy import func
 
 
-ROLES = {
-    u'super-admin': u'Super Admin',
-    u'network-admin': u'Network Admin',
-    u'gateway-admin': u'Gateway Admin'
-}
+@manager.command
+def bootstrap_instance(users_csv=None):
+    db.create_all()
+
+    create_roles()
+
+    if users_csv:
+        with open(users_csv) as f:
+            for user in csv.reader(f):
+                email, password, role = user
+                create_user(email, password, role)
+
+    create_country('ZA', u'South Africa')
+    create_currency('ZA', 'ZAR', u'South African Rand', u'R')
 
 @manager.command
 def bootstrap_tests():
-    current_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../data/tests.db'
+    bootstrap_instance()
 
-    db.create_all()
+    create_network(u'main-network', u'Network')
+    create_network(u'other-network', u'Other Network')
 
-    create_roles(quiet=True)
+    create_gateway(u'main-network', u'main-gateway1', u'Main Gateway #1')
+    create_gateway(u'main-network', u'main-gateway2', u'Main Gateway #2')
 
-    create_network(u'main-network', u'Network', quiet=True)
-    create_network(u'other-network', u'Other Network', quiet=True)
+    create_gateway(u'other-network', u'other-gateway1', u'Other Gateway #1')
+    create_gateway(u'other-network', u'other-gateway2', u'Other Gateway #2')
 
-    create_gateway(u'main-network', u'main-gateway1', u'Main Gateway #1', quiet=True)
-    create_gateway(u'main-network', u'main-gateway2', u'Main Gateway #2', quiet=True)
+    create_user(u'super-admin@example.com', u'admin', u'super-admin')
 
-    create_gateway(u'other-network', u'other-gateway1', u'Other Gateway #1', quiet=True)
-    create_gateway(u'other-network', u'other-gateway2', u'Other Gateway #2', quiet=True)
+    create_user(u'main-network@example.com', u'admin', u'network-admin', u'main-network')
+    create_user(u'other-network@example.com', u'admin', u'network-admin', u'other-network')
 
-    create_user(u'super-admin@example.com', u'admin', u'super-admin', quiet=True)
+    create_user(u'main-gateway1@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway1')
+    create_user(u'main-gateway2@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway2')
 
-    create_user(u'main-network@example.com', u'admin', u'network-admin', u'main-network', quiet=True)
-    create_user(u'other-network@example.com', u'admin', u'network-admin', u'other-network', quiet=True)
+    create_user(u'other-gateway1@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway1')
+    create_user(u'other-gateway2@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway2')
 
-    create_user(u'main-gateway1@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway1', quiet=True)
-    create_user(u'main-gateway2@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway2', quiet=True)
-
-    create_user(u'other-gateway1@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway1', quiet=True)
-    create_user(u'other-gateway2@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway2', quiet=True)
-
-    create_voucher(u'main-gateway1', 60, 'main-1-1', quiet=True)
-    create_voucher(u'main-gateway1', 60, 'main-1-2', quiet=True)
-    create_voucher(u'main-gateway2', 60, 'main-2-1', quiet=True)
-    create_voucher(u'main-gateway2', 60, 'main-2-2', quiet=True)
-    create_voucher(u'other-gateway1', 60, 'other-1-1', quiet=True)
-    create_voucher(u'other-gateway1', 60, 'other-1-2', quiet=True)
-    create_voucher(u'other-gateway2', 60, 'other-2-1', quiet=True)
-    create_voucher(u'other-gateway2', 60, 'other-2-2', quiet=True)
-
-    create_country('ZA', u'South Africa', quiet=True)
-    create_currency('ZA', 'ZAR', u'South African Rand', u'R', quiet=True)
+    create_voucher(u'main-gateway1', 60, 'main-1-1')
+    create_voucher(u'main-gateway1', 60, 'main-1-2')
+    create_voucher(u'main-gateway2', 60, 'main-2-1')
+    create_voucher(u'main-gateway2', 60, 'main-2-2')
+    create_voucher(u'other-gateway1', 60, 'other-1-1')
+    create_voucher(u'other-gateway1', 60, 'other-1-2')
+    create_voucher(u'other-gateway2', 60, 'other-2-1')
+    create_voucher(u'other-gateway2', 60, 'other-2-2')
 
     create_product(u'main-network', None, u'90MIN', u'90 Minute Voucher', 'ZAR', 3000, 'available')
 
@@ -80,7 +83,7 @@ def create_product(network_id, gateway_id, code, title, currency_id, price, stat
     db.session.commit()
 
     if not quiet:
-        print 'Product created: %s - %s' % (product.id, product.title)
+        print('Product created: %s - %s' % (product.id, product.title))
 
 @manager.command
 def create_country(id, title, quiet=True):
@@ -93,7 +96,7 @@ def create_country(id, title, quiet=True):
     db.session.commit()
 
     if not quiet:
-        print 'Country created: %s' % country.id
+        print('Country created: %s' % country.id)
 
 @manager.command
 def create_currency(country_id, id, title, prefix=None, suffix=None, quiet=True):
@@ -109,7 +112,7 @@ def create_currency(country_id, id, title, prefix=None, suffix=None, quiet=True)
     db.session.commit()
 
     if not quiet:
-        print 'Currency created: %s' % currency.id
+        print('Currency created: %s' % currency.id)
 
 @manager.command
 def create_voucher(gateway, minutes=60, code=None, quiet=True):
@@ -126,7 +129,7 @@ def create_voucher(gateway, minutes=60, code=None, quiet=True):
     db.session.commit()
 
     if not quiet:
-        print 'Voucher created: %s:%s' % (voucher.id, voucher.code)
+        print('Voucher created: %s:%s' % (voucher.id, voucher.code))
 
 @manager.command
 def create_network(id, title, description=None, quiet=True):
@@ -138,7 +141,7 @@ def create_network(id, title, description=None, quiet=True):
     db.session.commit()
 
     if not quiet:
-        print 'Network created'
+        print('Network created')
 
 @manager.command
 @manager.option('-e', '--email', help='Contact Email')
@@ -159,7 +162,7 @@ def create_gateway(network, id, title, description=None, email=None, phone=None,
     db.session.commit()
 
     if not quiet:
-        print 'Gateway created'
+        print('Gateway created')
 
 @manager.command
 def create_user(email, password, role, network=None, gateway=None, quiet=True):
@@ -171,23 +174,23 @@ def create_user(email, password, role, network=None, gateway=None, quiet=True):
         confirmation = prompt_pass('Confirm Password')
 
         if password != confirmation:
-            print "Passwords don't match"
+            print("Passwords don't match")
             return
 
     if role == 'network-admin':
         if network is None:
-            print 'Network is required for a network admin'
+            print('Network is required for a network admin')
             return
         if gateway is not None:
-            print 'Gateway is not required for a network admin'
+            print('Gateway is not required for a network admin')
             return
 
     if role == 'gateway-admin':
         if network is None:
-            print 'Network is required for a gateway admin'
+            print('Network is required for a gateway admin')
             return
         if gateway is None:
-            print 'Gateway is required for a gateway admin'
+            print('Gateway is required for a gateway admin')
             return
 
     user = users.create_user(email=email, password=encrypt_password(password))
@@ -202,12 +205,12 @@ def create_user(email, password, role, network=None, gateway=None, quiet=True):
     db.session.commit()
 
     if not quiet:
-        print 'User created'
+        print('User created')
 
 @manager.command
 def create_roles(quiet=True):
     if Role.query.count() == 0:
-        for name, description in ROLES.iteritems():
+        for name, description in six.iteritems(ROLES):
             role = Role()
             role.name = name
             role.description = description
@@ -215,7 +218,7 @@ def create_roles(quiet=True):
         db.session.commit()
 
         if not quiet:
-            print 'Roles created'
+            print('Roles created')
 
 @manager.command
 def process_vouchers():
@@ -228,7 +231,7 @@ def process_vouchers():
         if voucher.should_end():
             voucher.end()
             db.session.add(voucher)
-    
+
     # New vouchers that are unused and should expire
     max_age = current_app.config.get('VOUCHER_MAXAGE', 120)
     vouchers = Voucher.query \
@@ -253,25 +256,17 @@ def process_vouchers():
     db.session.commit()
 
 @manager.command
-def generate_key():
-    print hmac.new("datashaman:something", "something", md5).hexdigest()
-
-@manager.command
 def measurements():
     (incoming, outgoing) = db.session.query(func.sum(Voucher.incoming), func.sum(Voucher.outgoing)).filter(Voucher.status == 'active').first()
 
     measurements = {
-            'vouchers': {
-                'active': Voucher.query.filter_by(status='active').count(),
-                'blocked': Voucher.query.filter_by(status='blocked').count(),
-                'incoming': incoming,
-                'outgoing': outgoing,
-                'both': incoming + outgoing,
-            }
+        'vouchers': {
+            'active': Voucher.query.filter_by(status='active').count(),
+            'blocked': Voucher.query.filter_by(status='blocked').count(),
+            'incoming': incoming,
+            'outgoing': outgoing,
+            # 'both': incoming + outgoing,
+        }
     }
 
-    return json.dumps(measurements)
-
-@manager.command
-def db_create_all():
-    db.create_all()
+    print(json.dumps(measurements, indent=4))

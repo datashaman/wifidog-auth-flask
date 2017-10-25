@@ -1,5 +1,5 @@
 {% extends 'layouts/default.html' %}
-{% from "helpers/form.html" import render_field %}
+{% from "helpers/form.html" import field %}
 
 {% set title = 'Login' %}
 {% set show_flash = False %}
@@ -16,8 +16,8 @@
         {{ login_user_form.next | safe }}
         {{ login_user_form.hidden_tag() }}
         <fieldset>
-            {{ render_field(login_user_form.email, class='pure-input-1', placeholder='Email') }}
-            {{ render_field(login_user_form.password, class='pure-input-1', placeholder='Password') }}
+            {{ field(login_user_form.email, class='pure-input-1', placeholder='Email') }}
+            {{ field(login_user_form.password, class='pure-input-1', placeholder='Password') }}
 
             <label for="remember" class="pure-checkbox">
                 <input id="remember" type="checkbox" name="remember" value="y" />

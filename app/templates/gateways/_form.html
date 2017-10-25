@@ -1,0 +1,23 @@
+{% from 'helpers/form.html' import group %}
+
+<fieldset>
+    {{ group(form.network) }}
+
+    {{ group(form.id) }}
+    {{ group(form.title) }}
+    {{ group(form.subtitle) }}
+    {{ group(form.description) }}
+
+    {{ group(form.contact_email) }}
+    {{ group(form.contact_phone) }}
+    {{ group(form.url_home) }}
+    {{ group(form.url_facebook) }}
+
+    {{ group(form.login_ask_name) }}
+    {{ group(form.login_require_name) }}
+
+    <div class="pure-controls">
+        <button type="submit" class="pure-button pure-button-primary">Ok</button>
+        <button type="button" class="pure-button" onclick="history.back()">Cancel</button>
+    </div>
+</fieldset>

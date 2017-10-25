@@ -1,13 +1,92 @@
 {% extends 'layouts/default.html' %}
+{% import 'helpers/render.html' as render %}
 
-{% set title = 'Users' %}
+{% set page_title = 'Users' %}
 
-{% block head %}
-<!--[if lt IE 9]>
-<script>html5.addElements('users')</script>
-<![endif]-->
+{% set show_network = current_user.has_role('super-admin') %}
+{% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
+
+{% block header %}
+    <div class="header">
+        {% if current_user.is_authenticated %}
+            <div class="logged-in">
+                Logged in as <em>{{ current_user }}</em>.
+            </div>
+        {% endif %}
+
+        <h1>{{ page_title }}</h1>
+
+        <div class="actions-collection">
+            <form class="pure-form" method="post" action="{{ url_for('.users_new') }}">
+                <fieldset>
+                    {% if show_network %}
+                        {{ form.network }}
+                    {% endif %}
+                    {% if show_gateway %}
+                        {{ form.gateway }}
+                    {% endif %}
+                    {{ form.email }}
+                    {{ form.password }}
+                    <button type="submit" class="pure-button pure-button-primary">
+                        <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
+                        Create
+                    </button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
 {% endblock %}
 
 {% block content %}
-<users></users>
+    <div class="content">
+        {% if instances %}
+            <table width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        {% if show_network %}
+                            <th>Network</th>
+                        {% endif %}
+                        {% if show_gateway %}
+                            <th>Gateway</th>
+                        {% endif %}
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Created</th>
+                        <th class="actions">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for instance in instances %}
+                        <tr data-id={{ instance.id }} class={{ 'pure-table-' + loop.cycle('odd', 'even') }}>
+                            {% if show_network %}
+                                <td data-label="Network">{{ render.render(instance.network, 'Any') }}</td>
+                            {% endif %}
+                            {% if show_gateway %}
+                                <td data-label="Gateway">{{ render.render(instance.gateway, 'Any') }}</td>
+                            {% endif %}
+                            <td data-label="Email">
+                                <a href="{{ url_for('.users_edit', id=instance.id) }}">
+                                    {{ render.render(instance.email) }}
+                                </a>
+                            </td>
+                            <td data-label="Roles">{{ instance.roles | join(', ') }}</td>
+                            <td data-label="Created At">{{ render.render(instance.created_at) }}</td>
+
+                            <td class="actions actions-instance">
+                                <a
+                                    href="{{ url_for('.users_delete', id=instance.id) }}" class="pure-button"
+                                    title="{{ 'Cowardly refuse to delete current user' if current_user.id == instance.id }}"
+                                    {% if current_user.id == instance.id %}disabled="disabled"{% endif %}
+                                >
+                                    <span class="oi" data-glyph="x" title="Delete" aria-hidden="true"></span>
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
 {% endblock %}

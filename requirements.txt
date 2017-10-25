@@ -1,11 +1,10 @@
 asbool
 blinker
+dotenvy
 Flask
 Flask-Bcrypt
-Flask-InfluxDB
 Flask-Login
 Flask-Menu
-Flask-Migrate
 Flask-Potion==0.8.1
 Flask-Principal>=0.4.0
 Flask-Script
@@ -15,18 +14,12 @@ Flask-Uploads
 Flask-WTF
 gitchangelog
 gunicorn
-influxdb
 lxml
 markupsafe
 pillow
-python-dotenv
 requests
-sauceclient
-selenium
-suds
+six
 
-# Python 2.6
-# ordereddict
-
-# Python 2.7
-# functools32
+functools32 ; python_version < '3'
+suds ; python_version < '3'
+suds-py3 ; python_version >= '3'
