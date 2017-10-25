@@ -129,7 +129,7 @@ def record_change(f):
         change.args = json.dumps(kwargs)
 
         if current_user.is_authenticated:
-            change.user_id = current_user.id
+            change.user_id = getattr(current_user, 'id', None)
 
         db.session.add(change)
 

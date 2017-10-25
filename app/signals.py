@@ -23,7 +23,7 @@ def send_hit(t, data):
         hit['cid'] = cid
 
     if current_user.is_authenticated:
-        hit['uid'] = current_user.id
+        hit['uid'] = getattr(current_user, 'id', None)
 
     data.update(hit)
 

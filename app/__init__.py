@@ -5,14 +5,15 @@ import uuid
 from app.admin import VoucherAdmin
 from app.models import User, Role, db, users
 from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource, logos
-from app.services import influx_db, menu, security
+from app.services import menu, security
 from app.signals import init_signals
 from app.views import bp
 
 from flask_login import current_user, LoginManager
-from flask_uploads import configure_uploads
+from flaskext.uploads import configure_uploads
 from flask_potion.contrib.principals.needs import HybridRelationshipNeed
 from flask_principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed, Principal
+from flask_security import AnonymousUser
 
 def create_app(config=None):
     app = flask.Flask(__name__)
@@ -24,7 +25,6 @@ def create_app(config=None):
 
     db.init_app(app)
     api.init_app(app)
-    influx_db.init_app(app)
     menu.init_app(app)
 
     security.init_app(app, users)
@@ -46,7 +46,7 @@ def create_app(config=None):
 
     @principal.identity_loader
     def read_identity_from_flask_login():
-        if current_user.is_authenticated:
+        if hasattr(current_user, 'id'):
             return Identity(current_user.id)
         return AnonymousIdentity()
 

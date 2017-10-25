@@ -4,7 +4,7 @@ import time
 
 from app.forms import NetworkForm, LoginVoucherForm, NewVoucherForm, BroadcastForm
 from app.models import Auth, Gateway, Network, Ping, Voucher, generate_token, db
-from app.payu import get_transaction, set_transaction, capture
+# from app.payu import get_transaction, set_transaction, capture
 # from app.services import influx_db
 from app.signals import voucher_logged_in
 from app.utils import is_logged_in, has_role, has_a_role

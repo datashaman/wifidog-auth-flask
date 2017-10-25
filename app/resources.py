@@ -9,7 +9,7 @@ from flask_potion import Api, fields, signals
 from flask_potion.routes import Relation, Route, ItemRoute
 from flask_potion.contrib.principals import PrincipalResource, PrincipalManager
 from flask_security import current_user
-from flask_uploads import UploadSet, IMAGES
+from flaskext.uploads import UploadSet, IMAGES
 from PIL import Image
 
 super_admin_only = 'super-admin'

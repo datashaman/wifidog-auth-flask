@@ -1,13 +1,14 @@
 import os
 
 from asbool import asbool
-from dotenv import load_dotenv
+from dotenv import Dotenv
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 dotenv_path = os.path.join(BASE_DIR, '.env')
 if os.path.isfile(dotenv_path):
-    load_dotenv(dotenv_path)
+    dotenv = Dotenv(dotenv_path)
+    os.environ.update(dotenv)
 
 APP_VERSION = '0.7.0'
 DATABASE_CONNECTION_OPTIONS = {}
