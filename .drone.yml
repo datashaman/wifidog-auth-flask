@@ -23,6 +23,6 @@ pipeline:
     secrets: [ deploy_key ]
     when:
       event: push
-      branch: release/0.8.0
+      branch: master
       matrix:
         PYTHON_VERSION: 3.6

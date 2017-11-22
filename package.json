@@ -25,6 +25,7 @@
     "open-iconic": "^1.1.1",
     "promise": "~7.0.4",
     "purecss": "^1.0.0",
+    "uglify-js": "~> 2.6.0",
     "zepto": "^1.2.0"
   },
   "name": "wifidog-auth-flask",
