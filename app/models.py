@@ -182,7 +182,7 @@ class Voucher(db.Model):
 
     def should_end(self):
         if self.started_at:
-            return self.started_at + datetime.timedelta(minutes=self.minutes) < datetime.datetime.utcnow()
+            return self.end_at < datetime.datetime.utcnow()
         else:
             return False
 
@@ -192,9 +192,14 @@ class Voucher(db.Model):
             if self.should_end():
                 return 0
             else:
-                seconds = ((self.started_at + datetime.timedelta(minutes=self.minutes)) - datetime.datetime.utcnow()).seconds
+                seconds = (self.end_at - datetime.datetime.utcnow()).seconds
                 seconds = max(0, seconds)
                 return seconds / 60
+
+    @property
+    def end_at(self):
+        if self.started_at:
+            return self.started_at + datetime.timedelta(minutes=self.minutes)
 
     @record_change
     def extend(self):

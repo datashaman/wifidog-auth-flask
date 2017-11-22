@@ -14,6 +14,6 @@
     {{ time(row.created_at) }}
     {% if row.started_at %}
         {{ time(row.started_at) }}
-        {{ time(self.calculateEndAt(row)) }}
+        {{ time(row.end_at) }}
     {% endif %}
 {% endmacro %}
