@@ -1,22 +1,13 @@
 {% extends 'layouts/default.html' %}
-{% from 'helpers/form.html' import render_group %}
+{% import 'helpers/render.html' as render %}
 
-{% set title = 'Vouchers' %}
+{% set page_title = 'Edit Network' %}
 
 {% block content %}
-<h1>{{ network.title }}</h1>
-
-<form method="post" class="pure-form pure-form-stacked">
-    {{ form.csrf_token }}
-
-    <fieldset>
-        {{ render_group(form.id, label='ID') }}
-        {{ render_group(form.title) }}
-        {{ render_group(form.description) }}
-
-        <div class="pure-controls">
-            <button type="submit" class="pure-button pure-button-primary">Update</button>
-        </div>
-    </fieldset>
-</form>
+    <div class="content">
+        <form method="post" action={{ url_for('.networks_edit', id=instance.id) }} class="pure-form pure-form-aligned">
+            {{ form.csrf_token }}
+            {% include 'networks/_form.html' %}
+        </form>
+    </div>
 {% endblock %}

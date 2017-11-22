@@ -1,60 +1,68 @@
+PYTHON = python
+TAG = datashaman/wifidog-auth-flask
+
+tmuxp:
+	tmuxp load .
+
 serve:
-	python manage.py runserver -p 8080
+	python serve.py
 
 serve-production:
 	gunicorn --reload -b '127.0.0.1:8080' 'app:create_app()'
 
+docker-build:
+	docker build -t $(TAG) .
+
+docker-run: docker-build
+	docker run --env-file .env -p 8080:8080 -i -t $(TAG)
+
+docker-prune-stopped:
+	docker ps -a -q | xargs -r docker rm
+
+docker-prune-untagged:
+	docker images | grep '^<none>' | awk '{print $$3}' | xargs -r docker rmi
+
+docker-prune: docker-prune-stopped docker-prune-untagged
+
 browser-sync:
 	browser-sync start --proxy http://127.0.0.1:8080 --files="app/**"
 
-nodemon-tests: bootstrap-tests
-	nodemon tests.py
+lint:
+	pylint app
+
+bootstrap-local: bootstrap-tests
+	cp tests/tests.db data/local.db
 
 bootstrap-tests:
-	rm -f data/tests.db
-	python manage.py bootstrap_tests
+	rm -rf tests/tests.db && touch tests/tests.db
+	TESTING=true $(PYTHON) manage.py bootstrap_tests
 
-tests:
-	touch data/tests.db
-	python tests/test_unit.py
+watch:
+	while inotifywait -e close_write -r ./app ./tests; do make lint test; done
 
-tests-webdriver:
-	python tests/test_webdriver.py
+test:
+	TESTING=true $(PYTHON) -m unittest discover -s tests
+
+coverage:
+	TESTING=true coverage run --include='app/*' -m unittest discover -s tests
+	coveralls
 
 setup:
-	sudo apt-get install python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
-	sudo npm install -g bower gulp yarn
+	sudo -H apt-get install python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
+	sudo -H yarn global add gulp yarn
 
 development-install:
-	bundle install
 	pip install -r requirements.txt
 	yarn install
-	npm prune
-	bower install
-	bower prune
-	cd bower_components/pure && yarn install && node_modules/.bin/grunt
-	cd bower_components/zepto && yarn install && MODULES="zepto ajax callbacks deferred event" yarn run dist
 	gulp --dev
 
 production-install:
-	bundle install --without development --deployment --jobs=3 --retry=3
 	pip install -r requirements.txt
 	yarn install
-	npm prune
-	bower install
-	bower prune
-	cd bower_components/pure && yarn install && node_modules/.bin/grunt
-	cd bower_components/zepto && yarn install && MODULES="zepto ajax callbacks deferred event" yarn run dist
 	gulp
 
-db-migrate:
-	python manage.py db migrate
-
-db-upgrade:
-	python manage.py db upgrade
-
 bootstrap:
-	python bootstrap.py
+	$(PYTHON) bootstrap.py
 
 remove-db:
 	rm -f local.db
@@ -66,12 +74,7 @@ clean:
 	rm -rf app/static/*
 
 graphs:
-	python app/graphs.py
+	$(PYTHON) app/graphs.py
 
 dot:
 	dot -Tpng -O app/graphs.dot && eog app/graphs.dot.png
-
-deploy:
-	fab -H ubuntu@auth.datashaman.com deploy
-
-.PHONY: serve bootstrap clean remove-db reboot deploy tests

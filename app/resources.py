@@ -1,15 +1,15 @@
+from __future__ import absolute_import
+
 import errno
 import flask
 import os
 
-from app.graphs import states, actions
 from app.models import Network, User, Gateway, Voucher, Category, Product, Currency, db
-from flask_login import current_user, login_required
 from flask_potion import Api, fields, signals
 from flask_potion.routes import Relation, Route, ItemRoute
 from flask_potion.contrib.principals import PrincipalResource, PrincipalManager
 from flask_security import current_user
-from flaskext.uploads import UploadSet, IMAGES
+from flask_uploads import UploadSet, IMAGES
 from PIL import Image
 
 super_admin_only = 'super-admin'
@@ -56,21 +56,25 @@ class VoucherManager(Manager):
         query = query.filter(Voucher.status != 'archived')
         return query
 
-    def extend(self, voucher):
+    def extend(self, voucher, commit=True):
         voucher.extend()
-        db.session.commit()
+        if commit:
+            db.session.commit()
 
-    def block(self, voucher):
+    def block(self, voucher, commit=True):
         voucher.block()
-        db.session.commit()
+        if commit:
+            db.session.commit()
 
-    def unblock(self, voucher):
+    def unblock(self, voucher, commit=True):
         voucher.unblock()
-        db.session.commit()
+        if commit:
+            db.session.commit()
 
-    def archive(self, voucher):
+    def archive(self, voucher, commit=True):
         voucher.archive()
-        db.session.commit()
+        if commit:
+            db.session.commit()
 
 class UserResource(PrincipalResource):
     class Meta:
@@ -125,7 +129,7 @@ class GatewayResource(PrincipalResource):
         id_converter = 'string'
         id_field_class = fields.String
         permissions = {
-            'read': 'yes',
+            'read': gateway_or_above,
             'create': network_or_above,
             'update': network_or_above,
             'delete': network_or_above,
@@ -185,8 +189,6 @@ class VoucherResource(PrincipalResource):
 
         model = Voucher
         include_id = True
-        id_converter = 'string'
-        id_field_class = fields.String
         permissions = {
             'read': gateway_or_above,
             'create': gateway_or_above,
@@ -229,7 +231,7 @@ class CategoryResource(PrincipalResource):
             'read': gateway_or_above,
             'create': gateway_or_above,
             'update': gateway_or_above,
-            'delete': 'no',
+            'delete': gateway_or_above,
         }
         read_only_fields = ('created_at', 'updated_at')
 

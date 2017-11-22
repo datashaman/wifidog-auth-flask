@@ -1,0 +1,11 @@
+session_name: auth
+windows:
+    - window_name: services
+      layout: main-horizontal
+      panes:
+          - make watch
+          - make serve
+          - gulp serve
+    - window_name: vim
+      panes:
+          - vim

@@ -1,0 +1,28 @@
+{% extends 'layouts/default.html' %}
+{% import 'helpers/render.html' as render %}
+{% from 'helpers/form.html' import group %}
+
+{% set page_title = 'My Gateway' %}
+
+{% block content %}
+    <div class="content">
+        <form method="post" action={{ url_for('.my_gateway') }} class="pure-form pure-form-aligned">
+            {{ form.csrf_token }}
+
+            {{ group(form.id) }}
+            {{ group(form.title) }}
+            {{ group(form.subtitle) }}
+            {{ group(form.description) }}
+
+            {{ group(form.contact_email) }}
+            {{ group(form.contact_phone) }}
+            {{ group(form.url_home) }}
+            {{ group(form.url_facebook) }}
+
+            <div class="pure-controls">
+                <button type="submit" class="pure-button pure-button-primary">Ok</button>
+                <button type="button" class="pure-button" onclick="history.back()">Cancel</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

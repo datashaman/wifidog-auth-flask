@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import flask
 
 from flask_security import current_user
@@ -39,4 +41,3 @@ def args_get(which):
             value = None
         return value
     return func
-

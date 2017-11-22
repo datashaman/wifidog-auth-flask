@@ -1,22 +1,46 @@
+# -*- coding: utf-8 -*-
+"""
+Create app
+"""
+
+from __future__ import absolute_import
+
 import datetime
-import flask
 import uuid
+
+import six
+
+from app import constants
 
 from app.admin import VoucherAdmin
 from app.models import User, Role, db, users
-from app.resources import api, GatewayResource, NetworkResource, UserResource, VoucherResource, logos
+from app.resources import GatewayResource, \
+        NetworkResource, \
+        UserResource, \
+        VoucherResource, \
+        api, \
+        logos
 from app.services import menu, security
 from app.signals import init_signals
 from app.views import bp
 
+from flask import Flask, request
 from flask_login import current_user, LoginManager
-from flaskext.uploads import configure_uploads
+from flask_uploads import configure_uploads
 from flask_potion.contrib.principals.needs import HybridRelationshipNeed
-from flask_principal import Identity, UserNeed, AnonymousIdentity, identity_loaded, RoleNeed, Principal
+from flask_principal import \
+        AnonymousIdentity, \
+        Identity, \
+        Principal, \
+        RoleNeed, \
+        UserNeed, \
+        identity_loaded
 from flask_security import AnonymousUser
 
 def create_app(config=None):
-    app = flask.Flask(__name__)
+    """ Create app """
+
+    app = Flask(__name__)
 
     app.config.from_object('config')
 
@@ -38,6 +62,7 @@ def create_app(config=None):
 
     @identity_loaded.connect_via(app)
     def on_identity_loaded(sender, identity):
+        """Load needs onto the identity"""
         if not isinstance(identity, AnonymousIdentity):
             identity.provides.add(UserNeed(identity.id))
 
@@ -46,16 +71,23 @@ def create_app(config=None):
 
     @principal.identity_loader
     def read_identity_from_flask_login():
+        """Convert flask login to identity"""
         if hasattr(current_user, 'id'):
             return Identity(current_user.id)
         return AnonymousIdentity()
 
     @app.after_request
     def set_cid_cookie(response):
-        if 'cid' not in flask.request.cookies:
+        """Set CID cookie to hold session together"""
+        if 'cid' not in request.cookies:
             cid = str(uuid.uuid4())
             expires = datetime.datetime.now() + datetime.timedelta(days=365*2)
             response.set_cookie('cid', cid, expires=expires)
         return response
+
+    @app.context_processor
+    def context_processor():
+        """Context processors for use in templates"""
+        return dict(constants=constants, six=six)
 
     return app

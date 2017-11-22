@@ -1,0 +1,19 @@
+{% macro bytes(bytes) %}
+    {{ (bytes / 1024 / 1024)|int }}
+{% endmacro %}
+
+{% macro render(attribute, def='-') %}
+    {{ attribute | default(def) }}
+{% endmacro %}
+
+{% macro time(dt) %}
+    {{ dt.strftime('%H:%M') if dt }}
+{% endmacro %}
+
+{% macro times(row) %}
+    {{ time(row.created_at) }}
+    {% if row.started_at %}
+        {{ time(row.started_at) }}
+        {{ time(row.end_at) }}
+    {% endif %}
+{% endmacro %}

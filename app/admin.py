@@ -1,4 +1,7 @@
+from __future__ import absolute_import
+
 import json
+import six
 
 from app.graphs import states
 from app.models import Change, db
@@ -12,7 +15,7 @@ class VoucherAdmin(object):
             if event in state:
                 voucher.status = state[event]
 
-                for key, value in args.iteritems():
+                for key, value in six.iteritems(args):
                     setattr(voucher, key, value)
 
                 change = Change()
