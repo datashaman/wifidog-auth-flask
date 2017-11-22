@@ -194,7 +194,7 @@ class Voucher(db.Model):
             else:
                 seconds = (self.end_at - datetime.datetime.utcnow()).seconds
                 seconds = max(0, seconds)
-                return seconds / 60
+                return int(seconds / 60)
 
     @property
     def end_at(self):
