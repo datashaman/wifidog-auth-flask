@@ -1,13 +1,8 @@
-FROM python:3.6.3-slim-jessie
+FROM python:3.6-slim-jessie
 
 WORKDIR /var/app
 
-RUN apt-get update && \
-    apt-get install -yq --no-install-recommends \
-        fabric \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN pip install dotenvy
+RUN pip install dotenvy fabric jinja2
 
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
