@@ -26,3 +26,9 @@ pipeline:
       branch: master
       matrix:
         PYTHON_VERSION: 3.6
+  notify:
+    image: plugins/slack
+    channel: ci
+    when:
+      status: [ success, failure ]
+    secrets: [ slack_webhook ]
