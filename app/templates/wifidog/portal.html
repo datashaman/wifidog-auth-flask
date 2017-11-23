@@ -1,38 +1,77 @@
 {% extends 'layouts/default.html' %}
 
+{% set page_title = gateway.title %}
 {% set title = gateway.title %}
 
-{% block content %}
-{% include 'wifidog/_facebook.html' %}
+{% block header %}
+    {% include 'wifidog/_facebook.html' %}
 
-<portal gateway={{ gateway.id }} time_left={{ voucher and voucher.time_left }}></portal>
+    <div class="header">
+        {% if gateway.logo %}
+            <img src="/static/logos/{{ gateway.logo }}" alt="{{ gateway.title }}" />
+        {% else %}
+            <h1>{{ gateway.title }}</h1>
+        {% endif %}
+
+        {% if gateway.subtitle %}
+            <h2>{{ gateway.subtitle }}</h2>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="content">
+        {% if gateway.subhead %}
+            <h2 class="content-subhead">{{ gateway.subhead }}</h2>
+        {% endif %}
+
+        {% if voucher and voucher.time_left %}
+            <ul class="flashes">
+                <li class="success"><span id="time_left">{{ voucher.time_left }}</span> minutes left</li>
+            </ul>
+        {% endif %}
+
+        {% if gateway.description %}
+            {{ gateway.description }}
+        {% endif %}
+
+        <div
+            class="fb-like"
+            data-href="{{ gateway.url_facebook }}"
+            data-width="300"
+            data-layout="standard"
+            data-action="like"
+            data-show-faces="true"
+            data-share="true">
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
-{% if voucher %}
-<script>
-Zepto(function($) {
-    var time_left = {{ voucher.time_left }};
+    {% if voucher %}
+        <script>
+            Zepto(function($) {
+                var time_left = {{ voucher.time_left }};
 
-    if(time_left > 0) {
-        setInterval(function() {
-            time_left--;
-            $('#time_left').html(time_left);
-        }, 60000);
-    }
+                if(time_left > 0) {
+                    setInterval(function() {
+                        time_left--;
+                        $('#time_left').html(time_left);
+                    }, 60000);
+                }
 
-    if(time_left > 5) {
-        setTimeout(function() {
-            new Notification('Your session is about to expire. You have 5 minutes left.');
-        }, (time_left - 5) * 60000);
-    }
+                if(time_left > 5) {
+                    setTimeout(function() {
+                        new Notification('Your session is about to expire. You have 5 minutes left.');
+                    }, (time_left - 5) * 60000);
+                }
 
-    if(time_left > 10) {
-        setTimeout(function() {
-            new Notification('Your session is about to expire. You have 10 minutes left.');
-        }, (time_left - 10) * 60000);
-    }
-});
-</script>
-{% endif %}
+                if(time_left > 10) {
+                    setTimeout(function() {
+                        new Notification('Your session is about to expire. You have 10 minutes left.');
+                    }, (time_left - 10) * 60000);
+                }
+            });
+        </script>
+    {% endif %}
 {% endblock %}

@@ -508,9 +508,19 @@ def wifidog_login():
 
     if form.validate_on_submit():
         voucher_code = form.voucher_code.data.upper()
-        voucher = api.resources['vouchers'].manager.first([
+        vouchers = api.resources['vouchers'].manager.instances([
             Condition('code', COMPARATORS['$eq'], voucher_code),
         ])
+        voucher = vouchers.first()
+
+        if voucher is None:
+            flash(
+                'Voucher not found, did you type the code correctly?',
+                'error'
+            )
+
+            return redirect(request.referrer)
+
         data = form.data
         data['token'] = generate_token()
         api.resources['vouchers'].manager.update(voucher, data)
@@ -540,6 +550,7 @@ def wifidog_login():
         abort(404)
 
     gateway = read_or_404('gateways', gateway_id)
+
     return render_template('wifidog/login.html', form=form, gateway=gateway)
 
 
@@ -632,9 +643,10 @@ def wifidog_auth():
 def wifidog_portal():
     voucher_token = session.get('voucher_token')
     if voucher_token:
-        voucher = api.resources['vouchers'].manager.first([
+        vouchers = api.resources['vouchers'].manager.instances([
             Condition('token', COMPARATORS['$eq'], voucher_token),
         ])
+        voucher = vouchers.first()
     else:
         voucher = None
     gateway = read_or_404('gateways', request.args.get('gw_id'))

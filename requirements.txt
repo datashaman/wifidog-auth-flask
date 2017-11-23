@@ -11,7 +11,7 @@ Flask-Script
 Flask-Security-Fork
 Flask-SQLAlchemy>=2.0
 Flask-Uploads
-Flask-WTF
+https://github.com/lepture/flask-wtf/archive/master.zip#egg=Flask-WTF
 gitchangelog
 gunicorn
 lxml

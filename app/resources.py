@@ -129,7 +129,7 @@ class GatewayResource(PrincipalResource):
         id_converter = 'string'
         id_field_class = fields.String
         permissions = {
-            'read': gateway_or_above,
+            'read': 'yes',
             'create': network_or_above,
             'update': network_or_above,
             'delete': network_or_above,
@@ -190,9 +190,9 @@ class VoucherResource(PrincipalResource):
         model = Voucher
         include_id = True
         permissions = {
-            'read': gateway_or_above,
+            'read': 'yes',
             'create': gateway_or_above,
-            'update': gateway_or_above,
+            'update': 'yes',
             'delete': 'no',
         }
         read_only_fields = ('created_at', 'updated_at', 'available_actions', 'time_left')

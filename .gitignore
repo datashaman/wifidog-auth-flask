@@ -5,6 +5,7 @@
 /build/
 /.cache/
 /.coverage
+/logs/
 /node_modules/
 /.env
 /.env.local

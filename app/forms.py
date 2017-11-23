@@ -169,6 +169,7 @@ class LoginVoucherForm(FlaskForm):
 
     def validate_voucher(self, form, field):
         voucher_code = field.data.upper()
+
         voucher = Voucher.query.filter_by(code=voucher_code).first()
 
         if voucher is None:

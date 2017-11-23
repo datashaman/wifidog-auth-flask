@@ -3,31 +3,33 @@
 
 {% set title = 'Voucher Login' %}
 
+{% block header %}
+    <div class="header">
+        <h1>Login</h1>
+    </div>
+{% endblock %}
+
 {% block content %}
-<div class="header">
-    <h1>Login</h1>
-</div>
+    <div class="content">
+        <p><strong>Note:</strong> A voucher give you Internet access on one device only.</p>
 
-<div class="content">
-    <p><strong>Note:</strong> A voucher give you Internet access on one device only.</p>
+        <form method="post" action="{{ url_for('.wifidog_login') }}" class="pure-form pure-form-aligned">
+            {{ form.csrf_token }}
+            {{ form.gw_address | safe }}
+            {{ form.gw_port | safe }}
+            {{ form.gateway_id | safe }}
+            {{ form.mac | safe }}
+            {{ form.url | safe }}
 
-    <form method="post" action="{{ url_for('.wifidog_login') }}" class="pure-form pure-form-aligned">
-        {{ form.csrf_token }}
-        {{ form.gw_address | safe }}
-        {{ form.gw_port | safe }}
-        {{ form.gateway_id | safe }}
-        {{ form.mac | safe }}
-        {{ form.url | safe }}
-
-        <fieldset>
-            {{ group(form.voucher_code, required=True) }}
-            {% if gateway.login_ask_name %}
-                {{ group(form.name, required=gateway.login_require_name) }}
-            {% endif %}
-            <div class="pure-controls">
-                <button type="submit" class="pure-button pure-button-primary">Go</button>
-            </div>
-        </fieldset>
-    </form>
-</div>
+            <fieldset>
+                {{ group(form.voucher_code, required=True) }}
+                {% if gateway.login_ask_name %}
+                    {{ group(form.name, required=gateway.login_require_name) }}
+                {% endif %}
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button pure-button-primary">Go</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
 {% endblock %}
