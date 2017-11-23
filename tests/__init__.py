@@ -73,8 +73,19 @@ class TestCase(unittest.TestCase):
         self.assertEqual(302, response.status_code)
         self.assertEqual(location, response.headers['Location'])
 
+    def assertRedirectPost(self, url, data={}, location='http://localhost/'):
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(location, response.headers['Location'])
+
     def assertForbidden(self, url):
         response = self.client.get(url, follow_redirects=True)
+        html = self.get_html(response)
+        li = html.find('//ul[@class="flashes"]/li[@class="error"]')
+        self.assertEqual('You do not have permission to view this resource.', li.text)
+
+    def assertForbiddenPost(self, url, data={}):
+        response = self.client.post(url, data=data, follow_redirects=True)
         html = self.get_html(response)
         li = html.find('//ul[@class="flashes"]/li[@class="error"]')
         self.assertEqual('You do not have permission to view this resource.', li.text)
@@ -84,6 +95,12 @@ class TestCase(unittest.TestCase):
         if url != '/':
             location += '?' + self.urlencode({'next': url})
         self.assertRedirect(url, location)
+
+    def assertLoginPost(self, url, data={}):
+        location = 'http://localhost/login'
+        if url != '/':
+            location += '?' + self.urlencode({'next': url})
+        self.assertRedirectPost(url, data, location)
 
     def create_user(self, email, password, role, network_id=None, gateway_id=None):
         with self.app.test_request_context():

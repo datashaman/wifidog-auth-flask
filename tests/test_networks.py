@@ -39,3 +39,19 @@ class TestNetworks(TestCase):
 
         response = self.client.get('/networks/new')
         self.assertEqual(200, response.status_code)
+
+    def test_networks_store_as_anonymous(self):
+        self.assertLoginPost('/networks/new', data={'id': 'network', 'title': 'Network'})
+
+    def test_networks_store_as_gateway(self):
+        self.login('main-gateway1@example.com', 'admin')
+        self.assertForbiddenPost('/networks/new', data={'id': 'network', 'title': 'Network'})
+
+    def test_networks_store_as_network(self):
+        self.login('main-network@example.com', 'admin')
+        self.assertForbiddenPost('/networks/new', data={'id': 'network', 'title': 'Network'})
+
+    def test_networks_store_as_super(self):
+        self.login('super-admin@example.com', 'admin')
+        response = self.client.post('/networks/new', data={'id': 'network', 'title': 'Network'}, follow_redirects=True)
+        self.assertEqual(200, response.status_code)
