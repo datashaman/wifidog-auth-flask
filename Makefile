@@ -38,7 +38,7 @@ bootstrap-tests:
 	TESTING=true $(PYTHON) manage.py bootstrap_tests
 
 watch:
-	while inotifywait -e close_write -r ./app ./tests; do make lint test; done
+	while inotifywait -e close_write -r ./app ./tests; do make test; done
 
 test:
 	TESTING=true $(PYTHON) -m unittest discover -s tests

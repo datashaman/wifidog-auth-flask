@@ -1,5 +1,6 @@
 from tests import TestCase
 
+
 class TestNetworks(TestCase):
     def test_networks_index_as_anonymous(self):
         self.assertLogin('/networks')

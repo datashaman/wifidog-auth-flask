@@ -1,5 +1,6 @@
 from tests import TestCase
 
+
 class TestVouchers(TestCase):
     def test_voucher_new_as_anonymous(self):
         self.assertLogin('/new-voucher')

@@ -1,5 +1,6 @@
 from tests import TestCase
 
+
 class TestSite(TestCase):
     def test_home_redirects_to_login_as_anonymous(self):
         self.assertLogin('/')

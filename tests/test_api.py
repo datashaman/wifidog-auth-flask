@@ -2,6 +2,7 @@ import json
 
 from tests import TestCase
 
+
 class TestApi(TestCase):
     def test_api_networks_index_as_anonymous(self):
         response = self.client.get('/api/networks')
