@@ -13,4 +13,5 @@ EXPOSE 5000
 
 VOLUME /var/app/data
 
-CMD python manage.py runserver -h 0.0.0.0 -p 5000
+ENTRYPOINT ["python", "manage.py"]
+CMD ["runserver", "-h", "0.0.0.0", "-p", "5000"]

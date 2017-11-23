@@ -8,7 +8,7 @@ from wtforms import BooleanField, HiddenField, PasswordField, StringField, Integ
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from wtforms.ext.sqlalchemy.orm import model_form
 
-from app.models import db, Category, Currency, Gateway, Network, Product, Voucher, Role
+from app.models import db, Category, Country, Currency, Gateway, Network, Product, Voucher, Role
 from app.resources import api
 
 def default_minutes():
@@ -49,13 +49,22 @@ CategoryForm = model_form(
         }
     }
 )
+CountryForm = model_form(
+    Country,
+    db.session,
+    FlaskForm,
+    exclude=[
+        'created_at',
+        'updated_at',
+    ],
+    exclude_pk=False
+)
 CurrencyForm = model_form(
     Currency,
     db.session,
     FlaskForm,
     exclude=[
         'created_at',
-        'countries',
         'orders',
         'products',
         'updated_at',

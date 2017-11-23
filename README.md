@@ -1,13 +1,56 @@
-Wifidog Auth Flask
-==================
+# Wifidog Auth Flask
 
 Time-based voucher authentication server for Wifidog Captive Portal written in Python Flask. WIP.
 
 Bandwidth-based vouchering coming soon.
 
+## Docker
+
+Setup an alias to run the docker image. Put this in your _.bashrc_ or _.zshrc_:
+
+    alias wifidog='docker run --env-file .env -p 5000:5000 -v auth-data:/var/app/data -i -t datashaman/wifidog-auth-flask'
+
+That will run the latest build of the docker image, by default running the HTTP server on port 5000.
+
+Various other commands are available to help you manage the service:
+
+    create_country
+    create_currency
+    create_voucher
+    create_network
+    create_gateway
+    create_user
+    create_roles
+    create_product
+    process_vouchers
+    runserver
+
+Create a user with a role of _super-admin_:
+
+    wifidog create_user user@example.com password super-admin
+
+Create a network and gateway with that network:
+
+    wifidog create_network example-network "Example Network"
+    wifidog create_gateway example-network example-gateway "Example Gateway"
+
+The Wifidog client software should point to this service with the correct *gw_id* to identify the gateway being served.
+
+To run the HTTP server:
+
+    wifidog
+
+Or:
+
+    wifidog runserver
+
+All the commands have help text, use __--help__.
+
+## Development
+
 Setup required (for Ubuntu or Debian):
 
-    sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev libxml2-dev libxslt-dev redis-server
+    sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev libxml2-dev libxslt-dev
     sudo npm install -g gulp
 
 Logout and login to activate virtualenvwrapper then:
@@ -24,8 +67,6 @@ Go into the folder and install the dependencies (you should be in your virtualen
     setvirtualenvproject
     pip install -r requirements.txt
     npm install
-	cd node_modules/purecss && npm install && node_modules/.bin/grunt
-	cd node_modules/zepto && npm install && MODULES="zepto ajax callbacks deferred event" npm run-script dist
 
 Build the static files (see gulpfile.js for details):
 
@@ -37,15 +78,4 @@ Copy the sample .env file to its correct place (and edit it to suit your needs):
 
 Sensitive config is kept in the .env file, non-sensitive config is in config.py.
 
-Bootstrap the database (stored at data/local.db):
-
-    python manage.py create_roles
-
-    python manage.py create_network example-network "Example Network"
-    python manage.py create_gateway example-network example-gateway "Example Gateway"
-
-    python manage.py create_user -e super@example.com -p password -r super-admin
-    python manage.py create_user -e network@example.com -p password -r network-admin -n example-network
-    python manage.py create_user -e gateway@example.com -p password -r gateway-admin -n example-network -g example-gateway
-
-Read the help for each command for more options. Read the Makefile for other development tasks.
+Please read the Makefile for many useful development shortcuts.

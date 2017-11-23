@@ -11,6 +11,7 @@ from app import constants
 
 from app.forms import \
     CategoryForm, \
+    CountryForm, \
     CurrencyForm, \
     GatewayForm, \
     LoginVoucherForm, \
@@ -418,6 +419,41 @@ def products_delete(id):
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def products_edit(id):
     return resource_edit('products', id, ProductForm)
+
+
+@bp.route('/countries')
+@login_required
+@roles_accepted('super-admin')
+@register_menu(
+    bp,
+    '.countries',
+    'Countries',
+    visible_when=has_a_role('super-admin'),
+    order=99
+)
+def countries_index():
+    return resource_index('countries')
+
+
+@bp.route('/countries/new', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin')
+def countries_new():
+    return resource_new('countries', CountryForm)
+
+
+@bp.route('/countries/<id>/delete', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin')
+def countries_delete(id):
+    return resource_delete('countries', id)
+
+
+@bp.route('/countries/<id>', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin')
+def countries_edit(id):
+    return resource_edit('countries', id, CountryForm)
 
 
 @bp.route('/currencies')

@@ -17,10 +17,10 @@ db-reset:
 docker-build: db-reset
 	docker build -t $(TAG) .
 
-docker-run: docker-build
+docker-run:
 	docker run --env-file .env -p 5000:5000 -i -t $(TAG)
 
-docker-run-persistent: docker-build
+docker-run-persistent:
 	docker run --env-file .env -p 5000:5000 -v auth-data:/var/app/data -i -t $(TAG)
 
 docker-prune-stopped:

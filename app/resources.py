@@ -4,7 +4,7 @@ import errno
 import flask
 import os
 
-from app.models import Network, User, Gateway, Voucher, Category, Product, Currency, db
+from app.models import Network, User, Gateway, Voucher, Category, Product, Country, Currency, db
 from flask_potion import Api, fields, signals
 from flask_potion.routes import Relation, Route, ItemRoute
 from flask_potion.contrib.principals import PrincipalResource, PrincipalManager
@@ -260,6 +260,24 @@ class ProductResource(PrincipalResource):
         gateway = fields.ToOne('gateways')
         currency = fields.ToOne('currencies')
 
+class CountryResource(PrincipalResource):
+    class Meta:
+        manager = Manager
+
+        model = Country
+        include_id = True
+        id_converter = 'string'
+        id_field_class = fields.String
+        permissions = {
+            'read': gateway_or_above,
+            'create': super_admin_only,
+            'update': super_admin_only,
+            'delete': 'no',
+        }
+
+    class Schema:
+        id = fields.String(min_length=3, max_length=3)
+
 class CurrencyResource(PrincipalResource):
     class Meta:
         manager = Manager
@@ -297,3 +315,4 @@ api.add_resource(NetworkResource)
 api.add_resource(CategoryResource)
 api.add_resource(ProductResource)
 api.add_resource(CurrencyResource)
+api.add_resource(CountryResource)

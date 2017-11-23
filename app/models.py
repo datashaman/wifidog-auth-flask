@@ -368,6 +368,9 @@ class Country(db.Model):
     currencies = db.relationship('Currency', secondary=country_currencies,
             backref=db.backref('countries', lazy='dynamic'))
 
+    def __str__(self):
+        return self.title
+
 class Currency(db.Model):
     __tablename__ = 'currencies'
 
