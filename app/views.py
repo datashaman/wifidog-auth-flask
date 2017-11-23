@@ -20,7 +20,7 @@ from app.forms import \
     ProductForm, \
     UserForm
 
-from app.models import Auth, Ping, db
+from app.models import Auth, Gateway, Ping, Voucher, db
 from app.payu import get_transaction, set_transaction, capture
 from app.resources import api
 from app.signals import voucher_logged_in
@@ -508,10 +508,7 @@ def wifidog_login():
 
     if form.validate_on_submit():
         voucher_code = form.voucher_code.data.upper()
-        vouchers = api.resources['vouchers'].manager.instances([
-            Condition('code', COMPARATORS['$eq'], voucher_code),
-        ])
-        voucher = vouchers.first()
+        voucher = Voucher.query.filter_by(code=voucher_code).first()
 
         if voucher is None:
             flash(
@@ -521,18 +518,12 @@ def wifidog_login():
 
             return redirect(request.referrer)
 
-        data = form.data
-        data['token'] = generate_token()
-        api.resources['vouchers'].manager.update(voucher, data)
+        form.populate_obj(voucher)
+        voucher.token = generate_token()
+        db.session.commit()
 
         voucher_logged_in.send(current_app._get_current_object(),
                                voucher=voucher)
-
-        # flash(
-        #     'Logged in, continue to <a href="%s">%s</a>'
-        #         % (form.url.data, form.url.data),
-        #     'success'
-        # )
 
         url = ('http://%s:%s/wifidog/auth?token=%s' %
                (voucher.gw_address,
@@ -549,7 +540,7 @@ def wifidog_login():
     if gateway_id is None:
         abort(404)
 
-    gateway = read_or_404('gateways', gateway_id)
+    gateway = Gateway.query.filter_by(id=gateway_id).first_or_404()
 
     return render_template('wifidog/login.html', form=form, gateway=gateway)
 
@@ -604,8 +595,8 @@ def wifidog_auth():
         ip=request.args.get('ip'),
         mac=request.args.get('mac'),
         token=request.args.get('token'),
-        incoming=request.args.get('incoming'),
-        outgoing=request.args.get('outgoing'),
+        incoming=int(request.args.get('incoming')),
+        outgoing=int(request.args.get('outgoing')),
         gateway_id=request.args.get('gw_id')
     )
 
@@ -643,13 +634,13 @@ def wifidog_auth():
 def wifidog_portal():
     voucher_token = session.get('voucher_token')
     if voucher_token:
-        vouchers = api.resources['vouchers'].manager.instances([
-            Condition('token', COMPARATORS['$eq'], voucher_token),
-        ])
-        voucher = vouchers.first()
+        voucher = Voucher.query.filter_by(token=voucher_token).first()
     else:
         voucher = None
-    gateway = read_or_404('gateways', request.args.get('gw_id'))
+    gateway_id = request.args.get('gw_id')
+    if gateway_id is None:
+        abort(404)
+    gateway = Gateway.query.filter_by(id=gateway_id).first_or_404()
     return render_template('wifidog/portal.html',
                            gateway=gateway,
                            voucher=voucher)

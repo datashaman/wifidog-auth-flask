@@ -300,13 +300,13 @@ class Auth(db.Model):
             messages = ''
 
             if self.incoming is not None or self.outgoing is not None:
-                if int(self.incoming) > voucher.incoming:
-                    voucher.incoming = int(self.incoming)
+                if self.incoming > voucher.incoming:
+                    voucher.incoming = self.incoming
                 else:
                     messages += '| Warning: Incoming counter is smaller than stored value; counter not updated'
 
-                if int(self.outgoing) > voucher.outgoing:
-                    voucher.outgoing = int(self.outgoing)
+                if self.outgoing > voucher.outgoing:
+                    voucher.outgoing = self.outgoing
                 else:
                     messages += '| Warning: Outgoing counter is smaller than stored value; counter not updated'
             else:
