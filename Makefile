@@ -8,13 +8,20 @@ serve:
 	python serve.py
 
 serve-production:
-	gunicorn --reload -b '127.0.0.1:8080' 'app:create_app()'
+	gunicorn --reload -b '127.0.0.1:5000' 'app:create_app()'
 
-docker-build:
+db-reset:
+	rm -rf data/local.db
+	python manage.py bootstrap_instance
+
+docker-build: db-reset
 	docker build -t $(TAG) .
 
 docker-run: docker-build
-	docker run --env-file .env -p 8080:8080 -i -t $(TAG)
+	docker run --env-file .env -p 5000:5000 -i -t $(TAG)
+
+docker-run-persistent: docker-build
+	docker run --env-file .env -p 5000:5000 -v auth-data:/var/app/data -i -t $(TAG)
 
 docker-prune-stopped:
 	docker ps -a -q | xargs -r docker rm
@@ -25,7 +32,7 @@ docker-prune-untagged:
 docker-prune: docker-prune-stopped docker-prune-untagged
 
 browser-sync:
-	browser-sync start --proxy http://127.0.0.1:8080 --files="app/**"
+	browser-sync start --proxy http://127.0.0.1:5000 --files="app/**"
 
 lint:
 	pylint app

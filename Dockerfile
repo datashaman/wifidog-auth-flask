@@ -9,7 +9,8 @@ RUN pip install -r requirements.txt
 
 COPY . ./
 
-ENV HOST=0.0.0.0 PORT=8080
-EXPOSE 8080
+EXPOSE 5000
 
-CMD python serve.py
+VOLUME /var/app/data
+
+CMD python manage.py runserver -h 0.0.0.0 -p 5000
