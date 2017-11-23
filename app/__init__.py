@@ -12,7 +12,6 @@ import six
 
 from app import constants
 
-from app.admin import VoucherAdmin
 from app.models import User, Role, db, users
 from app.resources import GatewayResource, \
         NetworkResource, \
