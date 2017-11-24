@@ -1,5 +1,8 @@
 # Wifidog Auth Flask
 
+[![Build Status](http://drone.datashaman.com/api/badges/datashaman/widog-auth-flask/status.svg)](http://drone.datashaman.com/api/badges/datashaman/wifidog-auth-flask/status.svg)
+[![Coverage Status](https://coveralls.io/repos/github/datashaman/wifidog-auth-flask/badge.svg?branch=master)](https://coveralls.io/github/datashaman/wifidog-auth-flask?branch=master)
+
 Time-based voucher authentication server for Wifidog Captive Portal written in Python Flask. WIP.
 
 Bandwidth-based vouchering coming soon.
