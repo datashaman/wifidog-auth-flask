@@ -1,0 +1,5 @@
+platform:
+  PyPi:
+    https:
+      tests:
+        unlicensed: skip
