@@ -25,7 +25,7 @@ from app.models import Auth, Gateway, Ping, Voucher, db
 from app.payu import get_transaction, set_transaction, capture
 from app.resources import api
 from app.signals import voucher_logged_in
-from app.utils import is_logged_in, has_a_role
+from app.utils import is_logged_in, has_role
 
 from flask import \
     Blueprint, \
@@ -135,7 +135,7 @@ def resource_action(resource, id, action):
     bp,
     '.network',
     'My Network',
-    visible_when=has_a_role('network-admin'),
+    visible_when=has_role('network-admin'),
     order=10
 )
 def my_network():
@@ -156,7 +156,7 @@ def my_network():
     bp,
     '.gateway',
     'My Gateway',
-    visible_when=has_a_role('gateway-admin'),
+    visible_when=has_role('gateway-admin'),
     order=10
 )
 def my_gateway():
@@ -200,7 +200,7 @@ def my_account():
     bp,
     '.networks',
     'Networks',
-    visible_when=has_a_role('super-admin'),
+    visible_when=has_role('super-admin'),
     order=10
 )
 def networks_index():
@@ -235,7 +235,7 @@ def networks_delete(id):
     bp,
     '.gateways',
     'Gateways',
-    visible_when=has_a_role('super-admin', 'network-admin'),
+    visible_when=has_role('super-admin', 'network-admin'),
     order=20)
 def gateways_index():
     return resource_index('gateways')
@@ -269,7 +269,7 @@ def gateways_delete(id):
     bp,
     '.users',
     'Users',
-    visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
     order=40
 )
 def users_index():
@@ -332,7 +332,7 @@ def users_delete(id):
     bp,
     '.vouchers',
     'Vouchers',
-    visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
     order=5
 )
 def vouchers_index():
@@ -353,7 +353,7 @@ def vouchers_action(id, action):
     bp,
     '.categories',
     'Categories',
-    visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
     order=99
 )
 def categories_index():
@@ -388,7 +388,7 @@ def categories_edit(id):
     bp,
     '.products',
     'Products',
-    visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
     order=99
 )
 def products_index():
@@ -423,7 +423,7 @@ def products_edit(id):
     bp,
     '.countries',
     'Countries',
-    visible_when=has_a_role('super-admin'),
+    visible_when=has_role('super-admin'),
     order=99
 )
 def countries_index():
@@ -458,7 +458,7 @@ def countries_edit(id):
     bp,
     '.currencies',
     'Currencies',
-    visible_when=has_a_role('super-admin'),
+    visible_when=has_role('super-admin'),
     order=99
 )
 def currencies_index():
@@ -493,7 +493,7 @@ def currencies_edit(id):
     bp,
     '.new-voucher',
     'New Voucher',
-    visible_when=has_a_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
     order=0
 )
 def vouchers_new():
