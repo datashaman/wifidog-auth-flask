@@ -55,3 +55,35 @@ class TestNetworks(TestCase):
         self.login('super-admin@example.com', 'admin')
         response = self.client.post('/networks/new', data={'id': 'network', 'title': 'Network'}, follow_redirects=True)
         self.assertEqual(200, response.status_code)
+
+    def test_networks_edit_as_anonymous(self):
+        self.assertLogin('/networks/main-network')
+
+    def test_networks_edit_as_gateway(self):
+        self.login('main-gateway1@example.com', 'admin')
+        self.assertForbidden('/networks/main-network')
+
+    def test_networks_edit_as_network(self):
+        self.login('main-network@example.com', 'admin')
+        self.assertForbidden('/networks/main-network')
+
+    def test_networks_edit_as_super(self):
+        self.login('super-admin@example.com', 'admin')
+        response = self.client.get('/networks/main-network')
+        self.assertEqual(200, response.status_code)
+
+    def test_networks_update_as_anonymous(self):
+        self.assertLoginPost('/networks/main-network', {'id': 'network', 'title': 'Network'})
+
+    def test_networks_update_as_gateway(self):
+        self.login('main-gateway1@example.com', 'admin')
+        self.assertForbiddenPost('/networks/main-network')
+
+    def test_networks_update_as_network(self):
+        self.login('main-network@example.com', 'admin')
+        self.assertForbiddenPost('/networks/main-network')
+
+    def test_networks_update_as_super(self):
+        self.login('super-admin@example.com', 'admin')
+        response = self.client.post('/networks/main-network', data={'id': 'network', 'title': 'Network'}, follow_redirects=True)
+        self.assertEqual(200, response.status_code)
