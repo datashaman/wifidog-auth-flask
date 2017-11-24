@@ -63,12 +63,12 @@ setup:
 
 development-install:
 	pip install -r requirements.txt
-	yarn install
+	yarn
 	gulp --dev
 
 production-install:
 	pip install -r requirements.txt
-	yarn install
+	yarn
 	gulp
 
 bootstrap:
