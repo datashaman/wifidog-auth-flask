@@ -102,11 +102,6 @@ def resource_edit(resource, id, form_class):
                            instance=instance)
 
 
-def resource_show(resource, id):
-    instance = read_or_404(resource, id)
-    return render_template('%s/show.html' % resource, instance=instance)
-
-
 def resource_delete(resource, id):
     instance = read_or_404(resource, id)
     if request.method == 'POST':
