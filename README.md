@@ -10,7 +10,7 @@ Setup an alias to run the docker image. Put this in your _.bashrc_ or _.zshrc_:
 
     alias wifidog='docker run --env-file .env -p 5000:5000 -v auth-data:/var/app/data -i -t datashaman/wifidog-auth-flask'
 
-That will run the latest build of the docker image, by default running the HTTP server on port 5000.
+That will run the latest build of the docker image, by default running the HTTP server on port 5000. It will persist the data to a local named volume called *auth-data*. Change it as you see fit.
 
 Various other commands are available to help you manage the service:
 

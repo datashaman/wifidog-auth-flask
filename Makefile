@@ -17,6 +17,9 @@ db-reset:
 docker-build: db-reset
 	docker build -t $(TAG) .
 
+docker-push: db-reset
+	docker push $(TAG)
+
 docker-run:
 	docker run --env-file .env -p 5000:5000 -i -t $(TAG)
 
