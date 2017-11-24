@@ -151,6 +151,7 @@ class Voucher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     minutes = db.Column(db.Integer, nullable=False)
+    megabytes = db.Column(db.BigInteger)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     started_at = db.Column(db.DateTime)
@@ -181,10 +182,10 @@ class Voucher(db.Model):
         return self.created_at + datetime.timedelta(minutes=current_app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow()
 
     def should_end(self):
-        if self.started_at:
-            return self.end_at < datetime.datetime.utcnow()
-        else:
-            return False
+        return self.started_at is not None and self.end_at < datetime.datetime.utcnow()
+
+    def megabytes_are_finished(self):
+        return self.megabytes is not None and (self.incoming + self.outgoing) / (1024 * 1024) >= self.megabytes
 
     @property
     def time_left(self):
@@ -292,10 +293,11 @@ class Auth(db.Model):
                     if voucher.should_end():
                         voucher.end()
                         return (constants.AUTH_DENIED, 'Token is in use but has ended: %s' % self.token)
-                    else:
-                        return (constants.AUTH_ALLOWED, 'Token is already in use but details match: %s' % self.token)
-                else:
-                    return (constants.AUTH_DENIED, 'Token is already in use: %s' % self.token)
+                    if voucher.megabytes_are_finished():
+                        voucher.end()
+                        return (constants.AUTH_DENIED, 'Token is in use but megabytes are finished: %s' % self.token)
+                    return (constants.AUTH_ALLOWED, 'Token is already in use but details match: %s' % self.token)
+                return (constants.AUTH_DENIED, 'Token is already in use: %s' % self.token)
         elif self.stage in [ constants.STAGE_LOGOUT, constants.STAGE_COUNTERS ]:
             messages = ''
 
@@ -317,9 +319,13 @@ class Auth(db.Model):
                 # (at least it is for this model)
                 messages += '| Logout is not implemented'
 
-            if voucher.started_at is not None and voucher.should_end():
+            if voucher.should_end():
                 voucher.end()
                 return (constants.AUTH_DENIED, 'Token has ended: %s' % self.token)
+
+            if voucher.megabytes_are_finished():
+                voucher.end()
+                return (constants.AUTH_DENIED, 'Token megabytes are finished: %s' % self.token)
 
             return (constants.AUTH_ALLOWED, messages)
         else:

@@ -162,6 +162,7 @@ class MyUserForm(FlaskForm):
 class NewVoucherForm(FlaskForm):
     gateway_id = SelectField('Gateway')
     minutes = IntegerField('Minutes', [ validators.InputRequired(), validators.NumberRange(min=0) ], default=default_minutes)
+    megabytes = IntegerField('Megabytes', [ validators.NumberRange(min=0) ])
 
 class BroadcastForm(FlaskForm):
     message = StringField('Message', [ validators.InputRequired() ])
