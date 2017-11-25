@@ -136,7 +136,7 @@ def resource_action(resource, id, action):
     '.network',
     'My Network',
     visible_when=has_role('network-admin'),
-    order=10
+    order=997
 )
 def my_network():
     form = NetworkForm(obj=current_user.network)
@@ -157,7 +157,7 @@ def my_network():
     '.gateway',
     'My Gateway',
     visible_when=has_role('gateway-admin'),
-    order=10
+    order=998
 )
 def my_gateway():
     form = GatewayForm(obj=current_user.gateway)
@@ -178,7 +178,7 @@ def my_gateway():
     '.account',
     'My Account',
     visible_when=is_logged_in,
-    order=10
+    order=999
 )
 def my_account():
     form = MyUserForm(obj=current_user)
