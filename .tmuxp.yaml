@@ -6,6 +6,3 @@ windows:
           - make watch
           - make serve
           - gulp serve
-    - window_name: vim
-      panes:
-          - vim
