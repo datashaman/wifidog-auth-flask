@@ -11,10 +11,12 @@ from app.models import db, Category, Country, Currency, Gateway, Network, Produc
 from app.resources import api
 
 def default_megabytes():
-    return current_user.gateway.default_megabytes
+    if current_user.gateway is not None:
+        return current_user.gateway.default_megabytes
 
 def default_minutes():
-    return current_user.gateway.default_minutes
+    if current_user.gateway is not None:
+        return current_user.gateway.default_minutes
 
 def instances(resource):
     def func():
