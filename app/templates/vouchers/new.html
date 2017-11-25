@@ -6,15 +6,15 @@
 {% block content %}
     <div class="content">
         <div class="panel panel-voucher">
-            <div class="voucher-id">
-                {{ request.args.get('code') }}
-            </div>
-
             <div class="panel-body">
                 <form method="post" action={{ url_for('.vouchers_new') }} class="pure-form pure-form-aligned">
                     {{ form.csrf_token }}
 
                     <fieldset>
+                        <div class="voucher-id">
+                            {{ request.args.get('code') }}
+                        </div>
+
                         {{ group(form.gateway_id, required=True) }}
                         {{ group(form.minutes, required=True) }}
                         {{ group(form.megabytes) }}

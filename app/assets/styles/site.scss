@@ -86,8 +86,16 @@ th, td {
 
 .voucher-id {
     font-family: Georgia, Times, "Times New Roman", serif;
-    font-size: 200%;
-    margin: 3px 0 6px;
+    font-size: 150%;
+    font-weight: bold;
+    padding-left: 5px;
+    margin: 0 0 10px 7.5em;
+}
+
+@media only screen and (max-width: 480px) {
+    .voucher-id {
+        margin: 0 0 10px;
+    }
 }
 
 .state {
