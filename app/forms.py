@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 from app.utils import args_get
-from flask import current_app
 from flask_security import current_user
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, HiddenField, PasswordField, StringField, IntegerField, SelectField, validators
