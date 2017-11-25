@@ -1,5 +1,5 @@
 {% extends 'layouts/default.html' %}
-{% from 'helpers/form.html' import field %}
+{% from 'helpers/form.html' import group %}
 
 {% set page_title = 'New Voucher' %}
 
@@ -15,9 +15,9 @@
                     {{ form.csrf_token }}
 
                     <fieldset class="pure-group">
-                        {{ field(form.gateway_id, class='pure-input-1', required=True) }}
-                        {{ field(form.minutes, class='pure-input-1', placeholder='Minutes', required=True) }}
-                        {{ field(form.megabytes, class='pure-input-1', placeholder='Megabytes') }}
+                        {{ group(form.gateway_id, class='pure-input-1', required=True) }}
+                        {{ group(form.minutes, class='pure-input-1', required=True) }}
+                        {{ group(form.megabytes, class='pure-input-1') }}
                     </fieldset>
 
                     <button type="submit" class="pure-input-1 pure-button pure-button-primary">Generate</button>

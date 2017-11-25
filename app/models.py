@@ -120,6 +120,9 @@ class Gateway(db.Model):
     login_ask_name = db.Column(db.Boolean(), default=False)
     login_require_name = db.Column(db.Boolean(), default=False)
 
+    default_minutes = db.Column(db.Integer)
+    default_megabytes = db.Column(db.BigInteger)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
     def __str__(self):

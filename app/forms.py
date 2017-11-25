@@ -11,8 +11,11 @@ from wtforms.ext.sqlalchemy.orm import model_form
 from app.models import db, Category, Country, Currency, Gateway, Network, Product, Voucher, Role
 from app.resources import api
 
+def default_megabytes():
+    return current_user.gateway.default_megabytes
+
 def default_minutes():
-    return current_app.config.get('VOUCHER_DEFAULT_MINUTES')
+    return current_user.gateway.default_minutes
 
 def instances(resource):
     def func():
@@ -162,7 +165,7 @@ class MyUserForm(FlaskForm):
 class NewVoucherForm(FlaskForm):
     gateway_id = SelectField('Gateway')
     minutes = IntegerField('Minutes', [ validators.InputRequired(), validators.NumberRange(min=0) ], default=default_minutes)
-    megabytes = IntegerField('Megabytes', [ validators.Optional(), validators.NumberRange(min=0) ])
+    megabytes = IntegerField('Megabytes', [ validators.Optional(), validators.NumberRange(min=0) ], default=default_megabytes)
 
 class BroadcastForm(FlaskForm):
     message = StringField('Message', [ validators.InputRequired() ])
