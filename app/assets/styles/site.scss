@@ -94,6 +94,7 @@ th, td {
     padding: 10px;
     margin: 5px 0;
     border-radius: 5px;
+    display: inline-block;
 }
 
 .state-invalid {
@@ -356,10 +357,6 @@ table#vouchers {
     .pure-table-horizontal td {
         border-bottom: none;
     }
-
-    .pure-button-primary {
-        width: 100%;
-    }
 }
 
 .actions-collection {
@@ -368,6 +365,13 @@ table#vouchers {
 
 form .description {
     font-size: smaller;
+}
+
+.pure-form {
+    select,
+    textarea {
+        min-width: 231px;
+    }
 }
 
 .logged-in {

@@ -11,16 +11,18 @@
             </div>
 
             <div class="panel-body">
-                <form method="post" action={{ url_for('.vouchers_new') }} class="pure-form pure-form-stacked">
+                <form method="post" action={{ url_for('.vouchers_new') }} class="pure-form pure-form-aligned">
                     {{ form.csrf_token }}
 
-                    <fieldset class="pure-group">
-                        {{ group(form.gateway_id, class='pure-input-1', required=True) }}
-                        {{ group(form.minutes, class='pure-input-1', required=True) }}
-                        {{ group(form.megabytes, class='pure-input-1') }}
-                    </fieldset>
+                    <fieldset>
+                        {{ group(form.gateway_id, required=True) }}
+                        {{ group(form.minutes, required=True) }}
+                        {{ group(form.megabytes) }}
 
-                    <button type="submit" class="pure-input-1 pure-button pure-button-primary">Generate</button>
+                        <div class="pure-controls">
+                            <button type="submit" class="pure-button pure-button-primary">Generate</button>
+                        </div>
+                    </fieldset>
                 </form>
             </div>
         </div>

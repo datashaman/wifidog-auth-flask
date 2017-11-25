@@ -1,19 +1,21 @@
 {% extends 'layouts/default.html' %}
-{% from 'helpers/form.html' import field %}
+{% from 'helpers/form.html' import group %}
 
 {% block content %}
 <div class="panel panel-login">
     <h1 class="panel-title">Broadcast</h1>
 
     <div class="panel-body">
-        <form method="post" action="{{ url_for('app.broadcast') }}" class="pure-form pure-form-stacked">
+        <form method="post" action="{{ url_for('app.broadcast') }}" class="pure-form pure-form-aligned">
             {{ form.csrf_token }}
 
-            <fieldset class="pure-group">
-                {{ field(form.message, class='pure-input-1', placeholder='Message', required=True) }}
-            </fieldset>
+            <fieldset>
+                {{ group(form.message, required=True) }}
 
-            <button type="submit" class="pure-input-1 pure-button pure-button-primary">Go</button>
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button pure-button-primary">Go</button>
+                </div>
+            </fieldset>
         </form>
     </div>
 </div>

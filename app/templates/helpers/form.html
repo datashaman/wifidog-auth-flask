@@ -2,9 +2,11 @@
     {{ f(**kwargs) | safe }}
 
     {% if f.errors %}
-        <div class="state state-invalid">
-            <span class="oi" data-glyph="x" title="X" aria-hidden="true"></span>
-            {{ f.errors | join('; ') }}
+        <div class="pure-controls">
+            <div class="state state-invalid">
+                <span class="oi" data-glyph="x" title="X" aria-hidden="true"></span>
+                {{ f.errors | join('; ') }}
+            </div>
         </div>
     {% endif %}
 {% endmacro %}
