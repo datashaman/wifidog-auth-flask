@@ -42,12 +42,13 @@
                     {%- endif -%}
                     {%- endfor -%}
 
-                    {% include 'security/_menu.html' %}
 
                     {% if current_user.is_authenticated %}
-                    <li class="pure-menu-item">
-                        <a href="/logout" class="pure-menu-link">Logout</a>
-                    </li>
+                        <li class="pure-menu-item">
+                            <a href="/logout" class="pure-menu-link">Logout</a>
+                        </li>
+                    {% else %}
+                        {% include 'security/_menu.html' %}
                     {% endif %}
                 </ul>
             </div>
