@@ -40,7 +40,6 @@ from flask import \
     url_for
 from flask_menu import register_menu
 from flask_potion.exceptions import ItemNotFound
-from flask_potion.instances import COMPARATORS, Condition
 from flask_security import \
     current_user, \
     login_required, \
