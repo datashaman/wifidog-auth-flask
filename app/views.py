@@ -21,7 +21,7 @@ from app.forms import \
     ProductForm, \
     UserForm
 
-from app.models import Auth, Gateway, Ping, Voucher, db
+from app.models import Auth, Gateway, Network, Ping, Voucher, db
 from app.payu import get_transaction, set_transaction, capture
 from app.resources import api
 from app.signals import voucher_logged_in
@@ -141,7 +141,8 @@ def resource_action(resource, id, action):
 def my_network():
     form = NetworkForm(obj=current_user.network)
     if form.validate_on_submit():
-        api.resources['networks'].update(current_user.network, form.data)
+        form.populate_obj(current_user.network)
+        db.session.commit()
         flash('Update successful')
         return redirect('/')
     return render_template('networks/current.html',
@@ -162,8 +163,8 @@ def my_network():
 def my_gateway():
     form = GatewayForm(obj=current_user.gateway)
     if form.validate_on_submit():
-        api.resources['gateways'].manager.update(current_user.gateway,
-                                                 form.data)
+        form.populate_obj(current_user.gateway)
+        db.session.commit()
         flash('Update successful')
         return redirect('/')
     return render_template('gateways/current.html',
@@ -185,7 +186,8 @@ def my_account():
     if form.validate_on_submit():
         if form.password.data == '':
             del form.password
-        api.resources['users'].manager.update(current_user, form.data)
+        form.populate_obj(current_user)
+        db.session.commit()
         flash('Update successful')
         return redirect('/')
     return render_template('users/current.html',
@@ -312,7 +314,9 @@ def users_edit(id):
         if form.password.data == '':
             del form.password
 
-        instance = api.resources['users'].manager.update(instance, form.data)
+        form.populate_obj(instance)
+        db.session.commit()
+
         flash('Update %s successful' % instance)
         return redirect(url_for('.users_index'))
     return render_template('users/edit.html', form=form, instance=instance)
@@ -515,11 +519,9 @@ def vouchers_new():
         }
     else:
         if current_user.has_role('network-admin'):
-            networks = api.resources['networks'].manager.instances([
-                Condition('id', COMPARATORS['$eq'], current_user.network_id),
-            ])
+            networks = [current_user.network]
         else:
-            networks = resource_instances('networks')
+            networks = Network.query.all()
 
         for network in networks:
             for gateway in network.gateways:
@@ -535,11 +537,16 @@ def vouchers_new():
 
     form.gateway_id.choices = choices
     item = defaults[choices[0][0]]
-    form.minutes.data = item['minutes']
-    form.megabytes.data = item['megabytes']
+
+    if request.method == 'GET':
+        form.minutes.data = item['minutes']
+        form.megabytes.data = item['megabytes']
 
     if form.validate_on_submit():
-        voucher = api.resources['vouchers'].manager.create(form.data)
+        voucher = Voucher()
+        form.populate_obj(voucher)
+        db.session.add(voucher)
+        db.session.commit()
         return redirect(url_for('.vouchers_new', code=voucher.code))
 
     return render_template('vouchers/new.html', form=form, defaults=defaults)
