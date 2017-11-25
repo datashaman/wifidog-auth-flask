@@ -138,7 +138,7 @@ ProductForm = model_form(
 class UserForm(FlaskForm):
     network = QuerySelectField('Network', allow_blank=True, default=lambda: current_user.network, query_factory=instances('networks'))
     gateway = QuerySelectField('Gateway', allow_blank=True, default=lambda: current_user.gateway, query_factory=instances('gateways'))
-    email = StringField('Email', description='Your email address')
+    email = StringField('Email')
     password = PasswordField(
         'Password',
         [
@@ -152,7 +152,7 @@ class UserForm(FlaskForm):
     roles = QuerySelectMultipleField('Roles', query_factory=roles)
 
 class MyUserForm(FlaskForm):
-    email = StringField('Email', description='Your email address')
+    email = StringField('Email')
     password = PasswordField(
         'Password',
         [
