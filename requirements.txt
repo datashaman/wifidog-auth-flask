@@ -9,7 +9,7 @@ Flask-Menu
 Flask-Potion==0.8.1
 Flask-Principal>=0.4.0
 Flask-Script
-Flask-Security-Fork
+Flask-Security
 Flask-SQLAlchemy>=2.0
 Flask-Uploads
 https://github.com/lepture/flask-wtf/archive/master.zip#egg=Flask-WTF

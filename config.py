@@ -24,6 +24,7 @@ DEBUG = asbool(os.environ.get('DEBUG', True))
 GOOGLE_ANALYTICS_TRACKING_ID = os.environ.get('GOOGLE_ANALYTICS_TRACKING_ID')
 GTM_CONTAINER_ID = os.environ.get('GTM_CONTAINER_ID')
 HOST = os.environ.get('HOST', '127.0.0.1')
+MAIL_DEFAULT_SENDER = ['Datashaman Auth', 'no-reply@auth.datashaman.com']
 PORT = os.environ.get('PORT', 8080)
 PUSH_ENABLED = False
 SECRET_KEY = os.environ.get('SECRET_KEY', 'secret')
