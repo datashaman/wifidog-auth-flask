@@ -19,7 +19,7 @@ from app.resources import GatewayResource, \
         VoucherResource, \
         api, \
         logos
-from app.services import mail, menu, security
+from app.services import login_manager, mail, menu, security
 from app.signals import init_signals
 from app.views import bp
 
@@ -46,6 +46,7 @@ def create_app(config=None):
 
     db.init_app(app)
     api.init_app(app)
+    login_manager.init_app(app)
     mail.init_app(app)
     menu.init_app(app)
 

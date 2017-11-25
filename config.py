@@ -27,7 +27,6 @@ HOST = os.environ.get('HOST', '127.0.0.1')
 PORT = os.environ.get('PORT', 8080)
 PUSH_ENABLED = False
 SECRET_KEY = os.environ.get('SECRET_KEY', 'secret')
-SECURITY_CHANGEABLE = True
 SECURITY_CONFIRMABLE = True
 SECURITY_PASSWORD_HASH = 'sha512_crypt'
 SECURITY_PASSWORD_SALT = os.environ.get('SECURITY_PASSWORD_SALT', 'secret')

@@ -38,7 +38,6 @@ from flask import \
     render_template, \
     session, \
     url_for
-from flask_login import fresh_login_required
 from flask_menu import register_menu
 from flask_potion.exceptions import ItemNotFound
 from flask_potion.instances import COMPARATORS, Condition
@@ -174,7 +173,6 @@ def my_gateway():
 
 @bp.route('/user', methods=['GET', 'POST'])
 @login_required
-@fresh_login_required
 @register_menu(
     bp,
     '.account',

@@ -42,11 +42,9 @@ def send_event(category, action, label=None, value=None):
         })
 
 def on_user_logged_in(sender, user):
-    flask.flash('You were logged in')
     send_event('auth', 'login')
 
 def on_user_logged_out(sender, user):
-    flask.flash('You were logged out')
     send_event('auth', 'logout')
 
 def on_voucher_generated(sender, voucher):
