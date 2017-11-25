@@ -70,6 +70,7 @@ class User(db.Model, UserMixin):
 
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    confirmed_at = db.Column(db.DateTime())
 
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
 

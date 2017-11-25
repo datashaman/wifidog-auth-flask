@@ -5,7 +5,8 @@ import requests
 
 from blinker import Namespace
 from flask import current_app
-from flask_login import current_user, user_logged_in, user_logged_out
+from flask_login import user_logged_in, user_logged_out
+from flask_security import current_user
 
 signals = Namespace()
 

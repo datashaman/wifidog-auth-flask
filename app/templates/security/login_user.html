@@ -1,33 +1,32 @@
 {% extends 'layouts/default.html' %}
-{% from "helpers/form.html" import field %}
+{% from "helpers/form.html" import group %}
 
 {% set title = 'Login' %}
-{% set show_flash = False %}
+
+{% block header %}
+    <div class="header">
+        <h1>Login</h1>
+    </div>
+{% endblock %}
 
 {% block content %}
-<div class="header">
-    <h1>Login</h1>
-</div>
+    <div class="content">
+        <form action="{{ url_for_security('login') }}" method="POST" class="pure-form pure-form-stacked" name="login_user_form">
+            {{ login_user_form.next | safe }}
+            {{ login_user_form.hidden_tag() }}
+            <fieldset>
+                {{ group(login_user_form.email, class='pure-input-1') }}
+                {{ group(login_user_form.password, class='pure-input-1') }}
 
-<div class="content">
-    {% include "security/_messages.html" %}
+                <label for="remember" class="pure-checkbox">
+                    <input id="remember" type="checkbox" name="remember" value="y" />
+                    Remember Me
+                </label>
+            </fieldset>
 
-    <form action="{{ url_for_security('login') }}" method="POST" class="pure-form pure-form-stacked" name="login_user_form">
-        {{ login_user_form.next | safe }}
-        {{ login_user_form.hidden_tag() }}
-        <fieldset>
-            {{ field(login_user_form.email, class='pure-input-1', placeholder='Email') }}
-            {{ field(login_user_form.password, class='pure-input-1', placeholder='Password') }}
+            <button id="submit" type="submit" class="pure-input-1 pure-button pure-button-primary">Go</button>
+        </form>
 
-            <label for="remember" class="pure-checkbox">
-                <input id="remember" type="checkbox" name="remember" value="y" />
-                Remember Me
-            </label>
-        </fieldset>
-
-        <button id="submit" type="submit" class="pure-input-1 pure-button pure-button-primary">Go</button>
-    </form>
-
-    {% include "security/_menu.html" %}
-</div>
+        {% include "security/_menu.html" %}
+    </div>
 {% endblock %}

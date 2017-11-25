@@ -19,14 +19,12 @@ from app.resources import GatewayResource, \
         VoucherResource, \
         api, \
         logos
-from app.services import menu, security
+from app.services import mail, menu, security
 from app.signals import init_signals
 from app.views import bp
 
 from flask import Flask, request
-from flask_login import current_user, LoginManager
 from flask_uploads import configure_uploads
-from flask_potion.contrib.principals.needs import HybridRelationshipNeed
 from flask_principal import \
         AnonymousIdentity, \
         Identity, \
@@ -34,7 +32,7 @@ from flask_principal import \
         RoleNeed, \
         UserNeed, \
         identity_loaded
-from flask_security import AnonymousUser
+from flask_security import AnonymousUser, current_user
 
 def create_app(config=None):
     """ Create app """
@@ -48,6 +46,7 @@ def create_app(config=None):
 
     db.init_app(app)
     api.init_app(app)
+    mail.init_app(app)
     menu.init_app(app)
 
     security.init_app(app, users)

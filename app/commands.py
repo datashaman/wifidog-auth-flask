@@ -165,7 +165,7 @@ def create_gateway(network, id, title, description=None, email=None, phone=None,
         print('Gateway created')
 
 @manager.command
-def create_user(email, password, role, network=None, gateway=None, quiet=True):
+def create_user(email, password, role, network=None, gateway=None, confirmed=True, quiet=True):
     if email is None:
         email = prompt('Email')
 
@@ -197,6 +197,9 @@ def create_user(email, password, role, network=None, gateway=None, quiet=True):
 
     user.network_id = network
     user.gateway_id = gateway
+
+    if confirmed:
+        user.confirmed_at = datetime.datetime.now()
 
     if role is not None:
         role = Role.query.filter_by(name=role).first()

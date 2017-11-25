@@ -4,6 +4,7 @@ dotenvy
 Flask
 Flask-Bcrypt
 Flask-Login
+Flask-Mail
 Flask-Menu
 Flask-Potion==0.8.1
 Flask-Principal>=0.4.0
