@@ -499,6 +499,7 @@ def currencies_edit(id):
 def vouchers_new():
     form = NewVoucherForm()
     choices = []
+    defaults = {}
 
     if current_user.has_role('gateway-admin'):
         choices = [
@@ -508,6 +509,10 @@ def vouchers_new():
                              current_user.gateway.title)
             ]
         ]
+        defaults[current_user.gateway_id] = {
+            'minutes': current_user.gateway.default_minutes,
+            'megabytes': current_user.gateway.default_megabytes,
+        }
     else:
         if current_user.has_role('network-admin'):
             networks = api.resources['networks'].manager.instances([
@@ -523,14 +528,21 @@ def vouchers_new():
                     '%s - %s' % (network.title,
                                  gateway.title)
                 ])
+                defaults[gateway.id] = {
+                    'minutes': gateway.default_minutes,
+                    'megabytes': gateway.default_megabytes,
+                }
 
     form.gateway_id.choices = choices
+    item = defaults[choices[0][0]]
+    form.minutes.data = item['minutes']
+    form.megabytes.data = item['megabytes']
 
     if form.validate_on_submit():
         voucher = api.resources['vouchers'].manager.create(form.data)
         return redirect(url_for('.vouchers_new', code=voucher.code))
 
-    return render_template('vouchers/new.html', form=form)
+    return render_template('vouchers/new.html', form=form, defaults=defaults)
 
 
 @bp.route('/wifidog/login/', methods=['GET', 'POST'])

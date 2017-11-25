@@ -26,3 +26,16 @@
         </div>
     </div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+var defaults = {{ defaults | tojson }};
+Zepto(function($) {
+    $('#gateway_id').on('change', function (e) {
+        var item = defaults[$(this).val()];
+        $('#minutes').val(item.minutes);
+        $('#megabytes').val(item.megabytes);
+    });
+});
+</script>
+{% endblock %}
