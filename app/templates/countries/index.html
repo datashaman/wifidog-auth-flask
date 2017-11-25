@@ -13,6 +13,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Title</th>
+                        <th>Currencies</th>
                         <th class="actions">Actions</th>
                     </tr>
                 </thead>
@@ -22,6 +23,7 @@
                         <tr data-id={{ instance.id }} class={{ 'pure-table-' + loop.cycle('odd', 'even') }}>
                             <td class="id" data-label="ID"><a href={{ url_for('.countries_edit', id=instance.id) }}>{{ instance.id }}</a></td>
                             <td class="title" data-label="Title">{{ instance.title }}</td>
+                            <td class="currencies" data-label="Currencies">{{ instance.currencies | join(', ') }}</td>
 
                             <td class="actions actions-instance">
                                 <a href={{ url_for('.countries_delete', id=instance.id) }} class="pure-button">
