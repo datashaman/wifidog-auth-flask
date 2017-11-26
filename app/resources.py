@@ -193,7 +193,7 @@ class VoucherResource(PrincipalResource):
             'read': gateway_or_above,
             'create': gateway_or_above,
             'update': gateway_or_above,
-            'delete': 'no',
+            'delete': super_admin_only,
         }
         read_only_fields = ('created_at', 'updated_at', 'available_actions', 'time_left')
 
@@ -251,7 +251,7 @@ class ProductResource(PrincipalResource):
             'read': gateway_or_above,
             'create': gateway_or_above,
             'update': gateway_or_above,
-            'delete': 'no',
+            'delete': super_admin_only,
         }
         read_only_fields = ('created_at', 'updated_at')
 
@@ -272,7 +272,7 @@ class CountryResource(PrincipalResource):
             'read': gateway_or_above,
             'create': super_admin_only,
             'update': super_admin_only,
-            'delete': 'no',
+            'delete': super_admin_only,
         }
 
     class Schema:
@@ -290,7 +290,7 @@ class CurrencyResource(PrincipalResource):
             'read': gateway_or_above,
             'create': super_admin_only,
             'update': super_admin_only,
-            'delete': 'no',
+            'delete': super_admin_only,
         }
 
     class Schema:

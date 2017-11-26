@@ -9,24 +9,30 @@ Set a time limit or transfer limit (in MB) before the voucher is invalidated. Us
 
 ## Docker
 
-Setup an alias to run the docker image. Put this in your _.bashrc_ or _.zshrc_:
+Setup the following aliases to run the docker image. Put this in your _.bashrc_ or _.zshrc_:
 
-    alias wifidog='docker run --env-file .env -p 5000:5000 -v auth-data:/var/app/data -i -t datashaman/wifidog-auth-flask'
+    alias wifidog-server="docker run --env-file $HOME/.config/wifidog/env -p 5000:5000 -v auth-data:/var/app/data -v auth-uploads:/var/app/uploads -i -t datashaman/wifidog-auth-flask"
+    alias wifidog="docker run --env-file $HOME/.config/wifidog/env -v auth-data:/var/app/data -v auth-uploads:/var/app/uploads -i -t datashaman/wifidog-auth-flask"
 
-That will run the latest build of the docker image, by default running the HTTP server on port 5000. It will persist the data to a local named volume called *auth-data*. Change it as you see fit.
+Create the file at _$HOME/.config/wifidog/env_ to store your secrets.
 
-Various other commands are available to help you manage the service:
+Use _wifidog-server_ to run the HTTP server. Use _wifidog_ to run CLI commands.
 
-    create_country
-    create_currency
-    create_voucher
-    create_network
-    create_gateway
-    create_user
-    create_roles
-    create_product
-    process_vouchers
-    runserver
+That will run the latest build of the docker image, by default running the HTTP server on port 5000.
+
+It will persist the data to a local named volume called *auth-data*, and the uploads to a local named volume call *auth-uploads*. Change it as you see fit.
+
+Various commands are available to help you manage the service:
+
+    * wifidog create_country
+    * wifidog create_currency
+    * wifidog create_voucher
+    * wifidog create_network
+    * wifidog create_gateway
+    * wifidog create_user
+    * wifidog create_roles
+    * wifidog create_product
+    * wifidog process_vouchers
 
 Create a user with a role of _super-admin_:
 
@@ -41,11 +47,7 @@ The Wifidog client software should point to this service with the correct *gw_id
 
 To run the HTTP server:
 
-    wifidog
-
-Or:
-
-    wifidog runserver
+    wifidog-server
 
 All the commands have help text, use __--help__.
 
