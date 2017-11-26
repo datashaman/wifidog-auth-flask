@@ -29,9 +29,6 @@ def bootstrap_instance(users_csv=None):
                 email, password, role = user
                 create_user(email, password, role)
 
-    create_country('ZA', u'South Africa')
-    create_currency('ZA', 'ZAR', u'South African Rand', u'R')
-
 @manager.command
 def bootstrap_tests():
     bootstrap_instance()

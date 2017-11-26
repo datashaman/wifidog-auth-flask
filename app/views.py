@@ -534,7 +534,12 @@ def vouchers_new():
                     'megabytes': gateway.default_megabytes,
                 }
 
+    if choices == []:
+        flash('Define a network and gateway first.')
+        return redirect(request.referrer)
+
     form.gateway_id.choices = choices
+
     item = defaults[choices[0][0]]
 
     if request.method == 'GET':
