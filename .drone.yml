@@ -16,18 +16,6 @@ pipeline:
     - TESTING=true
     when:
       event: push
-  deploy:
-    image: python:2.7-slim-jessie
-    commands:
-    - bash deploy.sh ${DRONE_COMMIT_BRANCH}
-    secrets: [ deploy_key ]
-    when:
-      event: push
-      branch:
-      - master
-      - staging
-      matrix:
-        PYTHON_VERSION: 3.6
   publish:
     image: plugins/docker
     repo: datashaman/wifidog-auth-flask

@@ -24,9 +24,19 @@
                         Remember Me
                     </label>
 
-                    <button id="submit" type="submit" class="pure-button pure-button-primary">Go</button>
+                    <button id="auth-login" type="submit" class="pure-button pure-button-primary">Go</button>
                 </div>
             </fieldset>
         </form>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        Zepto(function($) {
+            $('#auth-login').on('click', function(e) {
+                ga('send', 'event', 'auth', 'login');
+            });
+        });
+    </script>
 {% endblock %}

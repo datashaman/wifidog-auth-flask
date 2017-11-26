@@ -5,7 +5,7 @@ import requests
 
 from blinker import Namespace
 from flask import current_app
-from flask_login import user_logged_in, user_logged_out
+from flask_login import user_logged_out
 from flask_security import current_user
 
 signals = Namespace()
@@ -41,9 +41,6 @@ def send_event(category, action, label=None, value=None):
             'ev': value,
         })
 
-def on_user_logged_in(sender, user):
-    send_event('auth', 'login')
-
 def on_user_logged_out(sender, user):
     send_event('auth', 'logout')
 
@@ -55,7 +52,6 @@ def on_voucher_logged_in(sender, voucher):
     send_event('voucher', 'login')
 
 def init_signals(app):
-    user_logged_in.connect(on_user_logged_in, app)
     user_logged_out.connect(on_user_logged_out, app)
     voucher_generated.connect(on_voucher_generated, app)
     voucher_logged_in.connect(on_voucher_logged_in, app)
