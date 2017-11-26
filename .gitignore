@@ -1,6 +1,5 @@
 *.pyc
-/app/static/tags/
-/app/tags/**/*.js
+/app/static/
 /bootstrap.py
 /build/
 /.cache/
