@@ -28,6 +28,14 @@ pipeline:
       - staging
       matrix:
         PYTHON_VERSION: 3.6
+  publish:
+    image: plugins/docker
+    repo: datashaman/wifidog-auth-flask
+    tags: latest
+    when:
+      event: push
+      matrix:
+        PYTHON_VERSION: 3.6
   notify:
     image: plugins/slack
     channel: ci
