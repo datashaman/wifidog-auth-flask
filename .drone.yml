@@ -7,7 +7,7 @@ cache:
 - /root/.cache
 
 pipeline:
-  pre_deploy:
+  test:
     image: python:${PYTHON_VERSION}-slim-jessie
     commands:
     - pip install -r requirements.txt
