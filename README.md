@@ -34,6 +34,10 @@ Various commands are available to help you manage the service:
     * wifidog create_product
     * wifidog process_vouchers
 
+Create roles:
+
+    wifidog create_roles
+
 Create a user with a role of _super-admin_:
 
     wifidog create_user user@example.com password super-admin
