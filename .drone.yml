@@ -31,7 +31,7 @@ pipeline:
   publish:
     image: plugins/docker
     repo: datashaman/wifidog-auth-flask
-    tags: ${DRONE_COMMIT_BRANCH}
+    tags: ${DRONE_COMMIT_BRANCH/master/latest}
     when:
       event: push
       matrix:
