@@ -30,13 +30,13 @@ pipeline:
         PYTHON_VERSION: 3.6
   publish:
     image: plugins/docker
-    registry: docker.io
     repo: datashaman/wifidog-auth-flask
     tags: latest
     when:
       event: push
       matrix:
         PYTHON_VERSION: 3.6
+    secrets: [ docker_username, docker_password ]
   notify:
     image: plugins/slack
     channel: ci
