@@ -20,7 +20,7 @@
                         {{ group(form.megabytes) }}
 
                         <div class="pure-controls">
-                            <button type="submit" class="pure-button pure-button-primary">Generate</button>
+                            <button id="voucher-generate" type="submit" class="pure-button pure-button-primary">Generate</button>
                         </div>
                     </fieldset>
                 </form>
@@ -37,6 +37,10 @@ Zepto(function($) {
         var item = defaults[$(this).val()];
         $('#minutes').val(item.minutes);
         $('#megabytes').val(item.megabytes);
+    });
+
+    $('#voucher-generate').on('click', function (e) {
+        ga('send', 'event', 'voucher', 'generate');
     });
 });
 </script>

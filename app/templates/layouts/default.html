@@ -45,7 +45,7 @@
 
                     {% if current_user.is_authenticated %}
                         <li class="pure-menu-item">
-                            <a href="/logout" class="pure-menu-link">Logout</a>
+                            <a id="auth-logout" href="/logout" class="pure-menu-link">Logout</a>
                         </li>
                     {% else %}
                         {% include 'security/_menu.html' %}
@@ -101,6 +101,11 @@
             new Notification(response.data);
         };
         {% endif %}
+
+        $('#auth-logout').on('click', function(e) {
+            console.log('send event auth logout');
+            ga('send', 'event', 'auth', 'logout');
+        });
 
         setupNotifications();
     });

@@ -35,6 +35,7 @@
     <script>
         Zepto(function($) {
             $('#auth-login').on('click', function(e) {
+                console.log('send event auth login');
                 ga('send', 'event', 'auth', 'login');
             });
         });

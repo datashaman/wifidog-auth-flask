@@ -20,7 +20,6 @@ from app.resources import GatewayResource, \
         api, \
         logos
 from app.services import login_manager, mail, menu, security
-from app.signals import init_signals
 from app.views import bp
 
 from flask import Flask, request
@@ -55,7 +54,6 @@ def create_app(config=None):
     principal = Principal()
     principal.init_app(app)
 
-    init_signals(app)
     configure_uploads(app, logos)
     app.register_blueprint(bp)
 

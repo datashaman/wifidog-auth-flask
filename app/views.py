@@ -24,7 +24,6 @@ from app.forms import \
 from app.models import Auth, Gateway, Network, Ping, Voucher, db
 from app.payu import get_transaction, set_transaction, capture
 from app.resources import api
-from app.signals import voucher_generated, voucher_logged_in
 from app.utils import is_logged_in, has_role
 
 from flask import \
@@ -552,9 +551,6 @@ def vouchers_new():
         db.session.add(voucher)
         db.session.commit()
 
-        voucher_generated.send(current_app._get_current_object(),
-                               voucher=voucher)
-
         return redirect(url_for('.vouchers_new', code=voucher.code))
 
     return render_template('vouchers/new.html', form=form, defaults=defaults)
@@ -580,8 +576,7 @@ def wifidog_login():
         voucher.token = generate_token()
         db.session.commit()
 
-        voucher_logged_in.send(current_app._get_current_object(),
-                               voucher=voucher)
+        session['voucher_token'] = voucher.token
 
         url = ('http://%s:%s/wifidog/auth?token=%s' %
                (voucher.gw_address,

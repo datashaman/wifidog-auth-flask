@@ -27,9 +27,20 @@
                     {{ group(form.name, required=gateway.login_require_name) }}
                 {% endif %}
                 <div class="pure-controls">
-                    <button type="submit" class="pure-button pure-button-primary">Go</button>
+                    <button id="voucher-login" type="submit" class="pure-button pure-button-primary">Go</button>
                 </div>
             </fieldset>
         </form>
     </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        Zepto(function ($) {
+            $('#voucher-login').on('click', function (e) {
+                console.log('send event voucher login');
+                ga('send', 'event', 'voucher', 'login');
+            });
+        });
+    </script>
 {% endblock %}
