@@ -18,7 +18,7 @@ build-static:
 	yarn
 	gulp
 
-docker-prepare: clean build-static db-reset
+docker-prepare: clean
 
 docker-build: docker-prepare
 	docker build -t $(TAG) .

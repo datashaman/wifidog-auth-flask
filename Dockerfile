@@ -1,13 +1,22 @@
-FROM python:3.6-slim-jessie
+FROM ubuntu:artful
 
 WORKDIR /var/app
 
-COPY requirements.txt ./
-RUN pip install -r requirements.txt
+RUN apt-get update -q
+RUN apt-get install -q -y --no-install-recommends \
+    nodejs \
+    npm \
+    python3.6 \
+    python-pip \
+    python-setuptools
 
 RUN echo "SQLALCHEMY_DATABASE_URI=sqlite:////var/app/data/local.db" > .env
 
 COPY . ./
+
+RUN pip install -r requirements.txt
+RUN npm install .
+RUN node_modules/.bin/gulp
 
 EXPOSE 5000
 
