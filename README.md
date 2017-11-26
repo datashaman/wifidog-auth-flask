@@ -14,7 +14,7 @@ Setup the following aliases to run the docker image. Put this in your _.bashrc_ 
     alias wifidog-server="docker run --env-file $HOME/.config/wifidog/env -p 5000:5000 -v auth-data:/var/app/data -v auth-uploads:/var/app/uploads -i -t datashaman/wifidog-auth-flask"
     alias wifidog="docker run --env-file $HOME/.config/wifidog/env -v auth-data:/var/app/data -v auth-uploads:/var/app/uploads -i -t datashaman/wifidog-auth-flask"
 
-Create the file at _$HOME/.config/wifidog/env_ to store your secrets.
+Create the file at _$HOME/.config/wifidog/env_ to store your secrets. Look at _.env.example_ for inspiration. Don't add _SQLALCHEMY_DATABASE_URI_, that is handled inside the container.
 
 Use _wifidog-server_ to run the HTTP server. Use _wifidog_ to run CLI commands.
 
