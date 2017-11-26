@@ -1,8 +1,6 @@
 .cache
 .codeclimate.yml
 .coverage
-.drone.yml
-.drone.yml
 .editorconfig
 .env
 .env.example
