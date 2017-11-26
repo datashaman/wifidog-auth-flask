@@ -30,7 +30,7 @@ pipeline:
         PYTHON_VERSION: 3.6
   publish:
     image: plugins/docker
-    repo: hub.docker.com/datashaman/wifidog-auth-flask
+    repo: datashaman/wifidog-auth-flask
     tags: latest
     when:
       event: push
