@@ -14,7 +14,11 @@ db-reset:
 	rm -rf data/local.db
 	python manage.py bootstrap_instance
 
-docker-build: db-reset
+build-static:
+	yarn
+	gulp
+
+docker-build: clean build-static db-reset
 	docker build -t $(TAG) .
 
 docker-push: db-reset
