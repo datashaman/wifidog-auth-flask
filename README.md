@@ -20,7 +20,7 @@ Use _wifidog-server_ to run the HTTP server. Use _wifidog_ to run CLI commands.
 
 That will run the latest build of the docker image, by default running the HTTP server on port 5000.
 
-It will persist the data to a local named volume called *auth-data*, and the uploads to a local named volume call *auth-uploads*. Change it as you see fit.
+It will persist the data to a local volume named *auth-data*, and the uploads to a local volume named *auth-uploads*. Change it as you see fit.
 
 Various commands are available to help you manage the service:
 
