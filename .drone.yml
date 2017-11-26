@@ -20,6 +20,7 @@ pipeline:
     image: plugins/docker
     repo: datashaman/wifidog-auth-flask
     tags: ${DRONE_COMMIT_BRANCH/master/latest}
+    privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     when:
