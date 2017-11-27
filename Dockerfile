@@ -29,7 +29,7 @@ RUN pip install -r requirements.txt && rm -rf /root/.cache
 RUN npm install . && rm -rf /root/.npm
 RUN node_modules/.bin/gulp
 
-EXPOSE 2060 5000
+EXPOSE 5000
 
 VOLUME /var/app/data
 
