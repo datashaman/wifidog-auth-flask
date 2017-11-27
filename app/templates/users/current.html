@@ -9,7 +9,7 @@
         <form method="post" action={{ url_for('.my_account') }} class="pure-form pure-form-aligned">
             {{ form.csrf_token }}
             {{ group(form.email) }}
-            {{ group(form.password) }}
+            {{ group(form.password, autocomplete="off") }}
             {{ group(form.confirm) }}
 
             <div class="pure-controls">

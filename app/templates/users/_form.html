@@ -13,7 +13,7 @@
     {% endif %}
 
     {{ group(form.email) }}
-    {{ group(form.password) }}
+    {{ group(form.password, autocomplete="off") }}
     {{ group(form.confirm) }}
 
     {% if form.active %}

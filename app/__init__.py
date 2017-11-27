@@ -22,7 +22,7 @@ from app.resources import GatewayResource, \
 from app.services import login_manager, mail, menu, security
 from app.views import bp
 
-from flask import Flask, request
+from flask import Flask
 from flask_uploads import configure_uploads
 from flask_principal import \
         AnonymousIdentity, \
@@ -31,7 +31,8 @@ from flask_principal import \
         RoleNeed, \
         UserNeed, \
         identity_loaded
-from flask_security import AnonymousUser, current_user
+from flask_security import current_user
+
 
 def create_app(config=None):
     """ Create app """
@@ -74,12 +75,12 @@ def create_app(config=None):
         return AnonymousIdentity()
 
     @app.after_request
-    def set_cid_cookie(response):
-        """Set CID cookie to hold session together"""
-        if 'cid' not in request.cookies:
-            cid = str(uuid.uuid4())
-            expires = datetime.datetime.now() + datetime.timedelta(days=365*2)
-            response.set_cookie('cid', cid, expires=expires)
+    def security_measures(response):
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1"
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
         return response
 
     @app.context_processor
