@@ -578,7 +578,7 @@ def wifidog_login():
 
         session['voucher_token'] = voucher.token
 
-        url = ('https://%s:%s/wifidog/auth/?token=%s' %
+        url = ('http://%s:%s/wifidog/auth/?token=%s' %
                (voucher.gw_address,
                 voucher.gw_port,
                 voucher.token))
