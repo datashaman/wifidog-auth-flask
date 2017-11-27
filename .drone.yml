@@ -3,16 +3,21 @@ matrix:
   - 2.7
   - 3.6
 
-cache:
-- /root/.cache
-
 pipeline:
+  restore-cache:
+    image: drillster/drone-volume-cache
+    restore: true
+    mount:
+      - ./pip-cache
+    volumes:
+      - /tmp/drone-cache:/cache
   test:
     image: python:${PYTHON_VERSION}-slim-jessie
     commands:
     - pip install -r requirements.txt
     - python -m unittest discover -s tests
     environment:
+    - PIP_DOWNLOAD_CACHE=./pip-cache
     - TESTING=true
     when:
       event: push
@@ -22,11 +27,19 @@ pipeline:
     tags: ${DRONE_COMMIT_BRANCH/master/latest}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    keep_build: true
     when:
       event: push
       matrix:
         PYTHON_VERSION: 3.6
     secrets: [ docker_username, docker_password ]
+  rebuild-cache:
+    image: drillster/drone-volume-cache
+    rebuild: true
+    mount:
+      - ./pip-cache
+    volumes:
+      - /tmp/drone-cache:/cache
   notify:
     image: plugins/slack
     channel: ci
