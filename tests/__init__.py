@@ -19,32 +19,24 @@ class TestCase(unittest.TestCase):
         super(TestCase, self).__init__(*args, **kwargs)
 
     def setUp(self):
-        self.fd, self.filename = tempfile.mkstemp()
-        os.write(self.fd, content)
+        fd, self.filename = tempfile.mkstemp()
+        os.write(fd, content)
+        os.close(fd)
 
         config = {
             'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + self.filename,
         }
 
         self.app = create_app(config)
-
-        db.init_app(self.app)
-
-        with self.app.app_context():
-            db.create_all()
-
         self.client = self.app.test_client()
 
     def tearDown(self):
-        self.logout()
-
-        os.close(self.fd)
         os.unlink(self.filename)
 
     def get_html(self, response):
         data = response.get_data()
         parser = etree.HTMLParser()
-        return etree.parse(six.StringIO(str(response.get_data())), parser)
+        return etree.parse(six.StringIO(str(data)), parser)
 
     def assertOk(self, url):
         response = self.client.get(url)
