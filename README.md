@@ -12,7 +12,7 @@ Set a time limit or transfer limit (in MB) before the voucher is invalidated. Us
 Setup the following aliases to run the docker image. Put this in your _.bashrc_ or _.zshrc_:
 
     alias wifidog-server="docker run --env-file $HOME/.config/wifidog/env -p 5000:5000 -v auth-data:/var/app/data -v auth-uploads:/var/app/uploads -i -t datashaman/wifidog-auth-flask"
-    alias wifidog="docker run --env-file $HOME/.config/wifidog/env -v auth-data:/var/app/data -v auth-uploads:/var/app/uploads -i -t datashaman/wifidog-auth-flask"
+    alias wifidog="docker run --env-file $HOME/.config/wifidog/env -v auth-data:/var/app/data -v auth-uploads:/var/app/uploads --rm -it datashaman/wifidog-auth-flask"
 
 Create the file at _$HOME/.config/wifidog/env_ to store your secrets. Look at _.env.example_ for inspiration. Don't add _SQLALCHEMY_DATABASE_URI_, that is handled inside the container.
 
