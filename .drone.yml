@@ -8,7 +8,7 @@ pipeline:
     image: drillster/drone-volume-cache
     restore: true
     mount:
-      - ./pip-cache
+      - ./cache
     volumes:
       - /tmp/drone-cache:/cache
   test:
@@ -17,7 +17,7 @@ pipeline:
     - pip install -r requirements.txt
     - python -m unittest discover -s tests
     environment:
-    - PIP_DOWNLOAD_CACHE=./pip-cache
+    - XDG_CACHE_HOME=./cache
     - TESTING=true
     when:
       event: push
@@ -37,7 +37,7 @@ pipeline:
     image: drillster/drone-volume-cache
     rebuild: true
     mount:
-      - ./pip-cache
+      - ./cache
     volumes:
       - /tmp/drone-cache:/cache
   notify:
