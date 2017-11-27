@@ -79,7 +79,8 @@ def create_app(config=None):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1"
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        if 'Cache-Control' not in response.headers:
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
         response.headers["Pragma"] = "no-cache"
         return response
 
