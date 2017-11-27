@@ -53,6 +53,18 @@ To run the HTTP server:
 
     wifidog-server
 
+The command *process_vouchers* does the following:
+
+    * Ends any vouchers with no time left.
+    * Expires any new vouchers that are unused after a configurable age (default is _120_ minutes).
+    * Archives any blocked, ended or expired vouchers that have not changed for a configurable age (default is _120_ minutes, the same config as above).
+
+To run the command:
+
+    wifidog process_vouchers
+
+Put that (or the underlying `docker run` command) into a cron so the system keeps the vouchers list clean.
+
 All the commands have help text, use __--help__.
 
 ## Development
