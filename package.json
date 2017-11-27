@@ -14,7 +14,6 @@
     "gulp-merge": "~0.1.1",
     "gulp-minify": "0.0.5",
     "gulp-rename": "~1.2.2",
-    "gulp-riot": "^0.3.1",
     "gulp-rollup": "^1.7.0",
     "gulp-sass": "^3.1.0",
     "gulp-size": "~2.0.0",
