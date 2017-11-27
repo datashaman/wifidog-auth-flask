@@ -65,16 +65,16 @@ coverage:
 
 setup:
 	sudo -H apt-get install python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev
-	sudo -H yarn global add gulp yarn
+	sudo -H npm -g install gulp
 
 development-install:
 	pip install -r requirements.txt
-	yarn
+	npm install
 	gulp --dev
 
 production-install:
 	pip install -r requirements.txt
-	yarn
+	npm install
 	gulp
 
 bootstrap:

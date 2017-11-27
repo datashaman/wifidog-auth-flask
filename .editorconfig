@@ -13,7 +13,7 @@ trim_trailing_whitespace = true
 indent_size = 1
 indent_style = tab
 
-[{composer.json,package.json,yarn.lock}]
+[{composer.json,package.json}]
 indent_size = 2
 
 [*.sh]
