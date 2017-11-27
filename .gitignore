@@ -1,5 +1,4 @@
 *.pyc
-/app/static/
 /bootstrap.py
 /build/
 /.cache/

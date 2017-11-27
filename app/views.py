@@ -5,6 +5,7 @@ Views for the app
 from __future__ import absolute_import
 from __future__ import division
 
+import os
 import uuid
 
 from app import constants
@@ -35,6 +36,7 @@ from flask import \
     redirect, \
     request, \
     render_template, \
+    send_from_directory, \
     session, \
     url_for
 from flask_menu import register_menu
@@ -730,6 +732,13 @@ def pay_cancel():
     return render_template('payu/transaction.html',
                            response=response,
                            basketAmount=basketAmount)
+
+@bp.route('/favicon.ico')
+def favicon():
+    directory = os.path.join(current_app.root_path, 'static')
+    return send_from_directory(directory,
+                               'favicon.ico',
+                               mimetype='image/vnd.microsoft.icon')
 
 
 @bp.route('/')
