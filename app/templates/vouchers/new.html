@@ -40,7 +40,12 @@ Zepto(function($) {
     });
 
     $('#voucher-generate').on('click', function (e) {
-        ga('send', 'event', 'voucher', 'generate');
+        console.log('send event voucher generate');
+        dataLayer.push({
+            event: 'trackEvent',
+            eventCategory: 'voucher',
+            eventAction: 'generate'
+        });
     });
 });
 </script>
