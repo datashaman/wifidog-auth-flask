@@ -27,12 +27,14 @@ class PayUPlugin(MessagePlugin):
         username_token = context.envelope.childAtPath('Header/wsse:Security/wsse:UsernameToken')
         username_token.getChild('wsse:Password').set('Type', 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText')
 
-client = Client(wsdl, plugins=[PayUPlugin()])
+client = None
 
-security = Security()
-token = UsernameToken(username, password)
-security.tokens.append(token)
-client.set_options(wsse=security)
+def init_client():
+    client = Client(wsdl, plugins=[PayUPlugin()])
+    security = Security()
+    token = UsernameToken(username, password)
+    security.tokens.append(token)
+    client.set_options(wsse=security)
 
 def set_transaction(currency_code, amount_in_cents, description, return_url, cancel_url):
     additional_information['returnUrl'] = return_url

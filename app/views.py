@@ -22,7 +22,7 @@ from app.forms import \
     UserForm
 
 from app.models import Auth, Gateway, Network, Ping, Voucher, db
-from app.payu import get_transaction, set_transaction, capture
+# from app.payu import get_transaction, set_transaction, capture
 from app.resources import api
 from app.utils import is_logged_in, has_role
 
