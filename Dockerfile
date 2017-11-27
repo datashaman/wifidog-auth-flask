@@ -6,7 +6,6 @@ RUN apt-get update -q && \
     apt-get install -q -y --no-install-recommends \
         nodejs \
         npm \
-        python3.6 \
         python-pip \
         python-setuptools && \
     rm -rf /var/lib/apt/lists/*
@@ -20,18 +19,18 @@ COPY \
     package.json \
     package-lock.json \
     requirements.txt \
-    yarn.lock \
     ./
 
 COPY app app/
 
-RUN pip install -r requirements.txt && rm -rf /root/.cache
-RUN npm install . && rm -rf /root/.npm
-RUN node_modules/.bin/gulp
+RUN pip install -r requirements.txt && rm -rf /root/.cache requirements.txt
+RUN npm install && rm -rf /root/.npm
+RUN node_modules/.bin/gulp && rm -rf app/assets gulpfile.js node_modules package.json package-lock.json
+RUN rm -rf /tmp/* /usr/share/doc /usr/share/info
 
 EXPOSE 5000
 
-VOLUME /var/app/data
+VOLUME ["/var/app/data", "/var/app/uploads"]
 
 ENTRYPOINT ["python", "manage.py"]
 CMD ["runserver", "-h", "0.0.0.0", "-p", "5000"]

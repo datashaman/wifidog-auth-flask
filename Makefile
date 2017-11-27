@@ -15,7 +15,7 @@ db-reset:
 	python manage.py bootstrap_instance
 
 build-static:
-	yarn
+	npm install
 	gulp
 
 docker-prepare: clean
@@ -87,7 +87,7 @@ reboot: remove-db bootstrap
 
 clean:
 	find . -name '*.pyc' -delete
-	rm -rf app/static/*
+	rm -rf app/static/{fonts,scripts,styles}/*
 
 graphs:
 	$(PYTHON) app/graphs.py

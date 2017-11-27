@@ -62,6 +62,9 @@ def bootstrap_tests():
     create_voucher(u'other-gateway2', 60, 'other-2-1')
     create_voucher(u'other-gateway2', 60, 'other-2-2')
 
+    create_country(u'ZA', u'South Africa')
+    create_currency(u'ZA', u'ZAR', u'South Africa')
+
     create_product(u'main-network', None, u'90MIN', u'90 Minute Voucher', 'ZAR', 3000, 'available')
 
 @manager.command

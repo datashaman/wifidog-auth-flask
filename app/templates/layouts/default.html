@@ -8,6 +8,8 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/screen.min.css') }}" />
 
+    {% include 'layouts/gtm_head.html' %}
+
     <!--[if lt IE 9]>
     <script src="{{ url_for('static', filename='scripts/ie.min.js') }}"></script>
     <![endif]-->
@@ -17,7 +19,7 @@
 </head>
 
 <body class="layout-default">
-    {% include 'layouts/gtm.html' %}
+    {% include 'layouts/gtm_body.html' %}
 
     <div id="layout">
         <a href="#menu" id="menuLink" class="menu-link">
