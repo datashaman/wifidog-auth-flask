@@ -25,8 +25,8 @@
                         <tr data-id={{ instance.id }} class={{ 'pure-table-' + loop.cycle('odd', 'even') }}>
                             <td class="id" data-label="ID"><a href={{ url_for('.currencies_edit', id=instance.id) }}>{{ instance.id }}</a></td>
                             <td class="title" data-label="Title">{{ instance.title }}</td>
-                            <td class="prefix" data-label="Prefix">{{ instance.prefix | default('-') }}</td>
-                            <td class="suffix" data-label="Suffix">{{ instance.suffix | default('-') }}</td>
+                            <td class="prefix" data-label="Prefix">{{ instance.prefix }}</td>
+                            <td class="suffix" data-label="Suffix">{{ instance.suffix }}</td>
                             <td class="countries" data-label="Countries">{{ instance.countries|join(', ') }}</td>
 
                             <td class="actions actions-instance">

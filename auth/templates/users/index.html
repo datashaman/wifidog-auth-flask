@@ -71,7 +71,7 @@
                                 </a>
                             </td>
                             <td data-label="Roles">{{ instance.roles | join(', ') }}</td>
-                            <td data-label="Created At">{{ render.render(instance.created_at) }}</td>
+                            <td data-label="Created At">{{ render.datetime(instance.created_at) }}</td>
 
                             <td class="actions actions-instance">
                                 <a

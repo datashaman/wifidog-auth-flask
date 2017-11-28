@@ -32,7 +32,7 @@
                             {% endif %}
                             <td data-label="ID"><a href="{{ url_for('.gateways_edit', id=instance.id) }}">{{ instance.id }}</a></td>
                             <td data-label="Title">{{ render.render(instance.title) }}</td>
-                            <td data-label="Created At">{{ render.render(instance.created_at) }}</td>
+                            <td data-label="Created At">{{ render.datetime(instance.created_at) }}</td>
 
                             <td class="actions actions-instance">
                                 <a href="{{ url_for('.gateways_delete', id=instance.id) }}" class="pure-button">

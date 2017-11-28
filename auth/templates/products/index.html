@@ -37,7 +37,7 @@
                                 <td data-label="Gateway">{{ render.render(instance.gateway) }}</td>
                             {% endif %}
                             <td class="code" data-label="Code"><a href={{ url_for('.products_edit', id=instance.id) }}>{{ instance.code }}</a></td>
-                            <td class="title" data-label="Title">{{ instance.title | default('-') }}</td>
+                            <td class="title" data-label="Title">{{ instance.title }}</td>
                             <td class="price" data-label="Price">{{ instance.currency.prefix }} {{ instance.price }}</td>
 
                             <td class="actions actions-instance">

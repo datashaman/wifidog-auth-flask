@@ -36,7 +36,7 @@
                                 <td data-label="Gateway">{{ render.render(instance.gateway) }}</td>
                             {% endif %}
                             <td class="code" data-label="Code"><a href={{ url_for('.categories_edit', id=instance.id) }}>{{ instance.code }}</a></td>
-                            <td class="title" data-label="Title">{{ instance.title | default('-') }}</td>
+                            <td class="title" data-label="Title">{{ instance.title }}</td>
 
                             <td class="actions actions-instance">
                                 <a href={{ url_for('.categories_delete', id=instance.id) }} class="pure-button">

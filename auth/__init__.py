@@ -6,6 +6,8 @@ Create app
 from __future__ import absolute_import
 
 import datetime
+import os
+import pytz
 import uuid
 
 import six
@@ -21,6 +23,8 @@ from auth.resources import GatewayResource, \
         logos
 from auth.services import login_manager, mail, menu, security
 from auth.views import bp
+
+from dateutil.tz import tzlocal
 
 from flask import Flask
 from flask_uploads import configure_uploads
@@ -83,6 +87,14 @@ def create_app(config=None):
             response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
         response.headers["Pragma"] = "no-cache"
         return response
+
+    @app.template_filter()
+    def local_datetime(value, format="%I:%M %p"):
+        tz = tzlocal()
+        utc = pytz.timezone('UTC')
+        value = utc.localize(value, is_dst=None).astimezone(pytz.utc)
+        local_dt = value.astimezone(tz)
+        return local_dt.strftime(format)
 
     @app.context_processor
     def context_processor():

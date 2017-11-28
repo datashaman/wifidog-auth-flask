@@ -6,8 +6,16 @@
     {{ attribute | default(def) }}
 {% endmacro %}
 
+{% macro date(dt) %}
+    {{ dt | local_datetime('%F') if dt }}
+{% endmacro %}
+
+{% macro datetime(dt) %}
+    {{ dt | local_datetime('%F %H:%M') if dt }}
+{% endmacro %}
+
 {% macro time(dt) %}
-    {{ dt.strftime('%H:%M') if dt }}
+    {{ dt | local_datetime('%H:%M') if dt }}
 {% endmacro %}
 
 {% macro times(row) %}
