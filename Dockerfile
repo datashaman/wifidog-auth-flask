@@ -7,7 +7,8 @@ RUN apt-get update -q && \
         nodejs \
         npm \
         python-pip \
-        python-setuptools && \
+        python-setuptools \
+        tzdata && \
     rm -rf /var/lib/apt/lists/*
 
 RUN echo "SQLALCHEMY_DATABASE_URI=sqlite:////var/app/data/local.db" > .env
