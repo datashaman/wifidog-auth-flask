@@ -1,14 +1,14 @@
 from __future__ import absolute_import
 
-from app.utils import args_get
+from auth.utils import args_get
 from flask_security import current_user
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, HiddenField, PasswordField, StringField, IntegerField, SelectField, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from wtforms.ext.sqlalchemy.orm import model_form
 
-from app.models import db, Category, Country, Currency, Gateway, Network, Product, Voucher, Role
-from app.resources import api
+from auth.models import db, Category, Country, Currency, Gateway, Network, Product, Voucher, Role
+from auth.resources import api
 
 def default_megabytes():
     if current_user.gateway is not None:

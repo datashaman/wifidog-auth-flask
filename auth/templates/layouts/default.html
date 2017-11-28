@@ -98,7 +98,7 @@
     <script>
     Zepto(function($) {
         {% if config.get('PUSH_ENABLED') %}
-        var eventSource = new EventSource('{{ url_for('app.push') }}');
+        var eventSource = new EventSource('{{ url_for('.push') }}');
         eventSource.onmessage = function(response) {
             new Notification(response.data);
         };

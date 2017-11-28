@@ -4,7 +4,7 @@ import errno
 import flask
 import os
 
-from app.models import Network, User, Gateway, Voucher, Category, Product, Country, Currency, db
+from auth.models import Network, User, Gateway, Voucher, Category, Product, Country, Currency, db
 from flask_potion import Api, fields, signals
 from flask_potion.routes import Relation, Route, ItemRoute
 from flask_potion.contrib.principals import PrincipalResource, PrincipalManager

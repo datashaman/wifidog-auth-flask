@@ -6,7 +6,7 @@
     <h1 class="panel-title">Broadcast</h1>
 
     <div class="panel-body">
-        <form method="post" action="{{ url_for('app.broadcast') }}" class="pure-form pure-form-aligned">
+        <form method="post" action="{{ url_for('.broadcast') }}" class="pure-form pure-form-aligned">
             {{ form.csrf_token }}
 
             <fieldset>

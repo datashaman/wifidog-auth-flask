@@ -8,9 +8,9 @@ from __future__ import division
 import os
 import uuid
 
-from app import constants
+from auth import constants
 
-from app.forms import \
+from auth.forms import \
     CategoryForm, \
     CountryForm, \
     CurrencyForm, \
@@ -22,10 +22,10 @@ from app.forms import \
     ProductForm, \
     UserForm
 
-from app.models import Auth, Gateway, Network, Ping, Voucher, db
-# from app.payu import get_transaction, set_transaction, capture
-from app.resources import api
-from app.utils import is_logged_in, has_role
+from auth.models import Auth, Gateway, Network, Ping, Voucher, db
+# from auth.payu import get_transaction, set_transaction, capture
+from auth.resources import api
+from auth.utils import is_logged_in, has_role
 
 from flask import \
     Blueprint, \
@@ -48,7 +48,7 @@ from flask_security import \
     roles_required
 
 
-bp = Blueprint('app', __name__)
+bp = Blueprint('auth', __name__)
 
 
 def generate_token():

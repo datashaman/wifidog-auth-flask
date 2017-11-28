@@ -6,8 +6,8 @@ import unittest
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0, BASE_DIR)
 
-from app import create_app
-from app.models import db, users, Role
+from auth import create_app
+from auth.models import db, users, Role
 from flask_security.utils import encrypt_password
 from lxml import etree
 

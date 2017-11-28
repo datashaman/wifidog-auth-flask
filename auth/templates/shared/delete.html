@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="content">
-        <form method="post" action={{ url_for('app.%s_delete' % resource, id=instance.id) }} class="pure-form pure-form-aligned">
+        <form method="post" action={{ url_for('.%s_delete' % resource, id=instance.id) }} class="pure-form pure-form-aligned">
             <fieldset>
                 <div class="pure-controls">
                     <p>Are you sure you want to <em>delete</em> <strong>{{ instance }}</strong>?</p>

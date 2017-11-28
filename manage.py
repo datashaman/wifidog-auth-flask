@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from app import create_app
-from app.models import db
-from app.services import manager
+from auth import create_app
+from auth.models import db
+from auth.services import manager
 
-import app.commands
+import auth.commands
 
 if __name__ == '__main__':
     app = create_app()

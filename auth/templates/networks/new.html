@@ -5,7 +5,7 @@
 
 {% block content %}
     <div class="content">
-        <form method="post" action={{ url_for('app.networks_new') }} class="pure-form pure-form-aligned">
+        <form method="post" action={{ url_for('.networks_new') }} class="pure-form pure-form-aligned">
             {{ form.csrf_token }}
             {% include 'networks/_form.html' %}
         </form>

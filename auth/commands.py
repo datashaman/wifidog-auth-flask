@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # encoding: utf-8
 
 from __future__ import absolute_import
@@ -8,9 +7,9 @@ import datetime
 import json
 import six
 
-from app.constants import ROLES
-from app.models import Role, Network, Gateway, Voucher, Country, Currency, Product, db, users
-from app.services import manager
+from auth.constants import ROLES
+from auth.models import Role, Network, Gateway, Voucher, Country, Currency, Product, db, users
+from auth.services import manager
 from flask import current_app
 from flask_script import prompt, prompt_pass
 from flask_security.utils import encrypt_password
@@ -28,6 +27,7 @@ def bootstrap_instance(users_csv=None):
             for user in csv.reader(f):
                 email, password, role = user
                 create_user(email, password, role)
+
 
 @manager.command
 def bootstrap_tests():
@@ -67,6 +67,7 @@ def bootstrap_tests():
 
     create_product(u'main-network', None, u'90MIN', u'90 Minute Voucher', 'ZAR', 3000, 'available')
 
+
 @manager.command
 def create_product(network_id, gateway_id, code, title, currency_id, price, status='new', quiet=True):
     product = Product()
@@ -85,6 +86,7 @@ def create_product(network_id, gateway_id, code, title, currency_id, price, stat
     if not quiet:
         print('Product created: %s - %s' % (product.id, product.title))
 
+
 @manager.command
 def create_country(id, title, quiet=True):
     country = Country()
@@ -97,6 +99,7 @@ def create_country(id, title, quiet=True):
 
     if not quiet:
         print('Country created: %s' % country.id)
+
 
 @manager.command
 def create_currency(country_id, id, title, prefix=None, suffix=None, quiet=True):
@@ -113,6 +116,7 @@ def create_currency(country_id, id, title, prefix=None, suffix=None, quiet=True)
 
     if not quiet:
         print('Currency created: %s' % currency.id)
+
 
 @manager.command
 def create_voucher(gateway, minutes=60, code=None, quiet=True):
@@ -131,6 +135,7 @@ def create_voucher(gateway, minutes=60, code=None, quiet=True):
     if not quiet:
         print('Voucher created: %s:%s' % (voucher.id, voucher.code))
 
+
 @manager.command
 def create_network(id, title, description=None, quiet=True):
     network = Network()
@@ -142,6 +147,7 @@ def create_network(id, title, description=None, quiet=True):
 
     if not quiet:
         print('Network created')
+
 
 @manager.command
 @manager.option('-e', '--email', help='Contact Email')
@@ -163,6 +169,7 @@ def create_gateway(network, id, title, description=None, email=None, phone=None,
 
     if not quiet:
         print('Gateway created')
+
 
 @manager.command
 def create_user(email, password, role, network=None, gateway=None, confirmed=True, quiet=True):
@@ -210,6 +217,7 @@ def create_user(email, password, role, network=None, gateway=None, confirmed=Tru
     if not quiet:
         print('User created')
 
+
 @manager.command
 def create_roles(quiet=True):
     if Role.query.count() == 0:
@@ -222,6 +230,7 @@ def create_roles(quiet=True):
 
         if not quiet:
             print('Roles created')
+
 
 @manager.command
 def process_vouchers():
@@ -257,6 +266,7 @@ def process_vouchers():
         db.session.add(voucher)
 
     db.session.commit()
+
 
 @manager.command
 def measurements():

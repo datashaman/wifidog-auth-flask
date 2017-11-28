@@ -9,7 +9,8 @@ import string
 
 import flask
 
-from app.graphs import available_actions
+from auth import constants
+from auth.graphs import available_actions
 from flask import current_app
 from flask_security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore
 from flask_sqlalchemy import SQLAlchemy
@@ -20,7 +21,6 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import backref
 from sqlalchemy.schema import UniqueConstraint
 
-from app import constants
 
 @event.listens_for(Engine, 'connect')
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -28,15 +28,18 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute('PRAGMA foreign_keys=ON')
     cursor.close()
 
+
 db = SQLAlchemy()
 
 chars = string.ascii_lowercase + string.digits
+
 
 def generate_code():
     source = ''.join(choice(chars) for _ in range(4))
     encoded = base64.b32encode(source.encode()).decode()
     result = re.sub(r'=*$', '', encoded)
     return result
+
 
 roles_users = db.Table('roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),

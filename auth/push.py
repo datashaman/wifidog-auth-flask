@@ -1,4 +1,4 @@
-from app.utils import has_role
+from auth.utils import has_role
 from flask import Blueprint
 from flask_menu import register_menu
 from redis import StrictRedis, ConnectionError
@@ -15,7 +15,6 @@ def event_stream():
     pubsub = redis.pubsub()
     pubsub.subscribe(channels)
 
-    count = 0
     while True:
         try:
             for message in pubsub.listen():

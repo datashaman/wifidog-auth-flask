@@ -10,17 +10,17 @@ import uuid
 
 import six
 
-from app import constants
+from auth import constants
 
-from app.models import User, Role, db, users
-from app.resources import GatewayResource, \
+from auth.models import User, Role, db, users
+from auth.resources import GatewayResource, \
         NetworkResource, \
         UserResource, \
         VoucherResource, \
         api, \
         logos
-from app.services import login_manager, mail, menu, security
-from app.views import bp
+from auth.services import login_manager, mail, menu, security
+from auth.views import bp
 
 from flask import Flask
 from flask_uploads import configure_uploads
