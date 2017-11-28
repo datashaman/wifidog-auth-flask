@@ -1,9 +1,15 @@
-*.pyc
+*.egg
+*.py[cod]
+*.so
+*~
+__pycache__/
 /bootstrap.py
 /build/
 /.cache/
 /.coverage
+/dist/
 /logs/
 /node_modules/
+/*.egg-info/
 /.env
 /.env.local
