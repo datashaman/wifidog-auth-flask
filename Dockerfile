@@ -21,11 +21,11 @@ COPY \
     requirements.txt \
     ./
 
-COPY app app/
+COPY auth auth/
 
 RUN pip install -r requirements.txt && rm -rf /root/.cache requirements.txt
 RUN npm install && rm -rf /root/.npm
-RUN node_modules/.bin/gulp && rm -rf app/assets gulpfile.js node_modules package.json package-lock.json
+RUN node_modules/.bin/gulp && rm -rf auth/assets gulpfile.js node_modules package.json package-lock.json
 RUN rm -rf /tmp/* /usr/share/doc /usr/share/info
 
 EXPOSE 5000
