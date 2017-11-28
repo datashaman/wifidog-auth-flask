@@ -27,7 +27,7 @@ var isProduction = true,
 		'node_modules/open-iconic/font/css/open-iconic.css'
 	],
 	siteStyles = [
-		'app/assets/styles/**/*.scss'
+		'auth/assets/styles/**/*.scss'
 	],
 	ieScripts = [
 		'node_modules/es5-shim/es5-shim.js',
@@ -40,7 +40,7 @@ var isProduction = true,
 		'node_modules/zepto/src/deferred.js',
 		'node_modules/zepto/src/event.js',
 		'node_modules/marked/lib/marked.js',
-		'app/assets/scripts/**/*.js',
+		'auth/assets/scripts/**/*.js',
 	];
 
 if(gutil.env.dev === true) {
@@ -54,7 +54,7 @@ gulp.task('styles', function() {
 		// .pipe(isProduction ? plugins.combineMediaQueries({ log: true }) : gutil.noop())
 		.pipe(isProduction ? plugins.cssnano() : gutil.noop())
 		.pipe(plugins.size())
-		.pipe(gulp.dest('./app/static/styles'))
+		.pipe(gulp.dest('./auth/static/styles'))
 		.pipe(browserSync.stream());
 });
 
@@ -64,13 +64,13 @@ gulp.task('scripts', function() {
 		scripts(siteScripts, 'site.min.js'))
 		.pipe(isProduction ? plugins.uglify() : gutil.noop()).on('error', errorHandler)
 		.pipe(plugins.size())
-		.pipe(gulp.dest('./app/static/scripts'));
+		.pipe(gulp.dest('./auth/static/scripts'));
 });
 
 gulp.task('fonts', function() {
 	return gulp.src([
 		'node_modules/open-iconic/font/fonts/**/*'
-	]).pipe(gulp.dest('./app/static/fonts'));
+	]).pipe(gulp.dest('./auth/static/fonts'));
 });
 
 gulp.task('build', [ 'styles', 'scripts', 'fonts' ]);
@@ -82,7 +82,7 @@ gulp.task('serve', [ 'build' ], function() {
 
 	gulp.watch(vendorStyles + siteStyles, [ 'styles' ]);
 	gulp.watch(ieScripts + siteScripts, [ 'scripts' ]);
-	gulp.watch('app/templates/**/*.html', reload);
+	gulp.watch('auth/templates/**/*.html', reload);
 });
 
 gulp.task('default', [ 'build' ]);
