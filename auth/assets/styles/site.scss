@@ -201,7 +201,6 @@ th, td {
     a {
         color: #999;
         border: none;
-        padding: 0.6em 0 0.6em 0.6em;
     }
 
     // Remove all background/borders, since we are applying them to #menu.
@@ -303,68 +302,68 @@ table#vouchers {
      * Tap the menu to trigger the active state.
      * Make the window large again.
      */
-    #layout.active {
-        position: relative;
-        left: $menu-width;
+#layout.active {
+    position: relative;
+    left: $menu-width;
+}
+
+tbody {
+    border: none;
+}
+
+thead {
+    display: none;
+}
+
+tbody,
+tr,
+th,
+td {
+    display: block;
+    padding: 0;
+    text-align: left;
+    white-space: normal;
+}
+
+table td:before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: sans-serif;
+}
+
+table#vouchers {
+    td.id {
+        font-family: Georgia, Times, "Times New Roman", serif;
+        font-size: 22px;
     }
 
-    tbody {
-        border: none;
-    }
-
-    thead {
-        display: none;
-    }
-
-    tbody,
-    tr,
-    th,
-    td {
-        display: block;
-        padding: 0;
-        text-align: left;
-        white-space: normal;
-    }
-
-    table td:before {
-        content: attr(data-label);
-        float: left;
-        font-weight: bold;
+    td.status .oi:after {
+        margin-left: 6px;
+        content: attr(title);
         text-transform: uppercase;
-        font-family: sans-serif;
+        font-size: 19px;
     }
+}
 
-    table#vouchers {
-        td.id {
-            font-family: Georgia, Times, "Times New Roman", serif;
-            font-size: 22px;
-        }
+table td {
+    text-align: right;
+}
 
-        td.status .oi:after {
-            margin-left: 6px;
-            content: attr(title);
-            text-transform: uppercase;
-            font-size: 19px;
-        }
-    }
+table .actions {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
 
-    table td {
-        text-align: right;
-    }
+.pure-table td {
+    padding: 6px 12px;
+}
 
-    table .actions {
-        display: inline-block;
-        width: 100%;
-        text-align: center;
-    }
-
-    .pure-table td {
-        padding: 6px 12px;
-    }
-
-    .pure-table-horizontal td {
-        border-bottom: none;
-    }
+.pure-table-horizontal td {
+    border-bottom: none;
+}
 }
 
 .actions-collection {
@@ -385,4 +384,95 @@ form .description {
 .logged-in {
     align: right;
     float: right;
+}
+
+.pure-accordion-list {
+    padding-left: 0;
+
+    input[type=radio] {
+        position: absolute;
+        opacity: 0;
+    }
+
+    label {
+        position: relative;
+        display: block;
+        box-shadow: inset 0 -1px #555960;
+        color: #ffffff;
+    }
+
+    a {
+        display: block;
+    }
+
+    ul {
+        display: none;
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    input:checked + a + ul {
+        display: block;
+    }
+
+    .pure-accordion-link {
+        color: #777;
+    }
+
+    .pure-accordion-children {
+        background-color: #fff;
+    }
+
+    .pure-accordion-link,
+    .pure-accordion-disabled,
+    .pure-accordion-heading {
+        padding: .5em 1em;
+    }
+
+    .pure-accordion-disabled {
+        opacity: .5;
+    }
+
+    .pure-accordion-disabled .pure-accordion-link:hover {
+        background-color: transparent;
+    }
+
+    .pure-accordion-active > .pure-accordion-link,
+    .pure-accordion-link:hover,
+    .pure-accordion-link:focus {
+        background-color: #eee;
+    }
+
+    .pure-accordion-selected .pure-accordion-link,
+    .pure-accordion-selected .pure-accordion-link:visited {
+        color: #000;
+    }
+
+    .pure-accordion-heading, .pure-accordion-link {
+        display: block;
+        text-decoration: none;
+        white-space: nowrap
+    }
+}
+
+#menu .pure-accordion li a:focus,#menu .pure-accordion li a:hover {
+    background: #333
+}
+
+#menu .pure-accordion-heading,#menu .pure-accordion-selected {
+    background: #1f8dd6
+}
+
+#menu .pure-accordion-selected a {
+    color: #fff
+}
+
+#menu .pure-accordion-children a {
+    color: #333
+}
+
+#menu .pure-accordion-heading {
+    font-size: 110%;
+    color: #fff;
+    margin: 0
 }
