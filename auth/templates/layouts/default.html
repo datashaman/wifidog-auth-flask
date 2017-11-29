@@ -27,32 +27,27 @@
         </a>
 
         <div id="menu">
-            <div class="pure-accordion">
-                <a href="#" class="pure-accordion-heading">Auth</a>
+            <div class="pure-menu">
+                <a href="#" class="pure-menu-heading">Auth</a>
 
-                <ul class="pure-accordion-list">
+                <ul class="pure-menu-list">
                     {%- for item in current_menu.children recursive -%}
                     {%- if item.visible -%}
-                    <li class="pure-accordion-item{% if item.active %} pure-accordion-selected{% endif %}{% if item.children %} pure-accordion-has-children pure-accordion-allow-hover{% endif %}">
-                        <label>
-                            {% if loop.depth == 1 %}
-                            <input name="item-selected" type="radio" {% if item.active %}checked{% endif %}/>
-                            {% endif %}
-                            <a href="{{ item.url }}" class="pure-accordion-link">{{ item.text }}</a>
-                            {%- if item.children -%}
-                                <ul class="pure-accordion-children">
-                                    {{ loop(item.children) }}
-                                </ul>
-                            {%- endif -%}
-                        </label>
+                    <li class="pure-menu-item{% if item.active %} pure-menu-selected{% endif %}{% if item.children %} pure-menu-has-children pure-menu-allow-hover{% endif %}">
+                        <a href="{{ item.url }}" class="pure-menu-link">{{ item.text }}</a>
+                        {%- if item.children -%}
+                        <ul class="pure-menu-children">
+                            {{ loop(item.children) }}
+                        </ul>
+                        {%- endif -%}
                     </li>
                     {%- endif -%}
                     {%- endfor -%}
 
 
                     {% if current_user.is_authenticated %}
-                        <li class="pure-accordion-item">
-                            <a id="auth-logout" href="/logout" class="pure-accordion-link">Logout</a>
+                        <li class="pure-menu-item">
+                            <a id="auth-logout" href="/logout" class="pure-menu-link">Logout</a>
                         </li>
                     {% else %}
                         {% include 'security/_menu.html' %}

@@ -1,56 +1,51 @@
-from flask import url_for
 from tests import TestCase
 
 
 class TestVouchers(TestCase):
     def test_voucher_new_as_anonymous(self):
-        with self.app.test_request_context():
-            self.assertLogin(url_for('.vouchers_new'))
+        self.assertLogin('/new-voucher')
 
     def test_voucher_new_as_gateway(self):
-        with self.app.test_request_context():
-            self.login('main-gateway1@example.com', 'admin')
+        self.login('main-gateway1@example.com', 'admin')
 
-            response = self.client.get(url_for('.vouchers_new'), follow_redirects=True)
-            self.assertEqual(200, response.status_code)
+        response = self.client.get('/new-voucher', follow_redirects=True)
+        self.assertEqual(200, response.status_code)
 
-            html = self.get_html(response)
-            options = html.findall('//select[@id="gateway_id"]/option')
+        html = self.get_html(response)
+        options = html.findall('//select[@id="gateway_id"]/option')
 
-            self.assertEqual(1, len(options))
-            self.assertEqual('main-gateway1', options[0].get('value'))
+        self.assertEqual(1, len(options))
+        self.assertEqual('main-gateway1', options[0].get('value'))
 
     def test_voucher_new_as_network(self):
-        with self.app.test_request_context():
-            self.login('main-network@example.com', 'admin')
+        self.login('main-network@example.com', 'admin')
 
-            response = self.client.get(url_for('.vouchers_new'), follow_redirects=True)
-            self.assertEqual(200, response.status_code)
+        response = self.client.get('/new-voucher', follow_redirects=True)
+        self.assertEqual(200, response.status_code)
 
-            html = self.get_html(response)
-            options = html.findall('//select[@id="gateway_id"]/option')
+        html = self.get_html(response)
+        options = html.findall('//select[@id="gateway_id"]/option')
 
-            self.assertEqual(2, len(options))
+        self.assertEqual(2, len(options))
 
-            self.assertEqual('main-gateway1', options[0].get('value'))
-            self.assertEqual('main-gateway2', options[1].get('value'))
+        self.assertEqual('main-gateway1', options[0].get('value'))
+        self.assertEqual('main-gateway2', options[1].get('value'))
 
     def test_voucher_new_as_super(self):
-        with self.app.test_request_context():
-            self.login('super-admin@example.com', 'admin')
+        self.login('super-admin@example.com', 'admin')
 
-            response = self.client.get(url_for('.vouchers_new'), follow_redirects=True)
-            self.assertEqual(200, response.status_code)
+        response = self.client.get('/new-voucher', follow_redirects=True)
+        self.assertEqual(200, response.status_code)
 
-            html = self.get_html(response)
-            options = html.findall('//select[@id="gateway_id"]/option')
+        html = self.get_html(response)
+        options = html.findall('//select[@id="gateway_id"]/option')
 
-            self.assertEqual(4, len(options))
+        self.assertEqual(4, len(options))
 
-            self.assertEqual('main-gateway1', options[0].get('value'))
-            self.assertEqual('main-gateway2', options[1].get('value'))
-            self.assertEqual('other-gateway1', options[2].get('value'))
-            self.assertEqual('other-gateway2', options[3].get('value'))
+        self.assertEqual('main-gateway1', options[0].get('value'))
+        self.assertEqual('main-gateway2', options[1].get('value'))
+        self.assertEqual('other-gateway1', options[2].get('value'))
+        self.assertEqual('other-gateway2', options[3].get('value'))
 
     def test_voucher_index_as_anonymous(self):
         self.assertLogin('/vouchers')

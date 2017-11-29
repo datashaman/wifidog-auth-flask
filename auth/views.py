@@ -490,12 +490,12 @@ def currencies_edit(id):
     return resource_edit('currencies', id, CurrencyForm)
 
 
-@bp.route('/vouchers/new', methods=['GET', 'POST'])
+@bp.route('/new-voucher', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
     bp,
-    '.vouchers.new',
+    '.new-voucher',
     'New Voucher',
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
     order=0
