@@ -8,7 +8,7 @@ serve:
 	python serve.py
 
 serve-production:
-	gunicorn --reload -b '127.0.0.1:5000' 'app:create_app()'
+	gunicorn --reload -b '127.0.0.1:5000' 'auth:create_app()'
 
 db-reset:
 	rm -rf data/local.db
@@ -41,10 +41,10 @@ docker-prune-untagged:
 docker-prune: docker-prune-stopped docker-prune-untagged
 
 browser-sync:
-	browser-sync start --proxy http://127.0.0.1:5000 --files="app/**"
+	browser-sync start --proxy http://127.0.0.1:5000 --files="auth/**"
 
 lint:
-	pylint app
+	pylint auth
 
 bootstrap-local: bootstrap-tests
 	cp tests/tests.db data/local.db
@@ -54,13 +54,13 @@ bootstrap-tests:
 	TESTING=true $(PYTHON) manage.py bootstrap_tests
 
 watch:
-	while inotifywait -e close_write -r ./app ./tests; do make test; done
+	while inotifywait -e close_write -r ./auth ./tests; do make test; done
 
 test:
 	TESTING=true $(PYTHON) -m unittest discover -s tests
 
 coverage:
-	TESTING=true coverage run --include='app/*' -m unittest discover -s tests
+	TESTING=true coverage run --include='auth/*' -m unittest discover -s tests
 	coveralls
 
 setup:
@@ -87,10 +87,10 @@ reboot: remove-db bootstrap
 
 clean:
 	find . -name '*.pyc' -delete
-	rm -rf app/static/{fonts,scripts,styles}/*
+	rm -rf auth/static/{fonts,scripts,styles}/*
 
 graphs:
-	$(PYTHON) app/graphs.py
+	$(PYTHON) auth/graphs.py
 
 dot:
-	dot -Tpng -O app/graphs.dot && eog app/graphs.dot.png
+	dot -Tpng -O auth/graphs.dot && eog auth/graphs.dot.png
