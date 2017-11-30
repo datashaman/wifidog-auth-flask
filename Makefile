@@ -54,7 +54,7 @@ bootstrap-tests:
 	TESTING=true $(PYTHON) manage.py bootstrap_tests
 
 watch:
-	while inotifywait -e close_write -r ./auth ./tests; do make test; done
+	while inotifywait -e close_write -r ./auth/*.py ./auth/templates ./tests; do make test; done
 
 test:
 	TESTING=true $(PYTHON) -m unittest discover -s tests
