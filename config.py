@@ -18,9 +18,7 @@ if os.path.isfile(dotenv_path):
     with open(dotenv_path) as dotenv_file:
         load_env(read(dotenv_file))
 
-APP_VERSION = '0.8.0'
 DATABASE_CONNECTION_OPTIONS = {}
-DEBUG = asbool(os.environ.get('DEBUG', True))
 GOOGLE_ANALYTICS_TRACKING_ID = os.environ.get('GOOGLE_ANALYTICS_TRACKING_ID')
 GTM_CONTAINER_ID = os.environ.get('GTM_CONTAINER_ID')
 HOST = os.environ.get('HOST', '127.0.0.1')
