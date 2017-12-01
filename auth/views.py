@@ -25,6 +25,9 @@ from auth.forms import \
 from auth.models import Auth, Gateway, Network, Ping, Voucher, db
 # from auth.payu import get_transaction, set_transaction, capture
 from auth.resources import api
+from auth.services import \
+        environment_dump, \
+        healthcheck as healthcheck_service
 from auth.utils import is_logged_in, has_role
 
 from flask import \
@@ -42,6 +45,7 @@ from flask import \
 from flask_menu import register_menu
 from flask_potion.exceptions import ItemNotFound
 from flask_security import \
+    auth_token_required, \
     current_user, \
     login_required, \
     roles_accepted, \
@@ -733,6 +737,7 @@ def pay_cancel():
                            response=response,
                            basketAmount=basketAmount)
 
+
 @bp.route('/favicon.ico')
 def favicon():
     directory = os.path.join(current_app.root_path, 'static')
@@ -741,16 +746,24 @@ def favicon():
                                mimetype='image/vnd.microsoft.icon')
 
 
+@bp.route('/auth-token')
+@login_required
+def auth_token():
+    return current_user.get_auth_token()
+
+
+@bp.route('/healthcheck')
+@auth_token_required
+def healthcheck():
+    return healthcheck_service.check()
+
+
+@bp.route('/environment')
+@auth_token_required
+def environment():
+    return environment_dump.dump_environment()
+
+
 @bp.route('/')
 def home():
     return redirect(url_for('security.login'))
-
-
-@bp.route('/config')
-def config():
-    return current_app.config['SQLALCHEMY_DATABASE_URI']
-
-
-@bp.route('/debug')
-def debug():
-    return jsonify(dict(session))
