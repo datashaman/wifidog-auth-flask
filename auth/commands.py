@@ -222,14 +222,21 @@ def create_user(email, password, role, network=None, gateway=None, confirmed=Tru
 def create_roles(quiet=True):
     if Role.query.count() == 0:
         for name, description in six.iteritems(ROLES):
-            role = Role()
-            role.name = name
-            role.description = description
-            db.session.add(role)
-        db.session.commit()
-
+            create_role(name, description, quiet)
         if not quiet:
             print('Roles created')
+
+
+@manager.command
+def create_role(name, description, quiet=True):
+    role = Role()
+    role.name = name
+    role.description = description
+    db.session.add(role)
+    db.session.commit()
+
+    if not quiet:
+        print('Role created')
 
 
 @manager.command
