@@ -11,7 +11,8 @@ STAGE_LOGOUT = 'logout'
 ROLES = {
     u'super-admin': u'Super Admin',
     u'network-admin': u'Network Admin',
-    u'gateway-admin': u'Gateway Admin'
+    u'gateway-admin': u'Gateway Admin',
+    u'service': u'Service',
 }
 
 STATUS_ICONS = {
