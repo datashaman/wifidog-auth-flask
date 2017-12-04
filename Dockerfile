@@ -5,6 +5,7 @@ WORKDIR /var/app
 RUN apt-get update -q \
     && apt-get install -q -y --no-install-recommends \
         curl \
+        jq \
         nodejs \
         npm \
         python-pip \
