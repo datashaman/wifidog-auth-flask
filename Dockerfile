@@ -2,14 +2,15 @@ FROM ubuntu:artful
 
 WORKDIR /var/app
 
-RUN apt-get update -q && \
-    apt-get install -q -y --no-install-recommends \
+RUN apt-get update -q \
+    && apt-get install -q -y --no-install-recommends \
+        curl \
         nodejs \
         npm \
         python-pip \
         python-setuptools \
         tzdata && \
-    rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 RUN echo "SQLALCHEMY_DATABASE_URI=sqlite:////var/app/data/local.db" > .env
 
