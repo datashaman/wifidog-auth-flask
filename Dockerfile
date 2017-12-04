@@ -17,6 +17,7 @@ RUN echo "SQLALCHEMY_DATABASE_URI=sqlite:////var/app/data/local.db" > .env
 COPY \
     config.py \
     gulpfile.js \
+    healthcheck.sh \
     manage.py \
     package.json \
     package-lock.json \
