@@ -4,5 +4,5 @@ windows:
       layout: main-horizontal
       panes:
           - make watch
-          - make serve
+          - flask run
           - gulp serve

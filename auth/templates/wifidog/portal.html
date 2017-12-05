@@ -7,8 +7,8 @@
     {% include 'wifidog/_facebook.html' %}
 
     <div class="header">
-        {% if gateway.logo %}
-            <img src="/static/logos/{{ gateway.logo }}" alt="{{ gateway.title }}" />
+        {% if logo_url %}
+            <img src="{{ logo_url }}" alt="{{ gateway.title }}" />
         {% else %}
             <h1>{{ gateway.title }}</h1>
         {% endif %}

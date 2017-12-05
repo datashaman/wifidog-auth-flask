@@ -77,7 +77,7 @@ gulp.task('build', [ 'styles', 'scripts', 'fonts' ]);
 
 gulp.task('serve', [ 'build' ], function() {
     browserSync({
-        proxy: 'localhost:8080'
+        proxy: 'localhost:5000'
     });
 
     gulp.watch(vendorStyles.concat(siteStyles), [ 'styles' ]);

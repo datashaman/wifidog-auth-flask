@@ -24,7 +24,7 @@ from auth.forms import \
 
 from auth.models import Auth, Gateway, Network, Ping, Voucher, db
 # from auth.payu import get_transaction, set_transaction, capture
-from auth.resources import api
+from auth.resources import api, logos
 from auth.services import \
         environment_dump, \
         healthcheck as healthcheck_service
@@ -49,6 +49,7 @@ from flask_security import \
     login_required, \
     roles_accepted, \
     roles_required
+from PIL import Image
 
 
 bp = Blueprint('auth', __name__)
@@ -251,14 +252,37 @@ def gateways_index():
 @roles_accepted('super-admin', 'network-admin')
 def gateways_new():
     form = GatewayForm()
-    return resource_new('gateways', form)
+    if form.validate_on_submit():
+        form.logo.data = logos.save(request.files['logo'])
+        instance = api.resources['gateways'].manager.create(form.data)
+        flash('Create %s successful' % instance)
+        return redirect(url_for('.gateways_index'))
+    return render_template('gateways/new.html', form=form)
 
 
 @bp.route('/gateways/<id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin')
 def gateways_edit(id):
-    return resource_edit('gateways', id, GatewayForm)
+    gateway = read_or_404('gateways', id)
+    form = GatewayForm(obj=gateway)
+    if form.validate_on_submit():
+        filename = form.logo.data = logos.save(request.files['logo'], name='%s.' % form.id.data)
+
+        im = Image.open(logos.path(filename))
+        im.thumbnail((300, 300), Image.ANTIALIAS)
+        im.save(logos.path(filename))
+
+        gateway = api.resources['gateways'].manager.update(gateway, form.data)
+        flash('Update %s successful' % gateway)
+        return redirect(url_for('.gateways_index'))
+    logo_url = None
+    if gateway.logo:
+        logo_url = logos.url(gateway.logo)
+    return render_template('gateways/edit.html',
+                           form=form,
+                           instance=gateway,
+                           logo_url=logo_url)
 
 
 @bp.route('/gateways/<id>/delete', methods=['GET', 'POST'])
@@ -709,8 +733,12 @@ def wifidog_portal():
     if gateway_id is None:
         abort(404)
     gateway = Gateway.query.filter_by(id=gateway_id).first_or_404()
+    logo_url = None
+    if gateway.logo:
+        logo_url = logos.url(gateway.logo)
     return render_template('wifidog/portal.html',
                            gateway=gateway,
+                           logo_url=logo_url,
                            voucher=voucher)
 
 

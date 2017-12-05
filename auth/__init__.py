@@ -59,7 +59,7 @@ def create_app(config=None):
     principal = Principal()
     principal.init_app(app)
 
-    configure_uploads(app, logos)
+    configure_uploads(app, (logos,))
     app.register_blueprint(bp)
 
     @identity_loaded.connect_via(app)

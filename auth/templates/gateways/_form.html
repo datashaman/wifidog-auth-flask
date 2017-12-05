@@ -10,9 +10,12 @@
     {{ group(form.subtitle) }}
     {{ group(form.description) }}
 
-    {% if instance.logo %}
-        <img src="/static/logos/{{ instance.logo }}" />
+    {% if logo_url %}
+        <div class="pure-controls">
+            <img src="{{ logo_url }}" />
+        </div>
     {% endif %}
+
     {{ group(form.logo) }}
 
     {{ group(form.contact_email) }}
