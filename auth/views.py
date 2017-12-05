@@ -100,7 +100,11 @@ def resource_instance(resource, id):
 
 def resource_instances(resource):
     """Return instances"""
-    return resource_query(resource).all()
+    query = resource_query(resource)
+    if resource == 'vouchers':
+        return query.order_by(Voucher.status.desc(), Voucher.created_at)
+    else:
+        return query.all()
 
 
 def resource_index(resource, form=None):
