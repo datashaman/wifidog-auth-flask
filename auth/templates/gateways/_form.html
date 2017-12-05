@@ -10,6 +10,11 @@
     {{ group(form.subtitle) }}
     {{ group(form.description) }}
 
+    {% if instance.logo %}
+        <img src="/static/logos/{{ instance.logo }}" />
+    {% endif %}
+    {{ group(form.logo) }}
+
     {{ group(form.contact_email) }}
     {{ group(form.contact_phone) }}
     {{ group(form.url_home) }}

@@ -3,9 +3,9 @@ from __future__ import absolute_import
 from auth.utils import args_get
 from flask_security import current_user
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, HiddenField, PasswordField, StringField, IntegerField, SelectField, validators
+from wtforms import BooleanField, HiddenField, PasswordField, StringField, IntegerField, SelectField, fields as f, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
-from wtforms.ext.sqlalchemy.orm import model_form
+from wtforms.ext.sqlalchemy.orm import converts, model_form, ModelConverter
 
 from auth.models import db, Category, Country, Currency, Gateway, Network, Product, Voucher, Role
 from auth.resources import api
@@ -75,6 +75,17 @@ CurrencyForm = model_form(
     ],
     exclude_pk=False
 )
+
+
+class GatewayConverter(ModelConverter):
+    @converts('String', 'Unicode')
+    def conv_String(self, field_args, **extra):
+        if extra['column'].name == 'logo':
+            return f.FileField(**field_args)
+        else:
+            return ModelConverter.conv_String(self, field_args, **extra)
+
+
 GatewayForm = model_form(
     Gateway,
     db.session,
@@ -96,7 +107,8 @@ GatewayForm = model_form(
             'default': lambda: current_user.network,
             'query_factory': instances('networks'),
         }
-    }
+    },
+    converter=GatewayConverter()
 )
 NetworkForm = model_form(
     Network,
