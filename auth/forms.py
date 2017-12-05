@@ -103,6 +103,9 @@ GatewayForm = model_form(
     ],
     exclude_pk=False,
     field_args={
+        'logo': {
+            'description': 'Images only, resampled down to 300 x 300 pixels.',
+        },
         'network': {
             'default': lambda: current_user.network,
             'query_factory': instances('networks'),
