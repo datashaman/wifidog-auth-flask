@@ -15,7 +15,7 @@ class TestMine(TestCase):
         self.login('main-gateway1@example.com', 'admin')
         html = self.assertOk('/gateway')
         response = self.client.post(html.find('//form').get('action'), data={'id': 'main-gateway1', 'title': 'Another Title'}, follow_redirects=True)
-        assert 'Update Main Gateway #1 successful' in str(response.get_data())
+        assert 'Update Another Title successful' in str(response.get_data())
 
     def test_my_network_as_gateway(self):
         self.login('main-gateway1@example.com', 'admin')
