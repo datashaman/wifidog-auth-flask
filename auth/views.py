@@ -205,7 +205,12 @@ def my_network():
 )
 def my_gateway():
     gateway = current_user.gateway
-    return _gateways_edit(gateway, 'My Gateway', url_for('.my_gateway'), url_for('.home'))
+    return _gateways_edit(
+        gateway,
+        'My Gateway',
+        url_for('.my_gateway'),
+        url_for('.home')
+    )
 
 
 @bp.route('/user', methods=['GET', 'POST'])
@@ -325,7 +330,12 @@ def _gateways_edit(gateway, page_title, action_url, redirect_url):
 @roles_accepted('super-admin', 'network-admin')
 def gateways_edit(id):
     gateway = Gateway.query.filter_by(id=id).first_or_404()
-    return _gateways_edit(gateway, 'Edit Gateway', url_for('.gateways_edit', id=id), url_for('.gateways_index'))
+    return _gateways_edit(
+        gateway,
+        'Edit Gateway',
+        url_for('.gateways_edit', id=id),
+        url_for('.gateways_index')
+    )
 
 
 @bp.route('/gateways/<id>/delete', methods=['GET', 'POST'])
