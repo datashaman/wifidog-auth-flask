@@ -148,7 +148,7 @@ class UserForm(FlaskForm):
         ]
     )
     confirm = PasswordField('Repeat Password')
-    active = BooleanField('Active')
+    active = BooleanField('Active', default=True)
     roles = QuerySelectMultipleField('Roles', query_factory=roles)
 
 class MyUserForm(FlaskForm):

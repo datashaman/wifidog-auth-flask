@@ -1,12 +1,10 @@
 {% extends 'layouts/default.html' %}
-{% import 'helpers/render.html' as render %}
 
 {% set page_title = 'New Gateway' %}
 
 {% block content %}
     <div class="content">
         <form method="post" action={{ url_for('.gateways_new') }} class="pure-form pure-form-aligned">
-            {{ form.csrf_token }}
             {% include 'gateways/_form.html' %}
         </form>
     </div>

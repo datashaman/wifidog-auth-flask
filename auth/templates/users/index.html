@@ -2,40 +2,11 @@
 {% import 'helpers/render.html' as render %}
 
 {% set page_title = 'Users' %}
+{% set new_title = 'New User' %}
+{% set new_url = url_for('.users_new') %}
 
 {% set show_network = current_user.has_role('super-admin') %}
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
-
-{% block header %}
-    <div class="header">
-        {% if current_user.is_authenticated %}
-            <div class="logged-in">
-                Logged in as <em>{{ current_user }}</em>.
-            </div>
-        {% endif %}
-
-        <h1>{{ page_title }}</h1>
-
-        <div class="actions-collection">
-            <form class="pure-form" method="post" action="{{ url_for('.users_new') }}">
-                <fieldset>
-                    {% if show_network %}
-                        {{ form.network }}
-                    {% endif %}
-                    {% if show_gateway %}
-                        {{ form.gateway }}
-                    {% endif %}
-                    {{ form.email }}
-                    {{ form.password(autocomplete="off") }}
-                    <button type="submit" class="pure-button pure-button-primary">
-                        <span class="oi" data-glyph="file" title="Create" aria-hidden="true"></span>
-                        Create
-                    </button>
-                </fieldset>
-            </form>
-        </div>
-    </div>
-{% endblock %}
 
 {% block content %}
     <div class="content">

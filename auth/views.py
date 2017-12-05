@@ -35,7 +35,6 @@ from flask import \
     abort, \
     current_app, \
     flash, \
-    jsonify, \
     redirect, \
     request, \
     render_template, \
@@ -84,9 +83,8 @@ def resource_index(resource, form=None):
                            instances=instances)
 
 
-def resource_new(resource, form_class):
+def resource_new(resource, form):
     """Handle a new resource request"""
-    form = form_class()
     if form.validate_on_submit():
         instance = api.resources[resource].manager.create(form.data)
         flash('Create %s successful' % instance)
@@ -217,7 +215,8 @@ def networks_index():
 @login_required
 @roles_required('super-admin')
 def networks_new():
-    return resource_new('networks', NetworkForm)
+    form = NetworkForm()
+    return resource_new('networks', form)
 
 
 @bp.route('/networks/<id>', methods=['GET', 'POST'])
@@ -249,9 +248,10 @@ def gateways_index():
 
 @bp.route('/gateways/new', methods=['GET', 'POST'])
 @login_required
-@roles_required('super-admin')
+@roles_accepted('super-admin', 'network-admin')
 def gateways_new():
-    return resource_new('gateways', GatewayForm)
+    form = GatewayForm()
+    return resource_new('gateways', form)
 
 
 @bp.route('/gateways/<id>', methods=['GET', 'POST'])
@@ -263,7 +263,7 @@ def gateways_edit(id):
 
 @bp.route('/gateways/<id>/delete', methods=['GET', 'POST'])
 @login_required
-@roles_required('super-admin')
+@roles_accepted('super-admin', 'network-admin')
 def gateways_delete(id):
     return resource_delete('gateways', id)
 
@@ -285,9 +285,14 @@ def users_index():
 
 @bp.route('/users/new', methods=['GET', 'POST'])
 @login_required
-@roles_accepted('super-admin', 'network-admin')
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def users_new():
-    return resource_new('users', UserForm)
+    form = UserForm()
+
+    if current_user.has_role('gateway-admin'):
+        del form.roles
+
+    return resource_new('users', form)
 
 
 @bp.route('/users/<id>', methods=['GET', 'POST'])
@@ -328,7 +333,7 @@ def users_edit(id):
 
 @bp.route('/users/<id>/delete', methods=['GET', 'POST'])
 @login_required
-@roles_accepted('super-admin', 'network-admin')
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def users_delete(id):
     return resource_delete('users', id)
 
@@ -372,7 +377,8 @@ def categories_index():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def categories_new():
-    return resource_new('categories', CategoryForm)
+    form = CategoryForm()
+    return resource_new('categories', form)
 
 
 @bp.route('/categories/<id>/delete', methods=['GET', 'POST'])
@@ -407,7 +413,8 @@ def products_index():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def products_new():
-    return resource_new('products', ProductForm)
+    form = ProductForm()
+    return resource_new('products', form)
 
 
 @bp.route('/products/<id>/delete', methods=['GET', 'POST'])
@@ -442,7 +449,8 @@ def countries_index():
 @login_required
 @roles_accepted('super-admin')
 def countries_new():
-    return resource_new('countries', CountryForm)
+    form = CountryForm()
+    return resource_new('countries', form)
 
 
 @bp.route('/countries/<id>/delete', methods=['GET', 'POST'])
@@ -477,7 +485,8 @@ def currencies_index():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def currencies_new():
-    return resource_new('currencies', CurrencyForm)
+    form = CurrencyForm()
+    return resource_new('currencies', form)
 
 
 @bp.route('/currencies/<id>/delete', methods=['GET', 'POST'])
