@@ -95,14 +95,17 @@ def resource_query(resource):
 
 def resource_instance(resource, id):
     """Return instances"""
-    return resource_query(resource).filter_by(id=id).first_or_404()
+    model = RESOURCE_MODELS[resource]
+    return resource_query(resource).filter(model.id == id).first_or_404()
 
 
 def resource_instances(resource):
     """Return instances"""
     query = resource_query(resource)
     if resource == 'vouchers':
-        return query.order_by(Voucher.status, Voucher.created_at.desc()).all()
+        return (query.filter(Voucher.status != 'archived')
+                     .order_by(Voucher.status, Voucher.created_at.desc())
+                     .all())
     else:
         return query.all()
 
