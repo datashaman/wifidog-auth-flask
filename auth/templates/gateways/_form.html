@@ -10,9 +10,9 @@
     {{ group(form.subtitle) }}
     {{ group(form.description) }}
 
-    {% if logo_url %}
+    {% if logos and form.logo.data %}
         <div class="pure-controls">
-            <img src="{{ logo_url }}" />
+            <img src="{{ logos.url(form.logo.data) }}" />
         </div>
     {% endif %}
 

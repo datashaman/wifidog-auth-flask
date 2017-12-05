@@ -1,5 +1,7 @@
 {% from 'helpers/form.html' import group %}
 
+{{ form.csrf_token }}
+
 <fieldset>
     {{ group(form.id) }}
     {{ group(form.title) }}

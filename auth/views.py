@@ -22,9 +22,9 @@ from auth.forms import \
     ProductForm, \
     UserForm
 
-from auth.models import Auth, Gateway, Network, Ping, Voucher, db
+from auth.models import Auth, Category, Country, Currency, Gateway, Network, Ping, Product, User, Voucher, db
 # from auth.payu import get_transaction, set_transaction, capture
-from auth.resources import api, logos
+from auth.resources import logos
 from auth.services import \
         environment_dump, \
         healthcheck as healthcheck_service
@@ -47,12 +47,22 @@ from flask_security import \
     auth_token_required, \
     current_user, \
     login_required, \
-    roles_accepted, \
-    roles_required
+    roles_accepted
 from PIL import Image
 
 
 bp = Blueprint('auth', __name__)
+
+RESOURCE_MODELS = {
+    'categories': Category,
+    'countries': Country,
+    'currencies': Currency,
+    'gateways': Gateway,
+    'networks': Network,
+    'products': Product,
+    'users': User,
+    'vouchers': Voucher,
+}
 
 
 def generate_token():
@@ -60,20 +70,37 @@ def generate_token():
     return uuid.uuid4().hex
 
 
-def read_or_404(resource, id):
-    """
-    Return instance found via resource manager,
-    abort with 404 if not found
-    """
-    try:
-        return api.resources[resource].manager.read(id)
-    except ItemNotFound:
-        abort(404)
+def resource_query(resource):
+    """Generate a filtered query for a resource"""
+    model = RESOURCE_MODELS[resource]
+    query = model.query
+
+    if current_user.has_role('network-admin') or current_user.has_role('gateway-admin'):
+        if model == Network:
+            query = query.filter_by(id=current_user.network_id)
+        elif model in [ Gateway, User ]:
+            query = query.filter_by(network_id=current_user.network_id)
+
+    if current_user.has_role('network-admin'):
+        if model == Voucher:
+            query = query.join(Voucher.gateway).join(Gateway.network).filter(Network.id == current_user.network_id)
+
+    if current_user.has_role('gateway-admin'):
+        if model == Gateway:
+            query = query.filter_by(id=current_user.gateway_id)
+        elif model in [ User, Voucher ]:
+            query = query.filter_by(gateway_id=current_user.gateway_id)
+
+    return query
+
+def resource_instance(resource, id):
+    """Return instances"""
+    return resource_query(resource).filter_by(id=id).first_or_404()
 
 
 def resource_instances(resource):
-    """Return instances found via resource manager"""
-    return api.resources[resource].manager.instances()
+    """Return instances"""
+    return resource_query(resource).all()
 
 
 def resource_index(resource, form=None):
@@ -87,17 +114,21 @@ def resource_index(resource, form=None):
 def resource_new(resource, form):
     """Handle a new resource request"""
     if form.validate_on_submit():
-        instance = api.resources[resource].manager.create(form.data)
+        instance = RESOURCE_MODELS[resource]()
+        form.populate_obj(instance)
+        db.session.add(instance)
+        db.session.commit()
         flash('Create %s successful' % instance)
         return redirect(url_for('.%s_index' % resource))
     return render_template('%s/new.html' % resource, form=form)
 
 
 def resource_edit(resource, id, form_class):
-    instance = read_or_404(resource, id)
+    instance = resource_instance(resource, id)
     form = form_class(obj=instance)
     if form.validate_on_submit():
-        instance = api.resources[resource].manager.update(instance, form.data)
+        form.populate_obj(instance)
+        db.session.commit()
         flash('Update %s successful' % instance)
         return redirect(url_for('.%s_index' % resource))
     return render_template('%s/edit.html' % resource,
@@ -106,9 +137,10 @@ def resource_edit(resource, id, form_class):
 
 
 def resource_delete(resource, id):
-    instance = read_or_404(resource, id)
+    instance = resource_instance(resource, id)
     if request.method == 'POST':
-        api.resources[resource].manager.delete(instance)
+        db.session.delete(instance)
+        db.session.commit()
         flash('Delete %s successful' % instance)
         return redirect(url_for('.%s_index' % resource))
     return render_template('shared/delete.html',
@@ -117,10 +149,11 @@ def resource_delete(resource, id):
 
 
 def resource_action(resource, id, action):
-    instance = read_or_404(resource, id)
+    instance = resource_instance(resource, id)
     if request.method == 'POST':
         if action in constants.ACTIONS[resource]:
-            getattr(api.resources[resource].manager, action)(instance)
+            getattr(instance, action)()
+            db.session.commit()
             flash('%s %s successful' % (instance, action))
             return redirect(url_for('.%s_index' % resource))
         else:
@@ -164,15 +197,8 @@ def my_network():
     order=998
 )
 def my_gateway():
-    form = GatewayForm(obj=current_user.gateway)
-    if form.validate_on_submit():
-        form.populate_obj(current_user.gateway)
-        db.session.commit()
-        flash('Update successful')
-        return redirect('/')
-    return render_template('gateways/current.html',
-                           form=form,
-                           instance=current_user.gateway)
+    gateway = current_user.gateway
+    return _gateways_edit(gateway, 'My Gateway', url_for('.home'))
 
 
 @bp.route('/user', methods=['GET', 'POST'])
@@ -214,7 +240,7 @@ def networks_index():
 
 @bp.route('/networks/new', methods=['GET', 'POST'])
 @login_required
-@roles_required('super-admin')
+@roles_accepted('super-admin')
 def networks_new():
     form = NetworkForm()
     return resource_new('networks', form)
@@ -222,14 +248,14 @@ def networks_new():
 
 @bp.route('/networks/<id>', methods=['GET', 'POST'])
 @login_required
-@roles_required('super-admin')
+@roles_accepted('super-admin')
 def networks_edit(id):
     return resource_edit('networks', id, NetworkForm)
 
 
 @bp.route('/networks/<id>/delete', methods=['GET', 'POST'])
 @login_required
-@roles_required('super-admin')
+@roles_accepted('super-admin')
 def networks_delete(id):
     return resource_delete('networks', id)
 
@@ -246,6 +272,14 @@ def networks_delete(id):
 def gateways_index():
     return resource_index('gateways')
 
+def handle_logo(form):
+    if request.files['logo']:
+        filename = form.logo.data = logos.save(request.files['logo'], name='%s.' % form.id.data)
+        im = Image.open(logos.path(filename))
+        im.thumbnail((300, 300), Image.ANTIALIAS)
+        im.save(logos.path(filename))
+    else:
+        del form.logo
 
 @bp.route('/gateways/new', methods=['GET', 'POST'])
 @login_required
@@ -253,36 +287,37 @@ def gateways_index():
 def gateways_new():
     form = GatewayForm()
     if form.validate_on_submit():
-        form.logo.data = logos.save(request.files['logo'])
-        instance = api.resources['gateways'].manager.create(form.data)
-        flash('Create %s successful' % instance)
+        handle_logo(form)
+        gateway = Gateway()
+        form.populate_obj(gateway)
+        db.session.add(gateway)
+        db.session.commit()
+        flash('Create %s successful' % gateway)
         return redirect(url_for('.gateways_index'))
     return render_template('gateways/new.html', form=form)
+
+
+def _gateways_edit(gateway, page_title, redirect_url):
+    form = GatewayForm(obj=gateway)
+    if form.validate_on_submit():
+        handle_logo(form)
+        form.populate_obj(gateway)
+        db.session.commit()
+        flash('Update %s successful' % gateway)
+        return redirect(redirect_url)
+    return render_template('gateways/edit.html',
+                           form=form,
+                           instance=gateway,
+                           logos=logos,
+                           page_title=page_title)
 
 
 @bp.route('/gateways/<id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin')
 def gateways_edit(id):
-    gateway = read_or_404('gateways', id)
-    form = GatewayForm(obj=gateway)
-    if form.validate_on_submit():
-        filename = form.logo.data = logos.save(request.files['logo'], name='%s.' % form.id.data)
-
-        im = Image.open(logos.path(filename))
-        im.thumbnail((300, 300), Image.ANTIALIAS)
-        im.save(logos.path(filename))
-
-        gateway = api.resources['gateways'].manager.update(gateway, form.data)
-        flash('Update %s successful' % gateway)
-        return redirect(url_for('.gateways_index'))
-    logo_url = None
-    if gateway.logo:
-        logo_url = logos.url(gateway.logo)
-    return render_template('gateways/edit.html',
-                           form=form,
-                           instance=gateway,
-                           logo_url=logo_url)
+    gateway = Gateway.query.filter_by(id=id).first_or_404()
+    return _gateways_edit(gateway, 'Edit Gateway', url_for('.gateways_index'))
 
 
 @bp.route('/gateways/<id>/delete', methods=['GET', 'POST'])
@@ -323,7 +358,7 @@ def users_new():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def users_edit(id):
-    instance = read_or_404('users', id)
+    instance = resource_instance('users', id)
 
     if (current_user.has_role('network-admin')
             and instance.network != current_user.network):

@@ -131,7 +131,7 @@ class GatewayResource(PrincipalResource):
         permissions = {
             'read': gateway_or_above,
             'create': network_or_above,
-            'update': network_or_above,
+            'update': gateway_or_above,
             'delete': network_or_above,
         }
         read_only_fields = ('created_at', 'updated_at')
@@ -153,12 +153,8 @@ class GatewayResource(PrincipalResource):
             })
 
             im = Image.open(logos.path(filename))
-
-            static_folder = os.path.abspath(os.path.dirname(__file__) + '/static/logos')
-            mkdir_p(static_folder)
-
             im.thumbnail((300, 300), Image.ANTIALIAS)
-            im.save(static_folder + '/' + filename)
+            im.save(logos.path(filename))
 
 class NetworkResource(PrincipalResource):
     gateways = Relation('gateways')
@@ -174,7 +170,7 @@ class NetworkResource(PrincipalResource):
         permissions = {
             'read': gateway_or_above,
             'create': super_admin_only,
-            'update': super_admin_only,
+            'update': network_or_above,
             'delete': super_admin_only,
         }
         read_only_fields = ('created_at', 'updated_at')

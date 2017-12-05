@@ -3,6 +3,8 @@
 {% set show_network = current_user.has_role('super-admin') %}
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
 
+{{ form.csrf_token }}
+
 <fieldset>
     {% if form.network and show_network %}
         {{ group(form.network) }}
