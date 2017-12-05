@@ -102,7 +102,7 @@ def resource_instances(resource):
     """Return instances"""
     query = resource_query(resource)
     if resource == 'vouchers':
-        return query.order_by(Voucher.status.desc(), Voucher.created_at).all()
+        return query.order_by(Voucher.status, Voucher.created_at.desc()).all()
     else:
         return query.all()
 
