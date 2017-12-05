@@ -40,7 +40,7 @@ def available_actions(status, interface):
                 result[action] = defn
         return result
 
-    return []
+    return {}
 
 states = {}
 
