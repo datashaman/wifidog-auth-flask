@@ -338,21 +338,6 @@ class Auth(db.Model):
         else:
             return (constants.AUTH_ERROR, 'Unknown stage: %s' % self.stage)
 
-class Ping(db.Model):
-    __tablename__ = 'pings'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_agent = db.Column(db.String(255))
-
-    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'), nullable=False)
-    gateway = db.relationship(Gateway, backref=backref('pings', lazy='dynamic'))
-
-    sys_uptime = db.Column(db.BigInteger)
-    sys_memfree = db.Column(db.BigInteger)
-    sys_load = db.Column(db.String)
-    wifidog_uptime = db.Column(db.BigInteger)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
-
 class Change(db.Model):
     __tablename__ = 'changes'
 

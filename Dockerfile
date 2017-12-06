@@ -1,5 +1,7 @@
 FROM ubuntu:artful
 
+ARG XDG_CACHE_HOME=/cache
+
 WORKDIR /var/app
 
 RUN apt-get update -q \
@@ -26,8 +28,8 @@ COPY \
 
 COPY auth auth/
 
-RUN pip install -r requirements.txt && rm -rf /root/.cache requirements.txt
-RUN npm install && rm -rf /root/.npm
+RUN pip install -r requirements.txt && rm requirements.txt
+RUN npm config set cache "${XDG_CACHE_HOME}/npm" && npm install
 RUN node_modules/.bin/gulp && rm -rf auth/assets gulpfile.js node_modules package.json package-lock.json
 RUN rm -rf /tmp/* /usr/share/doc /usr/share/info
 

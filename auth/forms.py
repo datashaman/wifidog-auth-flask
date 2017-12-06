@@ -95,7 +95,6 @@ GatewayForm = model_form(
         'created_at',
         'categories',
         'orders',
-        'pings',
         'products',
         'updated_at',
         'users',
