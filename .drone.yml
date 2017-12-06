@@ -7,17 +7,16 @@ pipeline:
   restore-cache:
     image: drillster/drone-volume-cache
     restore: true
-    mount:
-      - ./cache
+    mount: /tmp/cache
     volumes:
-      - /tmp/drone-cache:/cache
+    - /tmp/cache:/tmp/cache
   test:
     image: python:${PYTHON_VERSION}-slim-jessie
     commands:
     - pip install -r requirements.txt
     - python -m unittest discover -s tests
     environment:
-    - XDG_CACHE_HOME=./cache
+    - XDG_CACHE_HOME=/tmp/cache
     - TESTING=true
     when:
       event: push
@@ -25,10 +24,12 @@ pipeline:
     image: plugins/docker
     repo: datashaman/wifidog-auth-flask
     tags: ${DRONE_COMMIT_BRANCH/master/latest}
+    environment:
+    - XDG_CACHE_HOME=/tmp/cache
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    - /tmp/cache:/tmp/cache
+    - /var/run/docker.sock:/var/run/docker.sock
     privileged: true
-    keep_build: true
     when:
       event: push
       matrix:
@@ -37,10 +38,9 @@ pipeline:
   rebuild-cache:
     image: drillster/drone-volume-cache
     rebuild: true
-    mount:
-      - ./cache
+    mount: /tmp/cache
     volumes:
-      - /tmp/drone-cache:/cache
+    - /tmp/cache:/tmp/cache
   notify:
     image: plugins/slack
     channel: ci
