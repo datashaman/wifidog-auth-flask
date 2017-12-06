@@ -27,6 +27,7 @@ pipeline:
     tags: ${DRONE_COMMIT_BRANCH/master/latest}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    privileged: true
     keep_build: true
     when:
       event: push
