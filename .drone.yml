@@ -28,7 +28,7 @@ pipeline:
     environment:
     - XDG_CACHE_HOME=/cache
     volumes:
-    - ./cache:/cache
+    - /cache:/cache
     - /var/run/docker.sock:/var/run/docker.sock
     privileged: true
     when:
