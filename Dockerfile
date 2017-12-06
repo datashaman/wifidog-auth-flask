@@ -25,7 +25,7 @@ COPY \
 COPY auth auth/
 
 RUN pip install -r requirements.txt && rm requirements.txt
-RUN npm install && rm -rf /root/.npm
+RUN npm config set cache ./cache/npm && npm install
 RUN node_modules/.bin/gulp && rm -rf auth/assets gulpfile.js node_modules package.json package-lock.json
 RUN rm -rf /tmp/* /usr/share/doc /usr/share/info
 
