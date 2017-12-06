@@ -284,7 +284,7 @@ class Auth(db.Model):
         if voucher.ip is None:
             voucher.ip = flask.request.args.get('ip')
 
-        if voucher.status in [ 'archived', 'ended', 'expired' ]:
+        if voucher.status in ['archived', 'blocked', 'ended', 'expired']:
             return (constants.AUTH_DENIED, 'Requested token is the wrong status: %s' % self.token)
 
         if self.stage == constants.STAGE_LOGIN:
