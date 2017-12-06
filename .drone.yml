@@ -28,15 +28,11 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     keep_build: true
-    environment:
-    - DOCKER_CONTENT_TRUST=1
     when:
       event: push
       matrix:
         PYTHON_VERSION: 3.6
     secrets:
-    - docker_content_trust_repository_passphrase
-    - docker_content_trust_root_passphrase
     - docker_password
     - docker_username
   rebuild-cache:
