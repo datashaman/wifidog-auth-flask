@@ -12,8 +12,6 @@ RUN apt-get update -q \
         tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo "SQLALCHEMY_DATABASE_URI=sqlite:////var/app/data/local.db" > .env
-
 COPY \
     config.py \
     gulpfile.js \
