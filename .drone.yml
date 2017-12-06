@@ -30,6 +30,8 @@ pipeline:
     - /var/run/docker.sock:/var/run/docker.sock
     build_args:
     - XDG_CACHE_HOME=/cache
+    environment:
+    - XDG_CACHE_HOME=/cache
     privileged: true
     when:
       event: push
