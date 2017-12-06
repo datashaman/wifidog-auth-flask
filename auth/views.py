@@ -22,7 +22,7 @@ from auth.forms import \
     ProductForm, \
     UserForm
 
-from auth.models import Auth, Category, Country, Currency, Gateway, Network, Ping, Product, User, Voucher, db
+from auth.models import Auth, Category, Country, Currency, Gateway, Network, Product, User, Voucher, db
 # from auth.payu import get_transaction, set_transaction, capture
 from auth.resources import logos
 from auth.services import \
@@ -692,43 +692,6 @@ def wifidog_login():
 
 @bp.route('/wifidog/ping/')
 def wifidog_ping():
-    ping = Ping(
-        user_agent=request.user_agent.string,
-        gateway_id=request.args.get('gw_id'),
-        sys_uptime=request.args.get('sys_uptime'),
-        sys_memfree=request.args.get('sys_memfree'),
-        sys_load=request.args.get('sys_load'),
-        wifidog_uptime=request.args.get('wifidog_uptime')
-    )
-
-    db.session.add(ping)
-    db.session.commit()
-
-    def generate_point(measurement):
-        return {
-            "measurement": measurement,
-            "tags": {
-                "source": "ping",
-                "network_id": ping.gateway.network_id,
-                "gateway_id": ping.gateway_id,
-                "user_agent": ping.user_agent,
-            },
-            "time": ping.created_at,
-            "fields": {
-                "value": getattr(ping, measurement),
-            }
-        }
-
-    # points = [
-    #     generate_point(m) for m in [
-    #         'sys_uptime',
-    #         'sys_memfree',
-    #         'sys_load',
-    #         'wifidog_uptime'
-    #     ]
-    # ]
-    # influx_db.connection.write_points(points)
-
     return ('Pong', 200)
 
 
