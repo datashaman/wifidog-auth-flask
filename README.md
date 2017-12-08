@@ -100,5 +100,3 @@ Copy the sample .env file to its correct place (and edit it to suit your needs):
 Sensitive config is kept in the .env file, non-sensitive config is in config.py.
 
 Please read the Makefile for many useful development shortcuts.
-
-Add a line.
