@@ -5,6 +5,7 @@
 __pycache__/
 /bootstrap.py
 /build/
+/_cacache/
 /.cache/
 /.coverage
 /dist/
