@@ -26,7 +26,7 @@ docker-prepare: clean
 docker-build: docker-prepare
 	docker build -t $(TAG) .
 
-docker-push: db-reset
+docker-push:
 	docker push $(TAG)
 
 docker-run:
