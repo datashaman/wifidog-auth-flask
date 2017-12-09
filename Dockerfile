@@ -26,10 +26,11 @@ COPY \
     requirements.txt \
     ./
 
-COPY auth auth/
-
 RUN pip install -r requirements.txt && rm requirements.txt
 RUN npm config set cache "${XDG_CACHE_HOME}/npm" && npm install
+
+COPY auth auth/
+
 RUN node_modules/.bin/gulp && rm -rf auth/assets gulpfile.js node_modules package.json package-lock.json
 RUN rm -rf /tmp/* /usr/share/doc /usr/share/info
 
