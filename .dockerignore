@@ -13,6 +13,8 @@
 .gitchangelog.rc
 .gitignore
 .pylintrc
+auth/static/uploads
+data
 Dockerfile
 dependencyci.yml
 deploy.sh
