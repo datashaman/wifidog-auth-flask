@@ -32,6 +32,7 @@ pipeline:
     - XDG_CACHE_HOME=/cache
     environment:
     - XDG_CACHE_HOME=/cache
+    purge: false
     privileged: true
     when:
       event: push
