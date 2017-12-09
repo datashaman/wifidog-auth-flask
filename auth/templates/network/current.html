@@ -1,0 +1,11 @@
+{% extends 'layouts/default.html' %}
+
+{% set page_title = 'My Network' %}
+
+{% block content %}
+    <div class="content">
+        <form method="post" action={{ url_for('.my_network') }} class="pure-form pure-form-aligned">
+            {% include 'network/_form.html' %}
+        </form>
+    </div>
+{% endblock %}

@@ -1,27 +1,7 @@
-{% macro bytes(bytes) %}
-    {{ (bytes / 1024 / 1024)|int }}
-{% endmacro %}
-
-{% macro render(attribute, def='-') %}
-    {{ attribute | default(def) }}
-{% endmacro %}
-
-{% macro date(dt) %}
-    {{ dt | local_datetime('%F') if dt }}
-{% endmacro %}
-
-{% macro datetime(dt) %}
-    {{ dt | local_datetime('%F %H:%M') if dt }}
-{% endmacro %}
-
-{% macro time(dt) %}
-    {{ dt | local_datetime('%H:%M') if dt }}
-{% endmacro %}
-
 {% macro times(row) %}
-    {{ time(row.created_at) }}
+    {{ row.created_at | timeformat('short') }}
     {% if row.started_at %}
-        {{ time(row.started_at) }}
-        {{ time(row.end_at) }}
+        {{ row.started_at | timeformat('short') }}
+        {{ row.end_at | timeformat('short') }}
     {% endif %}
 {% endmacro %}

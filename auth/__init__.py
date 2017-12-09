@@ -5,78 +5,74 @@ Create app
 
 from __future__ import absolute_import
 
-import datetime
-import os
-import pytz
-import uuid
-
 import six
+import logging
 
 from auth import constants
-
-from auth.models import User, Role, db, users
-from auth.resources import GatewayResource, \
-        NetworkResource, \
-        UserResource, \
-        VoucherResource, \
-        api, \
-        logos
-from auth.services import login_manager, mail, menu, security
+from auth.models import db, users
+from auth.processors import init_processors
+from auth.services import login_manager, logos, mail, menu, security
+from auth.utils import render_currency_amount
 from auth.views import bp
 
-from dateutil.tz import tzlocal
-
-from flask import Flask
+from flask import Flask, render_template, request
+from flask_babelex import Babel
 from flask_uploads import configure_uploads
-from flask_principal import \
-        AnonymousIdentity, \
-        Identity, \
-        Principal, \
-        RoleNeed, \
-        UserNeed, \
-        identity_loaded
 from flask_security import current_user
+from logging.handlers import SMTPHandler
 
 
 def create_app(config=None):
     """ Create app """
-
     app = Flask(__name__)
-
     app.config.from_object('config')
-
     if config is not None:
         app.config.update(**config)
 
+    if not app.debug:
+        mail_handler = SMTPHandler(app.config['MAIL_SERVER'],
+                                   app.config['MAIL_DEFAULT_SENDER'][1],
+                                   app.config['ADMINS'],
+                                   app.config['MAIL_ERROR_SUBJECT'])
+        mail_handler.setFormatter(logging.Formatter('''
+    Message type:       %(levelname)s
+    Location:           %(pathname)s:%(lineno)d
+    Module:             %(module)s
+    Function:           %(funcName)s
+    Time:               %(asctime)s
+
+    Message:
+
+    %(message)s
+'''))
+
+        mail_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(mail_handler)
+
+    init_processors(app)
+
     db.init_app(app)
-    api.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
     menu.init_app(app)
 
     security.init_app(app, users)
-
-    principal = Principal()
-    principal.init_app(app)
-
     configure_uploads(app, (logos,))
     app.register_blueprint(bp)
 
-    @identity_loaded.connect_via(app)
-    def on_identity_loaded(sender, identity):
-        """Load needs onto the identity"""
-        if not isinstance(identity, AnonymousIdentity):
-            identity.provides.add(UserNeed(identity.id))
+    babel = Babel(app)
 
-            for role in current_user.roles:
-                identity.provides.add(RoleNeed(role.name))
+    @babel.localeselector
+    def get_locale():
+        if not current_user.is_anonymous:
+            return current_user.locale
 
-    @principal.identity_loader
-    def read_identity_from_flask_login():
-        """Convert flask login to identity"""
-        if hasattr(current_user, 'id'):
-            return Identity(current_user.id)
-        return AnonymousIdentity()
+        return request.accept_languages.best_match(app.config['SUPPORTED_LOCALES'])
+
+    @babel.timezoneselector
+    def get_timezone():
+        if not current_user.is_anonymous:
+            return current_user.timezone
 
     @app.after_request
     def security_measures(response):
@@ -88,17 +84,27 @@ def create_app(config=None):
         response.headers["Pragma"] = "no-cache"
         return response
 
-    @app.template_filter()
-    def local_datetime(value, format="%I:%M %p"):
-        tz = tzlocal()
-        utc = pytz.timezone('UTC')
-        value = utc.localize(value, is_dst=None).astimezone(pytz.utc)
-        local_dt = value.astimezone(tz)
-        return local_dt.strftime(format)
-
     @app.context_processor
     def context_processor():
         """Context processors for use in templates"""
-        return dict(constants=constants, six=six)
+        return dict(constants=constants,
+                    render_currency_amount=render_currency_amount,
+                    six=six)
+
+    @app.errorhandler(404)
+    def error_handler_404(error):
+        return render_template('error.html',
+                               error=error,
+                               page_title='Not Found',
+                               header=404,
+                               description="We can't seem to find the page you're looking for."), 404
+
+    @app.errorhandler(500)
+    def error_handler_500(error):
+        return render_template('error.html',
+                               error=error,
+                               page_title='Internal Server Error',
+                               header=500,
+                               description="Oops, looks like something went wrong."), 500
 
     return app

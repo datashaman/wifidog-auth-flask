@@ -8,10 +8,13 @@ tmuxp:
 	tmuxp load .
 
 serve:
-	python serve.py
+	PORT=5000 python serve.py
 
 serve-production:
 	gunicorn --reload -b '127.0.0.1:5000' 'auth:create_app()'
+
+sqlite3:
+	sqlite3 data/local.db
 
 db-reset:
 	rm -rf data/local.db
@@ -24,6 +27,7 @@ build-static:
 docker-prepare: clean
 
 docker-build: docker-prepare
+	./build.sh
 	docker build -t $(TAG) .
 
 docker-push:
@@ -52,6 +56,11 @@ lint:
 bootstrap-local: bootstrap-tests
 	cp tests/tests.db data/local.db
 
+bootstrap-reference:
+	rm -f data/local.db
+	$(PYTHON) manage.py bootstrap_reference
+	mv data/local.db data/reference.db
+
 bootstrap-tests:
 	rm -rf tests/tests.db && touch tests/tests.db
 	TESTING=true $(PYTHON) manage.py bootstrap_tests
@@ -60,7 +69,7 @@ watch:
 	while inotifywait -e close_write -r ./auth/*.py ./auth/templates ./tests; do make test; done
 
 test:
-	TESTING=true $(PYTHON) -m unittest discover -s tests
+	TESTING=true $(PYTHON) -m unittest discover -s tests -f
 
 coverage:
 	TESTING=true coverage run --include='auth/*' -m unittest discover -s tests
@@ -90,10 +99,14 @@ reboot: remove-db bootstrap
 
 clean:
 	find . -name '*.pyc' -delete
-	rm -rf auth/static/{fonts,scripts,styles}/*
+	rm -rf auth/static/{fonts,scripts,styles}/* build/
 
 graphs:
 	$(PYTHON) auth/graphs.py
 
 dot:
 	dot -Tpng -O auth/graphs.dot && eog auth/graphs.dot.png
+
+migrate:
+	rm -f data/new.db
+	python manage.py migrate

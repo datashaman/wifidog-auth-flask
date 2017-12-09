@@ -1,0 +1,51 @@
+{% extends 'layouts/default.html' %}
+{% from 'helpers/form.html' import group %}
+
+{% set page_title = 'New Voucher' %}
+
+{% block content %}
+    <div class="content">
+        <div class="panel panel-voucher">
+            <div class="panel-body">
+                <form method="post" action={{ url_for('.voucher_new') }} class="pure-form pure-form-aligned">
+                    {{ form.csrf_token }}
+
+                    <fieldset>
+                        <div class="voucher-id">
+                            {{ request.args.get('code') }}
+                        </div>
+
+                        {{ group(form.gateway_id, required=True) }}
+                        {{ group(form.minutes, required=True) }}
+                        {{ group(form.megabytes) }}
+
+                        <div class="pure-controls">
+                            <button id="voucher-generate" type="submit" class="pure-button pure-button-primary">Generate</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var defaults = {{ defaults | tojson }};
+Zepto(function($) {
+    $('#gateway_id').on('change', function (e) {
+        var item = defaults[$(this).val()];
+        $('#minutes').val(item.minutes);
+        $('#megabytes').val(item.megabytes);
+    });
+
+    $('#voucher-generate').on('click', function (e) {
+        dataLayer.push({
+            event: 'trackEvent',
+            eventCategory: 'voucher',
+            eventAction: 'generate'
+        });
+    });
+});
+</script>
+{% endblock %}

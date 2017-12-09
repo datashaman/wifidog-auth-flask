@@ -1,0 +1,14 @@
+{% extends 'layouts/default.html' %}
+
+{% block content %}
+    <div class="content">
+        <form
+            method="post"
+            action="{{ action_url }}"
+            enctype="multipart/form-data"
+            class="pure-form pure-form-aligned"
+        >
+            {% include 'gateway/_form.html' %}
+        </form>
+    </div>
+{% endblock %}

@@ -8,6 +8,10 @@ STAGE_COUNTERS = 'counters'
 STAGE_LOGIN = 'login'
 STAGE_LOGOUT = 'logout'
 
+LOCALES = {
+    'en': 'English'
+}
+
 ROLES = {
     u'super-admin': u'Super Admin',
     u'network-admin': u'Network Admin',
@@ -25,7 +29,15 @@ STATUS_ICONS = {
 }
 
 ACTIONS = {
-    'vouchers': [
+    'order': [
+        'cancel',
+        'uncancel',
+        'archive',
+    ],
+    'transaction': [
+        'archive',
+    ],
+    'voucher': [
         'extend',
         'block',
         'unblock',

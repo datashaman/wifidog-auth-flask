@@ -1,0 +1,91 @@
+{% extends 'layouts/default.html' %}
+
+{% set page_title = 'Orders' %}
+{% set new_title = 'New Order' %}
+{% set new_url = url_for('.order_new') %}
+
+{% set show_network = current_user.has_role('super-admin') %}
+{% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
+
+{% block content %}
+    <div class="content">
+        {% if instances %}
+            <table id="orders" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        {% if show_network or show_gateway %}
+                        <th>
+                            Network &amp; Gateway
+                        </th>
+                        {% endif %}
+                        <th>User</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Created At</th>
+
+                        <th class="actions">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for instance in instances %}
+                    <tr data-id={{ instance.id }} class="network {{ 'pure-table-' + loop.cycle('odd', 'even') }}">
+                        <td data-label="ID"><a href="{{ url_for('.order_edit', id=instance.id) }}">{{ instance }}</a></td>
+                        {% if show_network or show_gateway %}
+                        <td data-label="Network & Gateway">
+                            {% if show_network %}
+                            {{ instance.network }}
+                            {% endif %}
+                            {% if show_gateway %}
+                                {% if show_network %}<br />{% endif %}
+                                {{ instance.gateway }}
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                        <td data-label="User">{{ instance.user | default('-') }}</td>
+                        <td data-label="Status">{{ instance.status }}</td>
+                        <td data-label="Total">{{ render_currency_amount(instance.network.currency, instance.total) }}</td>
+                        <td data-label="Created At">{{ instance.created_at | datetimeformat('short') }}</td>
+
+                        <td class="actions actions-instance">
+                            <div class="pure-menu pure-menu-horizontal">
+                                <ul class="pure-menu-list">
+                                    {% for action, defn in six.iteritems(instance.available_actions) %}
+                                    {% if action == 'pay' %}
+                                        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                                            <a href="#" class="pure-menu-link" title="{{ action }}">
+                                                {% if defn.icon %}
+                                                <span class="oi" data-glyph={{ defn.icon }} aria-hidden="true"></span>
+                                                {% endif %}
+                                                {{ action }}
+                                            </a>
+                                            <ul class="pure-menu-children">
+                                                {% for processor in instance.user.country.processors if processor.active %}
+                                                <li class="pure-menu-item">
+                                                    <a href="{{ url_for('.order_pay', id=instance.id, processor_id=processor.id) }}" class="pure-menu-link">{{ processor.title }}</a>
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </li>
+                                    {% else %}
+                                        <li class="pure-menu-item">
+                                            <a href="{{ url_for('.order_action', id=instance.id, action=action) }}" class="pure-menu-link" title="{{ action }}">
+                                                {% if defn.icon %}
+                                                <span class="oi" data-glyph={{ defn.icon }} aria-hidden="true"></span>
+                                                {% endif %}
+                                                {{ action }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

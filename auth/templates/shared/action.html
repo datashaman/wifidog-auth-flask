@@ -4,15 +4,11 @@
 
 {% block content %}
     <div class="content">
-        <form method="post" action={{ url_for('.%s_action' % resource, action=action, id=instance.id) }} class="pure-form pure-form-aligned">
-            <fieldset>
-                <div class="pure-controls">
-                    <p>Are you sure you want to <em>{{ action }}</em> <strong>{{ instance }}</strong>?</p>
+        <form method="post" action="{{ action_url }}">
+            <p>Are you sure you want to <em>{{ action }}</em> <strong>{{ instance }}</strong>?</p>
 
-                    <button type="submit" class="pure-button pure-button-primary">Yes</button>
-                    <button type="button" class="pure-button" onclick="history.back()">No</button>
-                </div>
-            </fieldset>
+            <button type="submit" class="pure-button pure-button-primary">Yes</button>
+            <button type="button" class="pure-button" onclick="history.back()">No</button>
         </form>
     </div>
 {% endblock %}

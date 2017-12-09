@@ -37,6 +37,17 @@
             </div>
         {% endif %}
 
+        {% if gateway.public_phone or gateway.public_email %}
+            <ul>
+                {% if gateway.public_phone %}
+                <li>Phone: <a href="tel:{{ gateway.public_phone }}">{{ gateway.public_phone }}</a></li>
+                {% endif %}
+                {% if gateway.public_email %}
+                <li>Email: <a href="mailto:{{ gateway.public_email }}">{{ gateway.public_email }}</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+
         <div
             class="fb-like"
             data-href="{{ gateway.url_facebook }}"

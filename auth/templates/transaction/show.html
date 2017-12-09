@@ -1,0 +1,30 @@
+{% extends 'layouts/default.html' %}
+
+{% set page_title = 'Transaction %s' % transaction %}
+
+{% block content %}
+<div class="content">
+    <table class="table-properties">
+        <thead>
+            <tr><th /><th class="heading">Basket</th></tr>
+        </thead>
+
+        <tbody>
+            <tr><th>Amount</th><td>{{ render_currency_amount(transaction.currency, transaction.amount) }}</td></tr>
+            <tr><th>Description</th><td>{{ transaction.description }}</td></tr>
+        </tbody>
+
+        <thead>
+            <tr><th /><th class="heading">Details</th></tr>
+        </thead>
+
+        <tbody>
+            <tr><th>User</th><td><a href="{{ url_for('.user_edit', id=transaction.user_id) }}">{{ transaction.user }}</a></td></tr>
+            <tr><th>Order</th><td><a href="{{ url_for('.order_edit', id=transaction.order_id) }}">{{ transaction.order }}</a></td></tr>
+            <tr><th>Processor</th><td>{{ transaction.processor }}</td></tr>
+            <tr><th>Reference</th><td>{{ transaction.processor_reference }}</td></tr>
+            <tr><th>Status</th><td>{{ transaction.status }}</td></tr>
+        </tbody>
+    </div>
+</div>
+{% endblock %}

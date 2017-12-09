@@ -8,50 +8,95 @@ import json
 import six
 
 from auth.constants import ROLES
-from auth.models import Role, Network, Gateway, Voucher, Country, Currency, Product, db, users
+from auth.models import \
+    Category, \
+    Change, \
+    Country, \
+    Currency, \
+    Gateway, \
+    GatewayType, \
+    Network, \
+    Order, \
+    OrderItem, \
+    Processor, \
+    Product, \
+    Role, \
+    Transaction, \
+    User, \
+    Voucher, \
+    country_currencies, \
+    country_processors, \
+    db, \
+    product_categories, \
+    roles_users, \
+    users
 from auth.services import manager
 from flask import current_app
 from flask_script import prompt, prompt_pass
 from flask_security.utils import encrypt_password
-from sqlalchemy import func
+from sqlalchemy import func, inspect, Table
+from sqlalchemy.orm import Session
 
 
 @manager.command
-def bootstrap_instance(users_csv=None):
-    db.create_all()
+def bootstrap_instance(country_id, country_title, bind=None, users_csv=None):
+    db.create_all(bind=bind)
 
+    create_country(country_id, country_title)
+    create_gateway_types()
     create_roles()
 
     if users_csv:
         with open(users_csv) as f:
             for user in csv.reader(f):
-                email, password, role = user
-                create_user(email, password, role)
+                create_user(*user)
+
+
+@manager.command
+def bootstrap_reference(bind=None, users_csv=None):
+    db.create_all(bind=bind)
+
+    create_country('ZA', 'South Africa')
+    create_currency('ZA', 'ZAR', 'South African Rand', 'R')
+    create_processor('payu', 'PayU', 'ZA', active=True)
+    create_gateway_types()
+    create_roles()
+
+    if users_csv:
+        with open(users_csv) as f:
+            for user in csv.reader(f):
+                create_user(*user)
 
 
 @manager.command
 def bootstrap_tests():
-    bootstrap_instance()
+    bootstrap_instance(u'ZA', u'South Africa')
 
-    create_network(u'main-network', u'Network')
-    create_network(u'other-network', u'Other Network')
+    create_processor(u'cash', u'Cash', countries=u'ZA', active=True)
+    create_processor(u'snapscan', u'SnapScan', countries=u'ZA', active=True)
+    create_processor(u'payu', u'PayU', countries=u'ZA', active=True)
 
-    create_gateway(u'main-network', u'main-gateway1', u'Main Gateway #1')
-    create_gateway(u'main-network', u'main-gateway2', u'Main Gateway #2')
+    create_currency(u'ZA', u'ZAR', u'South African Rand', u'R')
 
-    create_gateway(u'other-network', u'other-gateway1', u'Other Gateway #1')
-    create_gateway(u'other-network', u'other-gateway2', u'Other Gateway #2')
+    create_network(u'main-network', u'Network', u'ZAR')
+    create_network(u'other-network', u'Other Network', u'ZAR')
 
-    create_user(u'super-admin@example.com', u'admin', u'super-admin')
+    create_gateway(u'main-network', u'main-gateway1', u'cafe', u'Main Gateway #1')
+    create_gateway(u'main-network', u'main-gateway2', u'cafe', u'Main Gateway #2')
 
-    create_user(u'main-network@example.com', u'admin', u'network-admin', u'main-network')
-    create_user(u'other-network@example.com', u'admin', u'network-admin', u'other-network')
+    create_gateway(u'other-network', u'other-gateway1', u'cafe', u'Other Gateway #1')
+    create_gateway(u'other-network', u'other-gateway2', u'cafe', u'Other Gateway #2')
 
-    create_user(u'main-gateway1@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway1')
-    create_user(u'main-gateway2@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway2')
+    create_user(u'super-admin@example.com', u'admin', u'super-admin', country_id=u'ZA')
 
-    create_user(u'other-gateway1@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway1')
-    create_user(u'other-gateway2@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway2')
+    create_user(u'main-network@example.com', u'admin', u'network-admin', u'main-network', country_id=u'ZA')
+    create_user(u'other-network@example.com', u'admin', u'network-admin', u'other-network', country_id=u'ZA')
+
+    create_user(u'main-gateway1@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway1', country_id=u'ZA')
+    create_user(u'main-gateway2@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway2', country_id=u'ZA')
+
+    create_user(u'other-gateway1@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway1', country_id=u'ZA')
+    create_user(u'other-gateway2@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway2', country_id=u'ZA')
 
     create_voucher(u'main-gateway1', 60, 'main-1-1')
     create_voucher(u'main-gateway1', 60, 'main-1-2')
@@ -62,21 +107,17 @@ def bootstrap_tests():
     create_voucher(u'other-gateway2', 60, 'other-2-1')
     create_voucher(u'other-gateway2', 60, 'other-2-2')
 
-    create_country(u'ZA', u'South Africa')
-    create_currency(u'ZA', u'ZAR', u'South Africa', u'R')
-
-    create_product(u'main-network', None, u'90MIN', u'90 Minute Voucher', 'ZAR', 3000, 'available')
+    create_product(u'main-network', None, u'90MIN', u'90 Minute Voucher', 30, 'available')
 
 
 @manager.command
-def create_product(network_id, gateway_id, code, title, currency_id, price, status='new', quiet=True):
+def create_product(network_id, gateway_id, code, title, price, status='new', quiet=True):
     product = Product()
 
     product.network_id = network_id
     product.gateway_id = gateway_id
     product.code = code
     product.title = title
-    product.currency_id = currency_id
     product.price = price
     product.status = status
 
@@ -102,10 +143,11 @@ def create_country(id, title, quiet=True):
 
 
 @manager.command
-def create_currency(country_id, id, title, prefix=None, suffix=None, quiet=True):
+def create_currency(countries, id, title, prefix=None, suffix=None, quiet=True):
     currency = Currency()
 
-    currency.country_id = country_id
+    country_ids = countries.split(',')
+    currency.countries = [Country.query.get(country_id) for country_id in country_ids]
     currency.id = id
     currency.title = title
     currency.prefix = prefix
@@ -137,9 +179,10 @@ def create_voucher(gateway, minutes=60, code=None, quiet=True):
 
 
 @manager.command
-def create_network(id, title, description=None, quiet=True):
+def create_network(id, title, currency_id, description=None, quiet=True):
     network = Network()
     network.id = id
+    network.currency_id = currency_id
     network.title = title
     network.description = description
     db.session.add(network)
@@ -154,11 +197,12 @@ def create_network(id, title, description=None, quiet=True):
 @manager.option('-p', '--phone', help='Contact Phone')
 @manager.option('-h', '--home', help='Home URL')
 @manager.option('-f', '--facebook', help='Facebook URL')
-def create_gateway(network, id, title, description=None, email=None, phone=None, home=None, facebook=None, logo=None, quiet=True):
+def create_gateway(network, id, type, title, description=None, email=None, phone=None, home=None, facebook=None, logo=None, quiet=True):
     gateway = Gateway()
     gateway.network_id = network
     gateway.id = id
     gateway.title = title
+    gateway.gateway_type_id = type
     gateway.description = description
     gateway.contact_email = email
     gateway.contact_phone = phone
@@ -172,7 +216,7 @@ def create_gateway(network, id, title, description=None, email=None, phone=None,
 
 
 @manager.command
-def create_user(email, password, role, network=None, gateway=None, confirmed=True, quiet=True):
+def create_user(email, password, role, network=None, gateway=None, country_id=None, quiet=True):
     if email is None:
         email = prompt('Email')
 
@@ -204,9 +248,8 @@ def create_user(email, password, role, network=None, gateway=None, confirmed=Tru
 
     user.network_id = network
     user.gateway_id = gateway
-
-    if confirmed:
-        user.confirmed_at = datetime.datetime.now()
+    user.country_id = country_id
+    user.confirmed_at = datetime.datetime.now()
 
     if role is not None:
         role = Role.query.filter_by(name=role).first()
@@ -242,6 +285,73 @@ def create_role(name, description, quiet=True):
 
 
 @manager.command
+def create_processor(id, title, countries=None, active=False, quiet=True):
+    processor = Processor()
+    processor.id = id
+    processor.title = title
+    processor.active = active
+    for country_id in countries.split(','):
+        country = Country.query.get(country_id)
+        processor.countries.append(country)
+    db.session.add(processor)
+    db.session.commit()
+
+    if not quiet:
+        print('Processor created')
+
+
+@manager.command
+def create_gateway_types(quiet=True):
+    types = {
+        'airline': u'Airline',
+        'airport': u'Airport Terminal/Lounge',
+        'business-center': u'Business/Conference Center',
+        'bus-station': u'Bus Station',
+        'cafe': u'Cafe/Coffee Shop',
+        'camp-ground': u'Camp Ground',
+        'community-network': u'Community Network',
+        'convention-center': u'Convention Center',
+        'copy-center': u'Copy Center/Business Services',
+        'cruise-ship': u'Cruise Ship',
+        'entertainment-venue': u'Entertainment Venues',
+        'gas-station': u'Gas/Petrol Station',
+        'hospital': u'Hospital',
+        'hotel': u'Hotel',
+        'internet-cafe': u'Internet Cafe',
+        'kiosk': u'Kiosk',
+        'library': u'Library',
+        'marina': u'Marina/Harbour',
+        'motorway': u'Motorway Travel Center/TruckStop',
+        'office': u'Office Building/Complex',
+        'other': u'Other',
+        'park': u'Park',
+        'pay-phone': u'Pay Phone/Booth',
+        'port': u'Port/Ferry Terminal',
+        'residence': u'Residential Housing/Apt Bldg',
+        'restaurant': u'Restaurant/Bar/Pub',
+        'school': u'School/University',
+        'shopping-center': u'Shopping Center',
+        'sports-arena': u'Sports Arena/Venue',
+        'store': u'Store/Retail Shop',
+        'train-station': u'Train/Rail Station',
+        'train': u'Train',
+        'water-travel': u'Water Travel',
+        'wifi-zone': u'Wi-Fi Zone',
+    }
+
+    for id, title in six.iteritems(types):
+        gateway_type = GatewayType()
+        gateway_type.id = id
+        gateway_type.title = title
+        db.session.add(gateway_type)
+
+    db.session.commit()
+
+    if not quiet:
+        print('Gateway types created')
+
+
+@manager.command
 def process_vouchers():
     # Active vouchers that should end
     vouchers = Voucher.query \
@@ -266,9 +376,9 @@ def process_vouchers():
 
     # Blocked, ended and expired vouchers that should be archived
     vouchers = Voucher.query \
-                .filter(Voucher.updated_at + datetime.timedelta(minutes=max_age) < func.current_timestamp()) \
-                .filter(Voucher.status.in_([ 'blocked', 'ended', 'expired' ])) \
-                .all()
+        .filter(Voucher.updated_at + datetime.timedelta(minutes=max_age) < func.current_timestamp()) \
+        .filter(Voucher.status.in_(['blocked', 'ended', 'expired'])) \
+        .all()
 
     for voucher in vouchers:
         voucher.archive()
@@ -292,3 +402,88 @@ def measurements():
     }
 
     print(json.dumps(measurements, indent=4))
+
+
+def clone_row(row):
+    new_row = {}
+    for k in row.keys():
+        new_row[k] = getattr(row, k)
+    return new_row
+
+
+@manager.command
+def migrate():
+    entities = [
+        Currency,
+        GatewayType,
+        Processor,
+        Role,
+        Country,
+        country_currencies,
+        country_processors,
+        Network,
+        Gateway,
+        Product,
+        Voucher,
+        Category,
+        product_categories,
+        User,
+        roles_users,
+        Change,
+        Order,
+        OrderItem,
+        Transaction,
+    ]
+
+    reference_engine = db.get_engine(current_app, 'reference')
+    reference_session = Session(reference_engine)
+
+    old_engine = db.get_engine(current_app, 'old')
+    old_session = Session(old_engine)
+
+    new_engine = db.get_engine(current_app, 'new')
+    new_session = Session(new_engine)
+
+    for entity in entities:
+        if type(entity) is Table:
+            if entity.exists(bind=old_engine):
+                rows = old_engine.execute(entity.select())
+            else:
+                rows = reference_engine.execute(entity.select())
+
+            entity.create(bind=new_engine)
+            for values in rows:
+                new_session.execute(entity.insert(values))
+        else:
+            if entity.__table__.exists(bind=old_engine):
+                insp = inspect(old_engine)
+                columns = [getattr(entity, c['name']) for c in insp.get_columns(entity.__tablename__) if hasattr(entity, c['name'])]
+                rows = [clone_row(r) for r in old_session.query(*columns).all()]
+            else:
+                rows = reference_session.query(entity).all()
+
+            class NewModel(entity):
+                __tablename__ = entity.__tablename__
+                __bind_key__ = 'new'
+
+            entity.__table__.create(bind=new_engine)
+
+            for row in rows:
+                if hasattr(row, '__dict__'):
+                    row = row.__dict__
+
+                if '_sa_instance_state' in row:
+                    del row['_sa_instance_state']
+
+                if entity.__tablename__ == 'networks':
+                    row['currency_id'] = u'ZAR'
+
+                if entity.__tablename__ == 'gateways':
+                    row['gateway_type_id'] = 'cafe'
+
+                if entity.__tablename__ == 'users':
+                    row['country_id'] = u'ZA'
+
+                new_session.execute(entity.__table__.insert(row))
+
+        new_session.commit()

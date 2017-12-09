@@ -9,7 +9,7 @@ class TestMine(TestCase):
     def test_my_account_as_gateway(self):
         self.login('main-gateway1@example.com', 'admin')
         html = self.assertOk('/user')
-        response = self.client.post(html.find('//form').get('action'), data={'email': 'another@example.com'}, follow_redirects=True)
+        response = self.client.post(html.find('//form').get('action'), data={'email': 'another@example.com', 'locale': 'en', 'timezone': 'UTC'}, follow_redirects=True)
         assert 'Update successful' in str(response.get_data())
 
     @skip('getting a 400 status, suspect file issues, can\'t duplicate irl')
@@ -31,7 +31,7 @@ class TestMine(TestCase):
     def test_my_account_as_network(self):
         self.login('main-network@example.com', 'admin')
         html = self.assertOk('/user')
-        response = self.client.post(html.find('//form').get('action'), data={'email': 'another@example.com'}, follow_redirects=True)
+        response = self.client.post(html.find('//form').get('action'), data={'email': 'another@example.com', 'locale': 'en', 'timezone': 'UTC'}, follow_redirects=True)
         assert 'Update successful' in str(response.get_data())
 
     def test_my_gateway_as_network(self):

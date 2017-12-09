@@ -1,16 +1,17 @@
-FROM ubuntu:artful
+FROM python:3.6-slim-jessie
 
-ARG XDG_CACHE_HOME=/cache
+ARG BUILD_HOME=/var/app/build
 
 WORKDIR /var/app
 
 RUN apt-get update -q \
     && apt-get install -q -y --no-install-recommends \
-        curl \
+        wget
+
+RUN wget -O - https://deb.nodesource.com/setup_8.x | bash -
+
+RUN apt-get install -q -y --no-install-recommends \
         nodejs \
-        npm \
-        python-pip \
-        python-setuptools \
         tzdata \
     && rm -rf /var/lib/apt/lists/*
 
@@ -18,28 +19,32 @@ RUN echo "SQLALCHEMY_DATABASE_URI=sqlite:////var/app/data/local.db" > .env
 
 COPY \
     config.py \
+    config.py \
+    deploy.sh \
     gulpfile.js \
     healthcheck.sh \
     manage.py \
     package.json \
     package-lock.json \
-    requirements.txt \
     ./
 
-RUN pip install -r requirements.txt && rm requirements.txt
-RUN npm config set cache "${XDG_CACHE_HOME}/npm" && npm install
+COPY build build/
+
+RUN ./deploy.sh
+RUN npm install
 
 COPY auth/assets auth/assets/
 
 RUN node_modules/.bin/gulp && rm -rf auth/assets gulpfile.js node_modules package.json package-lock.json
 
 COPY auth auth/
+COPY data/reference.db data/
 
 RUN rm -rf /tmp/* /usr/share/doc /usr/share/info
 
 EXPOSE 5000
 
-VOLUME ["/var/app/data", "/var/app/auth/static/uploads"]
+VOLUME ["/var/app/build", "/var/app/data", "/var/app/auth/static/uploads"]
 
 ENTRYPOINT ["python", "manage.py"]
 CMD ["runserver", "-h", "0.0.0.0", "-p", "5000"]

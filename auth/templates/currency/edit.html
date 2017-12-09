@@ -1,0 +1,12 @@
+{% extends 'layouts/default.html' %}
+
+{% set page_title = 'Edit Currency' %}
+
+{% block content %}
+    <div class="content">
+        <form method="post" action={{ url_for('.currency_edit', id=instance.id) }} class="pure-form pure-form-aligned">
+            {{ form.csrf_token }}
+            {% include 'currency/_form.html' %}
+        </form>
+    </div>
+{% endblock %}

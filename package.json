@@ -11,7 +11,7 @@
     "gulp-concat": "~2.6.0",
     "gulp-cssnano": "^2.1.0",
     "gulp-load-plugins": "~1.0.0-rc.1",
-    "gulp-merge": "~0.1.1",
+    "gulp-merge": "^0.1.1",
     "gulp-minify": "0.0.5",
     "gulp-rename": "~1.2.2",
     "gulp-rollup": "^1.7.0",

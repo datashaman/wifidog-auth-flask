@@ -14,10 +14,11 @@
 .gitignore
 .pylintrc
 auth/static/uploads
-data
+data/local.db
+data/new.db
+data/old.db
 Dockerfile
 dependencyci.yml
-deploy.sh
 node_modules
 tests
 uploads

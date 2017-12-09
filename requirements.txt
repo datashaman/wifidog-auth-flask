@@ -2,27 +2,18 @@ asbool
 blinker
 dotenvy
 Flask
-Flask-Bcrypt
-Flask-Login
 Flask-Mail
-https://github.com/datashaman/flask-menu/archive/master.zip#egg=Flask-Menu
-Flask-Potion==0.8.1
-Flask-Principal>=0.4.0
+Flask-Menu
 Flask-Script
 Flask-Security
 Flask-SQLAlchemy>=2.0
 Flask-Uploads
 https://github.com/lepture/flask-wtf/archive/master.zip#egg=Flask-WTF
-gitchangelog
-gunicorn
 healthcheck
-lxml
-markupsafe
 pillow
 requests
 six
+https://github.com/armooo/suds_requests/archive/master.zip#egg=suds_requests
 wheel
 
 functools32 ; python_version < '3'
-suds ; python_version < '3'
-suds-py3 ; python_version >= '3'

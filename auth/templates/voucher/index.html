@@ -1,0 +1,61 @@
+{% extends 'layouts/default.html' %}
+
+{% set page_title = 'Vouchers' %}
+{% set new_title = 'New Voucher' %}
+{% set new_url = '/new-voucher' %}
+
+{% block content %}
+    <div class="content">
+        {% if instances %}
+            <table id="vouchers" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>S</th>
+                        <th>Times</th>
+                        <th>Minutes Left</th>
+                        <th style="text-align:right">MB Used / Max</th>
+
+                        <th class="actions">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for instance in instances %}
+                    <tr data-id="{{ instance.id }}" data-code="{{ instance.code }}" class="voucher {{ 'pure-table-' + loop.cycle('odd', 'even') }}">
+                            <td class="code" data-label="Code">{{ instance.code }}</td>
+                            <td class="name" data-label="Name">{{ instance.name or '-' }}</td>
+                            <td class="status" data-label="Status"><span class="oi" data-glyph={{ constants.STATUS_ICONS[instance.status] }} title={{ instance.status }} aria-hidden="true"></span></td>
+                            <td data-label="Times">
+                                {{ instance.created_at | timeformat('short') }}
+                                {% if instance.started_at %}
+                                    {{ instance.started_at | timeformat('short') }}
+                                    {{ instance.end_at | timeformat('short') }}
+                                {% endif %}
+                            </td>
+                            <td data-label="Minutes Left">
+                                {% if instance.time_left %}{{ instance.time_left }} /{% endif %}
+                                {{ instance.minutes | default('-') }}
+                            </td>
+                            <td data-label="MB Used / Max" style="text-align:right">{{ ((instance.incoming + instance.outgoing) / 1024 / 1024) | int }} / {{ instance.megabytes }}</td>
+
+                            <td class="actions actions-instance">
+                                <div class="pure-button-group" role="group" aria-label="Actions Available">
+                                    {% for action, defn in six.iteritems(instance.available_actions) %}
+                                    <a href="{{ url_for('.voucher_action', id=instance.id, action=action) }}" class="pure-button" title="{{ action }}">
+                                        {% if defn.icon %}
+                                        <span class="oi" data-glyph={{ defn.icon }} aria-hidden="true"></span>
+                                        {% endif %}
+                                        {{ action }}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'layouts/default.html' %}
+{% from 'helpers/form.html' import group %}
+
+{% set page_title = 'New Order' %}
+{% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
+
+{% block content %}
+    <div class="content">
+        <form method="post" action={{ url_for('.order_new') }} class="order-item pure-form pure-g">
+            {{ order_form.csrf_token }}
+
+            {% if show_gateway %}
+                <div class="pure-u-1">
+                    {{ order_form.gateway }}
+                </div>
+            {% endif %}
+            <div class="pure-u-1 product">
+                {{ order_form.product }}
+            </div>
+            <div class="pure-u-1-3 quantity">
+                {{ order_form.quantity(type='number', min=1) }}
+            </div>
+            <div class="pure-u-1-3 price">
+                {{ order_form.price(type='number', min=0.01, step=0.01) }}
+            </div>
+            <div class="pure-u-1-3 submit">
+                <button type="submit" class="pure-button pure-button-primary">
+                    Add
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var prices = {{ prices | tojson }};
+Zepto(function($) {
+    $('#product')
+        .on('change', function (e) {
+            var price = prices[$(this).val()];
+            $('#price').val(price.toFixed(2));
+        })
+        .trigger('change');
+    $('#product').focus();
+});
+</script>
+{% endblock %}

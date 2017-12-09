@@ -5,13 +5,13 @@ from tests import TestCase
 class TestVouchers(TestCase):
     def test_voucher_new_as_anonymous(self):
         with self.app.test_request_context():
-            self.assertLogin(url_for('.vouchers_new'))
+            self.assertLogin(url_for('.voucher_new'))
 
     def test_voucher_new_as_gateway(self):
         with self.app.test_request_context():
             self.login('main-gateway1@example.com', 'admin')
 
-            response = self.client.get(url_for('.vouchers_new'), follow_redirects=True)
+            response = self.client.get(url_for('.voucher_new'), follow_redirects=True)
             self.assertEqual(200, response.status_code)
 
             html = self.get_html(response)
@@ -24,7 +24,7 @@ class TestVouchers(TestCase):
         with self.app.test_request_context():
             self.login('main-network@example.com', 'admin')
 
-            response = self.client.get(url_for('.vouchers_new'), follow_redirects=True)
+            response = self.client.get(url_for('.voucher_new'), follow_redirects=True)
             self.assertEqual(200, response.status_code)
 
             html = self.get_html(response)
@@ -39,7 +39,7 @@ class TestVouchers(TestCase):
         with self.app.test_request_context():
             self.login('super-admin@example.com', 'admin')
 
-            response = self.client.get(url_for('.vouchers_new'), follow_redirects=True)
+            response = self.client.get(url_for('.voucher_new'), follow_redirects=True)
             self.assertEqual(200, response.status_code)
 
             html = self.get_html(response)

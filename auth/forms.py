@@ -1,27 +1,32 @@
 from __future__ import absolute_import
 
 from auth.utils import args_get
+from flask import current_app
 from flask_security import current_user
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, HiddenField, PasswordField, StringField, IntegerField, SelectField, fields as f, validators
+from wtforms import BooleanField, FloatField, HiddenField, IntegerField, PasswordField, StringField, SelectField, fields as f, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from wtforms.ext.sqlalchemy.orm import converts, model_form, ModelConverter
 
 from auth.models import db, Category, Country, Currency, Gateway, Network, Product, Voucher, Role
-from auth.resources import api
+from auth.resources import resource_query
+
 
 def default_megabytes():
     if current_user.gateway is not None:
         return current_user.gateway.default_megabytes
 
+
 def default_minutes():
     if current_user.gateway is not None:
         return current_user.gateway.default_minutes
 
+
 def instances(resource):
     def func():
-        return api.resources[resource].manager.instances()
+        return resource_query(resource).all()
     return func
+
 
 def roles():
     if current_user.has_role(u'super-admin'):
@@ -29,6 +34,7 @@ def roles():
     if current_user.has_role(u'network-admin'):
         return db.session.query(Role).filter(Role.name == u'gateway-admin').all()
     return []
+
 
 CategoryForm = model_form(
     Category,
@@ -45,11 +51,11 @@ CategoryForm = model_form(
     field_args={
         'gateway': {
             'default': lambda: current_user.gateway,
-            'query_factory': instances('gateways'),
+            'query_factory': instances('gateway'),
         },
         'network': {
             'default': lambda: current_user.network,
-            'query_factory': instances('networks'),
+            'query_factory': instances('network'),
         }
     }
 )
@@ -69,6 +75,7 @@ CurrencyForm = model_form(
     FlaskForm,
     exclude=[
         'created_at',
+        'networks',
         'orders',
         'products',
         'updated_at',
@@ -107,7 +114,7 @@ GatewayForm = model_form(
         },
         'network': {
             'default': lambda: current_user.network,
-            'query_factory': instances('networks'),
+            'query_factory': instances('network'),
         }
     },
     converter=GatewayConverter()
@@ -127,6 +134,15 @@ NetworkForm = model_form(
     ],
     exclude_pk=False
 )
+
+
+class OrderForm(FlaskForm):
+    gateway = SelectField('Gateway', default=lambda: current_user.gateway)
+    product = QuerySelectField('Product', query_factory=instances('product'))
+    quantity = IntegerField('Quantity', default=1)
+    price = FloatField('Price')
+
+
 ProductForm = model_form(
     Product,
     db.session,
@@ -140,18 +156,19 @@ ProductForm = model_form(
     field_args={
         'gateway': {
             'default': lambda: current_user.gateway,
-            'query_factory': instances('gateways'),
+            'query_factory': instances('gateway'),
         },
         'network': {
             'default': lambda: current_user.network,
-            'query_factory': instances('networks'),
-        }
+            'query_factory': instances('network'),
+        },
     }
 )
 
+
 class UserForm(FlaskForm):
-    network = QuerySelectField('Network', allow_blank=True, default=lambda: current_user.network, query_factory=instances('networks'))
-    gateway = QuerySelectField('Gateway', allow_blank=True, default=lambda: current_user.gateway, query_factory=instances('gateways'))
+    network = QuerySelectField('Network', allow_blank=True, default=lambda: current_user.network, query_factory=instances('network'))
+    gateway = QuerySelectField('Gateway', allow_blank=True, default=lambda: current_user.gateway, query_factory=instances('gateway'))
     email = StringField('Email')
     password = PasswordField(
         'Password',
@@ -162,8 +179,12 @@ class UserForm(FlaskForm):
         ]
     )
     confirm = PasswordField('Repeat Password')
+    country = QuerySelectField('Country', default=lambda: current_app.config['DEFAULT_COUNTRY'], query_factory=instances('country'))
+    locale = SelectField('Locale', default=lambda: current_app.config['BABEL_DEFAULT_LOCALE'])
+    timezone = SelectField('Timezone', default=lambda: current_app.config['BABEL_DEFAULT_TIMEZONE'])
     active = BooleanField('Active', default=True)
     roles = QuerySelectMultipleField('Roles', query_factory=roles)
+
 
 class MyUserForm(FlaskForm):
     email = StringField('Email')
@@ -176,17 +197,23 @@ class MyUserForm(FlaskForm):
         ]
     )
     confirm = PasswordField('Repeat Password')
+    country = QuerySelectField('Country', default=lambda: current_app.config['DEFAULT_COUNTRY'], query_factory=instances('country'))
+    locale = SelectField('Locale', default=lambda: current_app.config['BABEL_DEFAULT_LOCALE'])
+    timezone = SelectField('Timezone', default=lambda: current_app.config['BABEL_DEFAULT_TIMEZONE'])
+
 
 class NewVoucherForm(FlaskForm):
     gateway_id = SelectField('Gateway')
-    minutes = IntegerField('Minutes', [ validators.InputRequired(), validators.NumberRange(min=0) ], default=default_minutes)
-    megabytes = IntegerField('Megabytes', [ validators.Optional(), validators.NumberRange(min=0) ], default=default_megabytes)
+    minutes = IntegerField('Minutes', [validators.InputRequired(), validators.NumberRange(min=0)], default=default_minutes)
+    megabytes = IntegerField('Megabytes', [validators.Optional(), validators.NumberRange(min=0)], default=default_megabytes)
+
 
 class BroadcastForm(FlaskForm):
-    message = StringField('Message', [ validators.InputRequired() ])
+    message = StringField('Message', [validators.InputRequired()])
+
 
 class LoginVoucherForm(FlaskForm):
-    voucher_code = StringField('Voucher Code', [ validators.InputRequired() ], default=args_get('voucher'), description='The voucher code you were given at the counter')
+    voucher_code = StringField('Voucher Code', [validators.InputRequired()], default=args_get('voucher'), description='The voucher code you were given at the counter')
     name = StringField('Your Name', description='So we know what to call you')
 
     gw_address = HiddenField('Gateway Address', default=args_get('gw_address'))

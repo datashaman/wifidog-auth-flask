@@ -1,0 +1,54 @@
+{% extends 'layouts/default.html' %}
+
+{% set page_title = 'Categories' %}
+{% set new_title = 'New Category' %}
+{% set new_url = url_for('.category_new') %}
+
+{% set show_network = current_user.has_role('super-admin') %}
+{% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
+
+{% block content %}
+    <div class="content">
+        {% if instances %}
+            <table width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        {% if show_network %}
+                            <th>Network</th>
+                        {% endif %}
+                        {% if show_gateway %}
+                            <th>Gateway</th>
+                        {% endif %}
+                        <th>Code</th>
+                        <th>Title</th>
+                        <th class="actions">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for instance in instances %}
+                        <tr data-id={{ instance.id }} class={{ 'pure-table-' + loop.cycle('odd', 'even') }}>
+                            {% if show_network %}
+                                <td data-label="Network">{{ instance.network | default('-') }}</td>
+                            {% endif %}
+                            {% if show_gateway %}
+                                <td data-label="Gateway">{{ instance.gateway | default('-') }}</td>
+                            {% endif %}
+                            <td class="code" data-label="Code"><a href={{ url_for('.category_edit', id=instance.id) }}>{{ instance.code }}</a></td>
+                            <td class="title" data-label="Title">{{ instance.title }}</td>
+
+                            <td class="actions actions-instance">
+                                <div class="pure-button-group" role="group" aria-label="Actions Available">
+                                    <a href={{ url_for('.category_delete', id=instance.id) }} class="pure-button">
+                                        <span class="oi" data-glyph="x" title="Delete" aria-hidden="true"></span>
+                                        Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -36,10 +36,6 @@ button {
     }
 }
 
-table .actions {
-    text-align: right;
-}
-
 .modal .actions {
     padding: 12px 0;
 }
@@ -352,12 +348,6 @@ table#vouchers {
         text-align: right;
     }
 
-    table .actions {
-        display: inline-block;
-        width: 100%;
-        text-align: center;
-    }
-
     .pure-table td {
         padding: 6px 12px;
     }
@@ -385,4 +375,61 @@ form .description {
 .logged-in {
     align: right;
     float: right;
+}
+
+.order-item {
+    .quantity,
+    .price {
+        input {
+            text-align: right;
+            width: 99%;
+        }
+    }
+
+    .price {
+        text-align: right;
+    }
+
+    .product {
+        select {
+            width: 100% !important;
+            margin-bottom: 5px;
+        }
+    }
+
+    .submit {
+        text-align: right;
+        button {
+            margin: 0;
+            width: 99%;
+        }
+    }
+}
+
+.divider {
+    margin: 10px 0;
+}
+
+.table-properties {
+    th {
+        text-align: left;
+        min-width: 150px;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+
+    thead th {
+        font-size: 165%;
+    }
+
+    tbody th {
+        vertical-align: top;
+        padding-right: 10px;
+    }
+}
+
+.pure-menu-children {
+    text-align: left;
 }

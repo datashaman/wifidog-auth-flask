@@ -3,17 +3,19 @@ from __future__ import division
 
 import base64
 import datetime
+import flask
 import json
 import re
+import six
 import string
 
-import flask
-
 from auth import constants
-from auth.graphs import available_actions
+from auth.graphs import transaction_actions, transaction_states, voucher_actions, voucher_states, order_actions, order_states
+from auth.services import db
+from auth.utils import render_currency_amount
+
 from flask import current_app
 from flask_security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore
-from flask_sqlalchemy import SQLAlchemy
 from random import choice
 
 from sqlalchemy import event
@@ -22,14 +24,22 @@ from sqlalchemy.orm import backref
 from sqlalchemy.schema import UniqueConstraint
 
 
+def available_actions(actions, states, status, interface):
+    if status in states:
+        result = {}
+        for action, defn in six.iteritems(actions):
+            if action in states[status] and defn['interface'] == interface:
+                result[action] = defn
+        return result
+
+    return {}
+
 @event.listens_for(Engine, 'connect')
 def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
     cursor.execute('PRAGMA foreign_keys=ON')
     cursor.close()
 
-
-db = SQLAlchemy()
 
 chars = string.ascii_lowercase + string.digits
 
@@ -68,14 +78,26 @@ class User(db.Model, UserMixin):
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'))
     gateway = db.relationship('Gateway', backref=backref('users', lazy='dynamic'))
 
+    first_name = db.Column(db.Unicode(40))
+    last_name = db.Column(db.Unicode(40))
+
     email = db.Column(db.Unicode(255), nullable=False)
     password = db.Column(db.String(255), nullable=False)
 
+    mobile = db.Column(db.String(20))
+
+    country_id = db.Column(db.String(3), db.ForeignKey('countries.id', onupdate='cascade'))
+    country = db.relationship('Country', backref=backref('users', lazy='dynamic'))
+
     active = db.Column(db.Boolean, default=True)
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     confirmed_at = db.Column(db.DateTime())
 
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+
+    locale = db.Column(db.String)
+    timezone = db.Column(db.String)
 
     __table_args__ = (
         UniqueConstraint('network_id', 'email'),
@@ -86,6 +108,42 @@ class User(db.Model, UserMixin):
 
 users = SQLAlchemyUserDatastore(db, User, Role)
 
+country_currencies = db.Table('country_currencies',
+    db.Column('country_id', db.String(3), db.ForeignKey('countries.id')),
+    db.Column('currency_id', db.String(3), db.ForeignKey('currencies.id'))
+)
+
+country_processors = db.Table('country_processors',
+    db.Column('country_id', db.String(3), db.ForeignKey('countries.id')),
+    db.Column('processor_id', db.String(20), db.ForeignKey('processors.id'))
+)
+
+class Country(db.Model):
+    __tablename__ = 'countries'
+
+    id = db.Column(db.String(3), primary_key=True)
+    title = db.Column(db.Unicode(40), unique=True, nullable=False)
+
+    currencies = db.relationship('Currency', secondary=country_currencies,
+            backref=db.backref('countries', lazy='dynamic'))
+
+    processors = db.relationship('Processor', secondary=country_processors,
+            backref=db.backref('countries', lazy='dynamic'))
+
+    def __str__(self):
+        return self.title
+
+class Currency(db.Model):
+    __tablename__ = 'currencies'
+
+    id = db.Column(db.String(3), primary_key=True)
+    title = db.Column(db.Unicode(20), unique=True, nullable=False)
+    prefix = db.Column(db.String(10))
+    suffix = db.Column(db.String(10))
+
+    def __str__(self):
+        return self.title
+
 class Network(db.Model):
     __tablename__ = 'networks'
 
@@ -95,10 +153,21 @@ class Network(db.Model):
     description = db.Column(db.UnicodeText)
     ga_tracking_id = db.Column(db.String(20))
 
+    currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', onupdate='cascade'), nullable=False)
+    currency = db.relationship(Currency, backref=backref('networks', lazy='dynamic'))
+
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
     def __str__(self):
         return self.title
+
+
+class GatewayType(db.Model):
+    __tablename__ = 'gateway_types'
+
+    id = db.Column(db.String(20), primary_key=True)
+    title = db.Column(db.Unicode(255), unique=True, nullable=False)
+
 
 class Gateway(db.Model):
     __tablename__ = 'gateways'
@@ -112,19 +181,39 @@ class Gateway(db.Model):
     subtitle = db.Column(db.Unicode(60))
     description = db.Column(db.UnicodeText)
 
+    status = db.Column(db.String(20), default='new')
+
+    gateway_type_id = db.Column(db.Unicode(20), db.ForeignKey('gateway_types.id', onupdate='cascade'), nullable=False)
+    gateway_type = db.relationship(GatewayType, backref=backref('gateways', lazy='dynamic'))
+
     contact_email = db.Column(db.Unicode(255))
     contact_phone = db.Column(db.String)
+
+    public_email = db.Column(db.Unicode(255))
+    public_phone = db.Column(db.String)
 
     url_home = db.Column(db.Unicode(255))
     url_facebook = db.Column(db.Unicode(255))
 
-    logo = db.Column(db.String(255))
+    url_map = db.Column(db.Unicode(255))
+
+    logo = db.Column(db.Unicode(255))
 
     login_ask_name = db.Column(db.Boolean(), default=False)
     login_require_name = db.Column(db.Boolean(), default=False)
 
     default_minutes = db.Column(db.Integer)
     default_megabytes = db.Column(db.BigInteger)
+
+    support_email = db.Column(db.Unicode(255))
+
+    last_ping_ip = db.Column(db.String(15))
+    last_ping_at = db.Column(db.DateTime)
+    last_ping_user_agent = db.Column(db.Unicode(255))
+    last_ping_sys_uptime = db.Column(db.Integer)
+    last_ping_wifidog_uptime = db.Column(db.Integer)
+    last_ping_sys_memfree = db.Column(db.Integer)
+    last_ping_sys_load = db.Column(db.Integer)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
@@ -240,10 +329,11 @@ class Voucher(db.Model):
 
     @property
     def available_actions(self):
-        return available_actions(self.status, 'admin')
+        return available_actions(voucher_actions, voucher_states, self.status, 'admin')
 
     def __str__(self):
         return self.code
+
 
 class Auth(db.Model):
     __tablename__ = 'auths'
@@ -352,34 +442,6 @@ class Change(db.Model):
     user = db.relationship(User, backref=backref('changes', lazy='dynamic'))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
-country_currencies = db.Table('country_currencies',
-    db.Column('country_id', db.String(3), db.ForeignKey('countries.id')),
-    db.Column('currency_id', db.String(3), db.ForeignKey('currencies.id'))
-)
-
-class Country(db.Model):
-    __tablename__ = 'countries'
-
-    id = db.Column(db.String(3), primary_key=True)
-    title = db.Column(db.Unicode(40), unique=True, nullable=False)
-
-    currencies = db.relationship('Currency', secondary=country_currencies,
-            backref=db.backref('countries', lazy='dynamic'))
-
-    def __str__(self):
-        return self.title
-
-class Currency(db.Model):
-    __tablename__ = 'currencies'
-
-    id = db.Column(db.String(3), primary_key=True)
-    title = db.Column(db.Unicode(20), unique=True, nullable=False)
-    prefix = db.Column(db.String(10))
-    suffix = db.Column(db.String(10))
-
-    def __str__(self):
-        return self.title
-
 product_categories = db.Table('product_categories',
     db.Column('product_id', db.Integer, db.ForeignKey('products.id')),
     db.Column('category_id', db.Integer, db.ForeignKey('categories.id')),
@@ -435,10 +497,7 @@ class Product(db.Model):
 
     description = db.Column(db.UnicodeText)
 
-    currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', onupdate='cascade'))
-    currency = db.relationship(Currency, backref=backref('products', lazy='dynamic'))
-
-    price = db.Column(db.Integer) # Cents
+    price = db.Column(db.Float, nullable=False)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
@@ -449,15 +508,12 @@ class Product(db.Model):
     )
 
     def __str__(self):
-        return self.title
+        return '%s - %s' % (self.title, render_currency_amount(self.network.currency, self.price))
 
 class Order(db.Model):
     __tablename__ = 'orders'
 
     id = db.Column(db.Integer, primary_key=True)
-
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    user = db.relationship(User, backref=backref('orders', lazy='dynamic'))
 
     network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', onupdate='cascade'), nullable=False)
     network = db.relationship(Network, backref=backref('orders', lazy='dynamic'))
@@ -465,50 +521,139 @@ class Order(db.Model):
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'))
     gateway = db.relationship(Gateway, backref=backref('orders', lazy='dynamic'))
 
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship(User, backref=backref('orders', lazy='dynamic'), foreign_keys=[user_id])
+
     status = db.Column(db.String(20), nullable=False, default='new')
 
     currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', onupdate='cascade'), nullable=False)
     currency = db.relationship(Currency, backref=backref('orders', lazy='dynamic'))
 
-    price = db.Column(db.Integer, nullable=False) # Cents
+    total = db.Column(db.Float, nullable=False)
+
+    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_by = db.relationship(User, backref=backref('orders_created', lazy='dynamic'), foreign_keys=[created_by_id])
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
+
+    @record_change
+    def cancel(self):
+        self.status = 'cancelled'
+
+    @record_change
+    def uncancel(self):
+        self.status = 'new'
+
+    @record_change
+    def archive(self):
+        self.status = 'archived'
+
+    @property
+    def available_actions(self):
+        return available_actions(order_actions, order_states, self.status, 'admin')
+
+    @property
+    def paid_transactions(self):
+        return self.transactions.filter_by(status='successful', type='payment')
+
+    @property
+    def paid_amount(self):
+        return sum(t.amount for t in self.paid_transactions)
+
+    @property
+    def owed_amount(self):
+        return self.total - self.paid_amount
+
+    def __str__(self):
+        return 'Order #%08d' % self.id
+
 
 class OrderItem(db.Model):
     __tablename__ = 'order_items'
 
     id = db.Column(db.Integer, primary_key=True)
 
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='cascade', onupdate='cascade'), nullable=False)
+    order = db.relationship(Order, backref=backref('items', lazy='dynamic'))
+
     product_id = db.Column(db.Integer, db.ForeignKey('products.id', onupdate='cascade'), nullable=False)
     product = db.relationship(Product, backref=backref('order_items', lazy='dynamic'))
 
     description = db.Column(db.Unicode(40))
 
-    units = db.Column(db.Integer, default=1, nullable=False)
-
-    price_per_unit = db.Column(db.Integer, nullable=False) # Cents
-    price = db.Column(db.Integer, nullable=False) # Cents
+    quantity = db.Column(db.Integer, default=1, nullable=False)
+    price = db.Column(db.Float, nullable=False)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
 
+    @property
+    def total(self):
+        return self.quantity * self.price
+
+    def __str__(self):
+        return '%d x %s - %s' % (self.quantity, self.product.title, render_currency_amount(self.order.currency, self.total))
+
+
+class Processor(db.Model):
+    __tablename__ = 'processors'
+
+    id = db.Column(db.Unicode(20), primary_key=True)
+    title = db.Column(db.Unicode(40))
+
+    active = db.Column(db.Boolean, nullable=False, default=True)
+
+    def pay_order(self, order):
+        from auth.processors import get_processor
+        return get_processor(self.id).pay_order(order)
+
+    def __str__(self):
+        return self.title
+
+
 class Transaction(db.Model):
     __tablename__ = 'transactions'
 
-    id = db.Column(db.String(40), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    hash = db.Column(db.String(40), nullable=False, unique=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     user = db.relationship(User, backref=backref('transactions', lazy='dynamic'))
 
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', onupdate='cascade'))
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='cascade', onupdate='cascade'))
     order = db.relationship(Order, backref=backref('transactions', lazy='dynamic'))
 
     type = db.Column(db.String(20), nullable=False, default='payment')
 
+    processor_id = db.Column(db.Integer, db.ForeignKey('processors.id', ondelete='cascade', onupdate='cascade'))
+    processor = db.relationship(Processor, backref=backref('transactions', lazy='dynamic'))
+
+    processor_reference = db.Column(db.String(40))
+
+    currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', onupdate='cascade'), nullable=False)
+    currency = db.relationship(Currency, backref=backref('transactions', lazy='dynamic'))
+
+    amount = db.Column(db.Float, nullable=False)
+
     payload = db.Column(db.UnicodeText)
 
     status = db.Column(db.String(20), nullable=False, default='new')
-    reference = db.Column(db.String(40))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint('processor_id', 'processor_reference'),
+    )
+
+    @record_change
+    def archive(self):
+        self.status = 'archived'
+
+    @property
+    def available_actions(self):
+        return available_actions(transaction_actions, transaction_states, self.status, 'admin')
+
+    def __str__(self):
+        return '#%08d' % self.id

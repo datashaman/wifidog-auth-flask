@@ -1,8 +1,42 @@
 from __future__ import absolute_import
 
-import six
+order_actions = {
+    'archive': {
+        'interface': 'admin',
+        'icon': 'x'
+    },
+    'pay': {
+        'interface': 'admin',
+        'icon': 'check'
+    },
+}
 
-actions = {
+order_states = {}
+
+for state in ('new','paid'):
+    order_states[state] = { 'archive': 'archived' }
+
+for ( source, method, destination) in (
+    ( 'new', 'pay', 'paid' ),
+):
+    if source not in order_states:
+        order_states[source] = {'archive': 'archived'}
+
+    order_states[source][method] = destination
+
+transaction_actions = {
+    'archive': {
+        'interface': 'admin',
+        'icon': 'x'
+    },
+}
+
+transaction_states = {}
+
+for state in ('successful', 'failed'):
+    transaction_states[state] = {'archive': 'archived'}
+
+voucher_actions = {
     'archive': {
         'interface': 'admin',
         'icon': 'x',
@@ -32,20 +66,10 @@ actions = {
     },
 }
 
-def available_actions(status, interface):
-    if status in states:
-        result = {}
-        for action, defn in six.iteritems(actions):
-            if action in states[status] and defn['interface'] == interface:
-                result[action] = defn
-        return result
-
-    return {}
-
-states = {}
+voucher_states = {}
 
 for state in ('new', 'active', 'expired', 'ended', 'blocked'):
-    states[state] = { 'archive': 'archived' }
+    voucher_states[state] = { 'archive': 'archived' }
 
 for ( source, method, destination) in (
     ( 'new', 'expire', 'expired' ),
@@ -56,11 +80,15 @@ for ( source, method, destination) in (
     ( 'blocked', 'unblock', 'active' ),
     ( 'new', 'login', 'active' ),
 ):
-    if source not in states:
-        states[source] = { 'archive': 'archived' }
+    if source not in voucher_states:
+        voucher_states[source] = { 'archive': 'archived' }
 
-    states[source][method] = destination
+    voucher_states[source][method] = destination
 
 if __name__ == '__main__':
     import json
-    print(json.dumps(states, indent=4))
+    print('Orders')
+    print(json.dumps(order_states, indent=4))
+
+    print('Vouchers')
+    print(json.dumps(voucher_states, indent=4))

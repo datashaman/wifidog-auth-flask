@@ -1,0 +1,77 @@
+{% extends 'layouts/default.html' %}
+
+{% set page_title = 'Transactions' %}
+
+{% set show_network = current_user.has_role('super-admin') %}
+{% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
+
+{% block content %}
+    <div class="content">
+        {% if instances %}
+            <table id="orders" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        {% if show_network or show_gateway %}
+                        <th>
+                            Network &amp; Gateway
+                        </th>
+                        {% endif %}
+                        <th>User</th>
+                        <th>Order</th>
+                        <th>Processor</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                        <th>Created At</th>
+
+                        <th class="actions">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for instance in instances %}
+                    <tr data-id={{ instance.id }} class="network {{ 'pure-table-' + loop.cycle('odd', 'even') }}">
+                        <td data-label="ID"><a href="{{ url_for('.transaction_show', hash=instance.hash) }}">{{ instance }}</a></td>
+                        {% if show_network or show_gateway %}
+                        <td data-label="Network & Gateway">
+                            {% if show_network %}
+                            {{ instance.order.network }}
+                            {% endif %}
+                            {% if show_gateway %}
+                                {% if show_network %}<br />{% endif %}
+                                {{ instance.order.gateway }}
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                        <td data-label="User"><a href="{{ url_for('.user_edit', id=instance.user_id) }}">{{ instance.user }}</a></td>
+                        <td data-label="Order">
+                            {% if instance.order_id %}
+                                <a href="{{ url_for('.order_edit', id=instance.order_id) }}">{{ instance.order }}</a></td>
+                            {% else %}
+                                None
+                            {% endif %}
+                        </td>
+                        <td data-label="Processor">{{ instance.processor }}</td>
+                        <td data-label="Status">{{ instance.status }}</td>
+                        <td data-label="Amount">{{ render_currency_amount(instance.currency, instance.amount) }}</td>
+                        <td data-label="Created At">{{ instance.created_at | datetimeformat('short') }}</td>
+
+                        <td class="actions actions-instance">
+                            <div class="pure-button-group" role="group" aria-label="Actions Available">
+                                {% for action, defn in six.iteritems(instance.available_actions) %}
+                                <a href="{{ url_for('.transaction_action', hash=instance.hash, action=action) }}" class="pure-button" title="{{ action }}">
+                                    {% if defn.icon %}
+                                    <span class="oi" data-glyph={{ defn.icon }} aria-hidden="true"></span>
+                                    {% endif %}
+                                    {{ action }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -14,23 +14,30 @@ pipeline:
   test:
     image: python:${PYTHON_VERSION}-slim-jessie
     commands:
-    - pip install -r requirements.txt
+    - pip install -r requirements-tests.txt
     - python -m unittest discover -s tests
+    - bash build.sh
     environment:
     - XDG_CACHE_HOME=./cache
     - TESTING=true
     when:
       event: push
+  put-build:
+    image: samepagelabs/s3cmd
+    commands:
+    - /usr/local/bin/s3cmd --host=$${SPACES_ENDPOINT} --host-bucket="%(bucket)s.$${SPACES_ENDPOINT}" --access_key=$${SPACES_ACCESS_KEY} --secret_key=$${SPACES_SECRET_KEY} put ./build/build.tgz s3://$${SPACES_BUCKET}/builds/auth/${DRONE_BUILD_NUMBER}/python-${PYTHON_VERSION}.tgz
+    secrets:
+    - spaces_access_key
+    - spaces_bucket
+    - spaces_endpoint
+    - spaces_secret_key
   publish:
     image: plugins/docker
     repo: datashaman/wifidog-auth-flask
     tags: ${DRONE_COMMIT_BRANCH/master/latest}
     volumes:
-    - /cache:/cache
     - /var/run/docker.sock:/var/run/docker.sock
     build_args:
-    - XDG_CACHE_HOME=/cache
-    environment:
     - XDG_CACHE_HOME=/cache
     purge: false
     privileged: true
@@ -53,4 +60,5 @@ pipeline:
     channel: ci
     when:
       status: [ success, failure ]
-    secrets: [ slack_webhook ]
+    secrets:
+    - slack_webhook

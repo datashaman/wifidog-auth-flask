@@ -5,8 +5,9 @@ Views for the app
 from __future__ import absolute_import
 from __future__ import division
 
+import datetime
 import os
-import uuid
+import six
 
 from auth import constants
 
@@ -19,16 +20,32 @@ from auth.forms import \
     MyUserForm, \
     NetworkForm, \
     NewVoucherForm, \
+    OrderForm, \
     ProductForm, \
     UserForm
 
-from auth.models import Auth, Category, Country, Currency, Gateway, Network, Product, User, Voucher, db
-# from auth.payu import get_transaction, set_transaction, capture
-from auth.resources import logos
+from auth.models import \
+    Auth, \
+    Category, \
+    Country, \
+    Currency, \
+    Gateway, \
+    Network, \
+    Order, \
+    OrderItem, \
+    Processor, \
+    Product, \
+    Transaction, \
+    User, \
+    Voucher, \
+    db
+
+from auth.resources import resource_instance, resource_instances, RESOURCE_MODELS
 from auth.services import \
         environment_dump, \
-        healthcheck as healthcheck_service
-from auth.utils import is_logged_in, has_role
+        healthcheck as healthcheck_service, \
+        logos
+from auth.utils import generate_token, has_role, is_logged_in
 
 from flask import \
     Blueprint, \
@@ -42,72 +59,16 @@ from flask import \
     session, \
     url_for
 from flask_menu import register_menu
-from flask_potion.exceptions import ItemNotFound
 from flask_security import \
     auth_token_required, \
     current_user, \
     login_required, \
     roles_accepted
 from PIL import Image
+from pytz import common_timezones
 
 
 bp = Blueprint('auth', __name__)
-
-RESOURCE_MODELS = {
-    'categories': Category,
-    'countries': Country,
-    'currencies': Currency,
-    'gateways': Gateway,
-    'networks': Network,
-    'products': Product,
-    'users': User,
-    'vouchers': Voucher,
-}
-
-
-def generate_token():
-    """Generate token for the voucher session"""
-    return uuid.uuid4().hex
-
-
-def resource_query(resource):
-    """Generate a filtered query for a resource"""
-    model = RESOURCE_MODELS[resource]
-    query = model.query
-
-    if current_user.has_role('network-admin') or current_user.has_role('gateway-admin'):
-        if model == Network:
-            query = query.filter_by(id=current_user.network_id)
-        elif model in [ Gateway, User ]:
-            query = query.filter_by(network_id=current_user.network_id)
-
-    if current_user.has_role('network-admin'):
-        if model == Voucher:
-            query = query.join(Voucher.gateway).join(Gateway.network).filter(Network.id == current_user.network_id)
-
-    if current_user.has_role('gateway-admin'):
-        if model == Gateway:
-            query = query.filter_by(id=current_user.gateway_id)
-        elif model in [ User, Voucher ]:
-            query = query.filter_by(gateway_id=current_user.gateway_id)
-
-    return query
-
-def resource_instance(resource, id):
-    """Return instances"""
-    model = RESOURCE_MODELS[resource]
-    return resource_query(resource).filter(model.id == id).first_or_404()
-
-
-def resource_instances(resource):
-    """Return instances"""
-    query = resource_query(resource)
-    if resource == 'vouchers':
-        return (query.filter(Voucher.status != 'archived')
-                     .order_by(Voucher.status, Voucher.created_at.desc())
-                     .all())
-    else:
-        return query.all()
 
 
 def resource_index(resource, form=None):
@@ -155,8 +116,8 @@ def resource_delete(resource, id):
                            resource=resource)
 
 
-def resource_action(resource, id, action):
-    instance = resource_instance(resource, id)
+def resource_action(resource, id, action, param_name='id'):
+    instance = resource_instance(resource, id, param_name)
     if request.method == 'POST':
         if action in constants.ACTIONS[resource]:
             getattr(instance, action)()
@@ -165,9 +126,11 @@ def resource_action(resource, id, action):
             return redirect(url_for('.%s_index' % resource))
         else:
             abort(404)
+    action_url = url_for('.%s_action'  % resource, **{'action': action, param_name: getattr(instance, param_name)})
     return render_template('shared/action.html',
-                           instance=instance,
                            action=action,
+                           action_url=action_url,
+                           instance=instance,
                            resource=resource)
 
 
@@ -188,7 +151,7 @@ def my_network():
         db.session.commit()
         flash('Update successful')
         return redirect('/')
-    return render_template('networks/current.html',
+    return render_template('network/current.html',
                            form=form,
                            instance=current_user.network)
 
@@ -205,11 +168,10 @@ def my_network():
 )
 def my_gateway():
     gateway = current_user.gateway
-    return _gateways_edit(
+    return _gateway_edit(
         gateway,
         'My Gateway',
-        url_for('.my_gateway'),
-        url_for('.home')
+        url_for('.my_gateway')
     )
 
 
@@ -224,6 +186,10 @@ def my_gateway():
 )
 def my_account():
     form = MyUserForm(obj=current_user)
+
+    form.locale.choices = list((id, title) for id, title in six.iteritems(constants.LOCALES))
+    form.timezone.choices = list((timezone, timezone) for timezone in common_timezones)
+
     if form.validate_on_submit():
         if form.password.data == '':
             del form.password
@@ -231,7 +197,7 @@ def my_account():
         db.session.commit()
         flash('Update successful')
         return redirect('/')
-    return render_template('users/current.html',
+    return render_template('user/current.html',
                            form=form,
                            instance=current_user)
 
@@ -246,30 +212,30 @@ def my_account():
     visible_when=has_role('super-admin'),
     order=10
 )
-def networks_index():
-    return resource_index('networks')
+def network_index():
+    return resource_index('network')
 
 
 @bp.route('/networks/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin')
-def networks_new():
+def network_new():
     form = NetworkForm()
-    return resource_new('networks', form)
+    return resource_new('network', form)
 
 
 @bp.route('/networks/<id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin')
-def networks_edit(id):
-    return resource_edit('networks', id, NetworkForm)
+def network_edit(id):
+    return resource_edit('network', id, NetworkForm)
 
 
 @bp.route('/networks/<id>/delete', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin')
-def networks_delete(id):
-    return resource_delete('networks', id)
+def network_delete(id):
+    return resource_delete('network', id)
 
 
 @bp.route('/gateways')
@@ -281,8 +247,8 @@ def networks_delete(id):
     'Gateways',
     visible_when=has_role('super-admin', 'network-admin'),
     order=20)
-def gateways_index():
-    return resource_index('gateways')
+def gateway_index():
+    return resource_index('gateway')
 
 def handle_logo(form):
     if request.files['logo']:
@@ -296,7 +262,7 @@ def handle_logo(form):
 @bp.route('/gateways/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin')
-def gateways_new():
+def gateway_new():
     form = GatewayForm()
     if form.validate_on_submit():
         handle_logo(form)
@@ -305,19 +271,19 @@ def gateways_new():
         db.session.add(gateway)
         db.session.commit()
         flash('Create %s successful' % gateway)
-        return redirect(url_for('.gateways_index'))
-    return render_template('gateways/new.html', form=form)
+        return redirect(url_for('.gateway_index'))
+    return render_template('gateway/new.html', form=form)
 
 
-def _gateways_edit(gateway, page_title, action_url, redirect_url):
+def _gateway_edit(gateway, page_title, action_url):
     form = GatewayForm(obj=gateway)
     if form.validate_on_submit():
         handle_logo(form)
         form.populate_obj(gateway)
         db.session.commit()
         flash('Update %s successful' % gateway)
-        return redirect(redirect_url)
-    return render_template('gateways/edit.html',
+        return redirect(url_for('.home'))
+    return render_template('gateway/edit.html',
                            action_url=action_url,
                            form=form,
                            instance=gateway,
@@ -328,21 +294,20 @@ def _gateways_edit(gateway, page_title, action_url, redirect_url):
 @bp.route('/gateways/<id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin')
-def gateways_edit(id):
+def gateway_edit(id):
     gateway = Gateway.query.filter_by(id=id).first_or_404()
-    return _gateways_edit(
+    return _gateway_edit(
         gateway,
         'Edit Gateway',
-        url_for('.gateways_edit', id=id),
-        url_for('.gateways_index')
+        url_for('.gateway_edit', id=id)
     )
 
 
 @bp.route('/gateways/<id>/delete', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin')
-def gateways_delete(id):
-    return resource_delete('gateways', id)
+def gateway_delete(id):
+    return resource_delete('gateway', id)
 
 
 @bp.route('/users')
@@ -355,28 +320,39 @@ def gateways_delete(id):
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
     order=40
 )
-def users_index():
+def user_index():
     form = UserForm()
-    return resource_index('users', form=form)
+    return resource_index('user', form=form)
 
 
 @bp.route('/users/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def users_new():
+def user_new():
     form = UserForm()
+
+    form.locale.choices = list((id, title) for id, title in six.iteritems(constants.LOCALES))
+    form.timezone.choices = list((timezone, timezone) for timezone in common_timezones)
 
     if current_user.has_role('gateway-admin'):
         del form.roles
 
-    return resource_new('users', form)
+    if form.validate_on_submit():
+        user = User()
+        form.populate_obj(user)
+        db.session.add(user)
+        db.session.commit()
+        flash('Create %s successful' % user)
+        return redirect(url_for('.user_index'))
+
+    return render_template('user/new.html', form=form)
 
 
-@bp.route('/users/<id>', methods=['GET', 'POST'])
+@bp.route('/users/<int:id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def users_edit(id):
-    instance = resource_instance('users', id)
+def user_edit(id):
+    instance = resource_instance('user', id)
 
     if (current_user.has_role('network-admin')
             and instance.network != current_user.network):
@@ -388,6 +364,9 @@ def users_edit(id):
         abort(403)
 
     form = UserForm(obj=instance)
+
+    form.locale.choices = list((id, title) for id, title in six.iteritems(constants.LOCALES))
+    form.timezone.choices = list((timezone, timezone) for timezone in common_timezones)
 
     if current_user.has_role('network-admin'):
         del form.gateway
@@ -404,15 +383,15 @@ def users_edit(id):
         db.session.commit()
 
         flash('Update %s successful' % instance)
-        return redirect(url_for('.users_index'))
-    return render_template('users/edit.html', form=form, instance=instance)
+        return redirect(url_for('.user_index'))
+    return render_template('user/edit.html', form=form, instance=instance)
 
 
-@bp.route('/users/<id>/delete', methods=['GET', 'POST'])
+@bp.route('/users/<int:id>/delete', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def users_delete(id):
-    return resource_delete('users', id)
+def user_delete(id):
+    return resource_delete('user', id)
 
 
 @bp.route('/vouchers')
@@ -425,15 +404,15 @@ def users_delete(id):
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
     order=5
 )
-def vouchers_index():
-    return resource_index('vouchers')
+def voucher_index():
+    return resource_index('voucher')
 
 
-@bp.route('/vouchers/<id>/<action>', methods=['GET', 'POST'])
+@bp.route('/vouchers/<int:id>/<action>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def vouchers_action(id, action):
-    return resource_action('vouchers', id, action)
+def voucher_action(id, action):
+    return resource_action('voucher', id, action)
 
 
 @bp.route('/categories')
@@ -446,30 +425,30 @@ def vouchers_action(id, action):
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
     order=99
 )
-def categories_index():
-    return resource_index('categories')
+def category_index():
+    return resource_index('category')
 
 
 @bp.route('/categories/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def categories_new():
+def category_new():
     form = CategoryForm()
-    return resource_new('categories', form)
+    return resource_new('category', form)
 
 
-@bp.route('/categories/<id>/delete', methods=['GET', 'POST'])
+@bp.route('/categories/<int:id>/delete', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def categories_delete(id):
-    return resource_delete('categories', id)
+def category_delete(id):
+    return resource_delete('category', id)
 
 
-@bp.route('/categories/<id>', methods=['GET', 'POST'])
+@bp.route('/categories/<int:id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def categories_edit(id):
-    return resource_edit('categories', id, CategoryForm)
+def category_edit(id):
+    return resource_edit('category', id, CategoryForm)
 
 
 @bp.route('/products')
@@ -482,30 +461,30 @@ def categories_edit(id):
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
     order=99
 )
-def products_index():
-    return resource_index('products')
+def product_index():
+    return resource_index('product')
 
 
 @bp.route('/products/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def products_new():
+def product_new():
     form = ProductForm()
-    return resource_new('products', form)
+    return resource_new('product', form)
 
 
-@bp.route('/products/<id>/delete', methods=['GET', 'POST'])
+@bp.route('/products/<int:id>/delete', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def products_delete(id):
-    return resource_delete('products', id)
+def product_delete(id):
+    return resource_delete('product', id)
 
 
-@bp.route('/products/<id>', methods=['GET', 'POST'])
+@bp.route('/products/<int:id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def products_edit(id):
-    return resource_edit('products', id, ProductForm)
+def product_edit(id):
+    return resource_edit('product', id, ProductForm)
 
 
 @bp.route('/countries')
@@ -518,30 +497,30 @@ def products_edit(id):
     visible_when=has_role('super-admin'),
     order=99
 )
-def countries_index():
-    return resource_index('countries')
+def country_index():
+    return resource_index('country')
 
 
 @bp.route('/countries/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin')
-def countries_new():
+def country_new():
     form = CountryForm()
-    return resource_new('countries', form)
+    return resource_new('country', form)
 
 
 @bp.route('/countries/<id>/delete', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin')
-def countries_delete(id):
-    return resource_delete('countries', id)
+def country_delete(id):
+    return resource_delete('country', id)
 
 
 @bp.route('/countries/<id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin')
-def countries_edit(id):
-    return resource_edit('countries', id, CountryForm)
+def country_edit(id):
+    return resource_edit('country', id, CountryForm)
 
 
 @bp.route('/currencies')
@@ -554,30 +533,269 @@ def countries_edit(id):
     visible_when=has_role('super-admin'),
     order=99
 )
-def currencies_index():
-    return resource_index('currencies')
+def currency_index():
+    return resource_index('currency')
 
 
 @bp.route('/currencies/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def currencies_new():
+def currency_new():
     form = CurrencyForm()
-    return resource_new('currencies', form)
+    return resource_new('currency', form)
 
 
 @bp.route('/currencies/<id>/delete', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def currencies_delete(id):
-    return resource_delete('currencies', id)
+def currency_delete(id):
+    return resource_delete('currency', id)
 
 
 @bp.route('/currencies/<id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def currencies_edit(id):
-    return resource_edit('currencies', id, CurrencyForm)
+def currency_edit(id):
+    return resource_edit('currency', id, CurrencyForm)
+
+
+@bp.route('/orders')
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+@register_menu(
+    bp,
+    '.orders',
+    'Orders',
+    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
+    order=2
+)
+def order_index():
+    return resource_index('order')
+
+
+def _gateway_choices():
+    choices = []
+
+    if current_user.has_role('gateway-admin'):
+        choices = [
+            [
+                current_user.gateway_id,
+                '%s - %s' % (current_user.gateway.network.title,
+                             current_user.gateway.title)
+            ]
+        ]
+    else:
+        if current_user.has_role('network-admin'):
+            networks = [current_user.network]
+        else:
+            networks = Network.query.all()
+
+        for network in networks:
+            for gateway in network.gateways:
+                choices.append([
+                    gateway.id,
+                    '%s - %s' % (network.title,
+                                 gateway.title)
+                ])
+
+    return choices
+
+
+@bp.route('/new-order', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+@register_menu(
+    bp,
+    '.new-order',
+    'New Order',
+    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
+    order=0
+)
+def order_new():
+    order_form = OrderForm()
+
+    show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin')
+
+    if show_gateway:
+        choices = _gateway_choices()
+
+        if choices == []:
+            flash('Define a network and gateway first.')
+            return redirect(request.referrer)
+
+        order_form.gateway.choices = choices
+        gateway = Gateway.query.get(order_form.gateway.data)
+    else:
+        del order_form.gateway
+        gateway = current_user.gateway
+
+    if order_form.validate_on_submit():
+        order = Order()
+
+        order.gateway_id = gateway.id
+        order.network_id = gateway.network_id
+
+        order.created_by_id = current_user.id
+        order.currency_id = gateway.network.currency_id
+        order.user_id = current_user.id
+
+        order_item = OrderItem()
+        order_item.order = order
+        order_item.product_id = order_form.product.data.id
+        order_item.price = order_form.price.data
+        order_item.quantity = order_form.quantity.data
+
+        _recalculate_total(order)
+
+        db.session.add(order)
+        db.session.add(order_item)
+        db.session.commit()
+
+        flash('Create %s successful' % order)
+        return redirect(url_for('.order_edit', id=order.id))
+
+    prices = dict((p.id, p.price) for p in Product.query.all())
+    price = '%.2f' % (list(prices.values())[0])
+
+    return render_template('order/new.html',
+                           order_form=order_form,
+                           price=price,
+                           prices=prices)
+
+
+def _recalculate_total(order):
+    order.total = 0
+    for item in order.items:
+        order.total += item.price * item.quantity
+
+
+@bp.route('/orders/<int:id>', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def order_edit(id):
+    order = resource_instance('order', id)
+
+    if order.status == 'new':
+        order_form = OrderForm(obj=order)
+
+        show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin')
+
+        if show_gateway:
+            choices = _gateway_choices()
+
+            if choices == []:
+                flash('Define a network and gateway first.')
+                return redirect(request.referrer)
+
+            order_form.gateway.choices = choices
+            gateway = Gateway.query.get(order_form.gateway.data)
+        else:
+            del order_form.gateway
+            gateway = current_user.gateway
+
+        if order_form.validate_on_submit():
+            order_item = OrderItem()
+            order_item.order = order
+            order_item.product_id = order_form.product.data.id
+            order_item.price = order_form.price.data
+            order_item.quantity = order_form.quantity.data
+
+            order.gateway = gateway
+            order.network = gateway.network
+
+            _recalculate_total(order)
+
+            db.session.add(order_item)
+            db.session.commit()
+
+            flash('Create %s successful' % order)
+            return redirect(url_for('.order_edit', id=order.id))
+
+        prices = dict((p.id, p.price) for p in Product.query.all())
+        price = '%.2f' % (list(prices.values())[0])
+
+        return render_template('order/edit.html',
+                               order_form=order_form,
+                               order=order,
+                               price=price,
+                               prices=prices)
+
+    return render_template('order/show.html', order=order)
+
+
+
+@bp.route('/orders/<int:id>/delete', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def order_delete(id):
+    return resource_delete('order', id)
+
+
+@bp.route('/orders/<int:id>/<int:item_id>', methods=['POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def order_item_edit(id, item_id):
+    order = Order.query.filter_by(id=id).first_or_404()
+    order_item = OrderItem.query.filter_by(id=item_id).first_or_404()
+    order_item_label = str(order_item)
+
+    action = request.form.get('action')
+
+    if action == 'remove':
+        db.session.delete(order_item)
+    else:
+        order_item.product = Product.query.get(request.form.get('product'))
+        order_item.quantity = int(request.form.get('quantity'))
+        order_item.price = float(request.form.get('price'))
+
+    _recalculate_total(order)
+    db.session.commit()
+
+    flash('%s %s successful' % (action[0].upper() + action[1:], order_item_label))
+    return redirect(url_for('.order_edit', id=id))
+
+
+@bp.route('/orders/<int:id>/pay/<processor_id>', methods=['GET', 'POST'])
+def order_pay(id, processor_id):
+    order = resource_instance('order', id)
+    processor = resource_instance('processor', processor_id)
+    return processor.pay_order(order)
+
+
+@bp.route('/orders/<int:id>/<action>', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def order_action(id, action):
+    return resource_action('order', id, action)
+
+
+@bp.route('/transactions')
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+@register_menu(
+    bp,
+    '.transactions',
+    'Transactions',
+    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
+    order=3
+)
+def transaction_index():
+    return resource_index('transaction')
+
+
+@bp.route('/transactions/<hash>')
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def transaction_show(hash):
+    transaction = Transaction.query.filter(Transaction.hash == hash).first_or_404()
+    return render_template('transaction/show.html', transaction=transaction)
+
+
+@bp.route('/transactions/<hash>/<action>', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def transaction_action(hash, action):
+    return resource_action('transaction', hash, action, 'hash')
 
 
 @bp.route('/new-voucher', methods=['GET', 'POST'])
@@ -590,7 +808,7 @@ def currencies_edit(id):
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
     order=0
 )
-def vouchers_new():
+def voucher_new():
     form = NewVoucherForm()
     choices = []
     defaults = {}
@@ -643,9 +861,9 @@ def vouchers_new():
         db.session.add(voucher)
         db.session.commit()
 
-        return redirect(url_for('.vouchers_new', code=voucher.code))
+        return redirect(url_for('.voucher_new', code=voucher.code))
 
-    return render_template('vouchers/new.html', form=form, defaults=defaults)
+    return render_template('voucher/new.html', form=form, defaults=defaults)
 
 
 @bp.route('/wifidog/login/', methods=['GET', 'POST'])
@@ -692,6 +910,18 @@ def wifidog_login():
 
 @bp.route('/wifidog/ping/')
 def wifidog_ping():
+    gateway = Gateway.query.filter_by(id=request.args.get('gw_id')).first_or_404()
+
+    gateway.last_ping_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    gateway.last_ping_at = datetime.datetime.utcnow()
+    gateway.last_ping_user_agent = request.user_agent.string
+    gateway.last_ping_sys_uptime = request.args.get('sys_uptime')
+    gateway.last_ping_wifidog_uptime = request.args.get('wifidog_uptime')
+    gateway.last_ping_sys_memfree = request.args.get('sys_memfree')
+    gateway.last_ping_sys_load = request.args.get('sys_load')
+
+    db.session.commit()
+
     return ('Pong', 200)
 
 
@@ -756,39 +986,6 @@ def wifidog_portal():
                            gateway=gateway,
                            logo_url=logo_url,
                            voucher=voucher)
-
-
-@bp.route('/pay')
-def pay():
-    return_url = url_for('.pay_return', _external=True)
-    cancel_url = url_for('.pay_cancel', _external=True)
-    response = set_transaction('ZAR',
-                               1000,
-                               'Something',
-                               return_url,
-                               cancel_url)
-    return redirect('%s?PayUReference=%s' % (capture, response.payUReference))
-
-
-@bp.route('/pay/return')
-def pay_return():
-    response = get_transaction(request.args.get('PayUReference'))
-    basketAmount = '{:.2f}'.format(int(response.basket.amountInCents) / 100)
-    category = 'success' if response.successful else 'error'
-    flash(response.displayMessage, category)
-    return render_template('payu/transaction.html',
-                           response=response,
-                           basketAmount=basketAmount)
-
-
-@bp.route('/pay/cancel')
-def pay_cancel():
-    response = get_transaction(request.args.get('payUReference'))
-    basketAmount = '{:.2f}'.format(int(response.basket.amountInCents) / 100)
-    flash(response.displayMessage, 'warning')
-    return render_template('payu/transaction.html',
-                           response=response,
-                           basketAmount=basketAmount)
 
 
 @bp.route('/favicon.ico')

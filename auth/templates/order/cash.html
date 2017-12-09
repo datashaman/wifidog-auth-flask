@@ -1,0 +1,38 @@
+{% extends 'layouts/default.html' %}
+{% from 'helpers/form.html' import group %}
+
+{% set page_title = 'Order Cash' %}
+
+{% block content %}
+    <div class="order-cash content">
+        <form method="post" action="{{ url_for('.order_pay', id=order.id, processor_id='cash') }}" class="pure-form pure-form-aligned">
+            {{ form.csrf_token }}
+
+            <fieldset>
+                <div class="pure-controls">
+                    <ul>
+                        <li>Total: {{ render_currency_amount(order.currency, order.total) }}</li>
+                        <li>Paid: {{ render_currency_amount(order.currency, order.paid_amount) }}</li>
+                        <li>Owing: {{ render_currency_amount(order.currency, order.owed_amount) }}</li>
+                    </ul>
+                </div>
+
+                {{ group(form.currency) }}
+                {{ group(form.cash, type='number', min=0, max=order.owed_amount, value='%.2f' % order.owed_amount) }}
+
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button pure-button-primary">Ok</button>
+                    <button type="button" class="pure-button" onclick="history.back()">Cancel</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+Zepto(function($) {
+    $('#cash').focus();
+});
+</script>
+{% endblock %}

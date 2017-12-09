@@ -1,0 +1,45 @@
+{% extends 'layouts/default.html' %}
+
+{% set page_title = 'Currencies' %}
+{% set new_title = 'New Currency' %}
+{% set new_url = url_for('.currency_new') %}
+
+{% block content %}
+    <div class="content">
+        {% if instances %}
+            <table width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Prefix</th>
+                        <th>Suffix</th>
+                        <th>Countries</th>
+                        <th class="actions">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for instance in instances %}
+                        <tr data-id={{ instance.id }} class={{ 'pure-table-' + loop.cycle('odd', 'even') }}>
+                            <td class="id" data-label="ID"><a href={{ url_for('.currency_edit', id=instance.id) }}>{{ instance.id }}</a></td>
+                            <td class="title" data-label="Title">{{ instance.title }}</td>
+                            <td class="prefix" data-label="Prefix">{{ instance.prefix }}</td>
+                            <td class="suffix" data-label="Suffix">{{ instance.suffix }}</td>
+                            <td class="countries" data-label="Countries">{{ instance.countries|join(', ') }}</td>
+
+                            <td class="actions actions-instance">
+                                <div class="pure-button-group" role="group" aria-label="Actions Available">
+                                    <a href={{ url_for('.currency_delete', id=instance.id) }} class="pure-button">
+                                        <span class="oi" data-glyph="x" title="Delete" aria-hidden="true"></span>
+                                        Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
