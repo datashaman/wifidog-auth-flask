@@ -29,9 +29,12 @@ COPY \
 RUN pip install -r requirements.txt && rm requirements.txt
 RUN npm config set cache "${XDG_CACHE_HOME}/npm" && npm install
 
-COPY auth auth/
+COPY auth/assets auth/assets/
 
 RUN node_modules/.bin/gulp && rm -rf auth/assets gulpfile.js node_modules package.json package-lock.json
+
+COPY auth auth/
+
 RUN rm -rf /tmp/* /usr/share/doc /usr/share/info
 
 EXPOSE 5000
