@@ -1,5 +1,8 @@
 PYTHON = python
-TAG = datashaman/wifidog-auth-flask
+REPO = datashaman/wifidog-auth-flask
+BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
+RELEASE = $(subst master,latest,$(BRANCH))
+TAG = $(REPO):$(RELEASE)
 
 tmuxp:
 	tmuxp load .
