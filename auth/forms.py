@@ -126,6 +126,7 @@ GatewayForm = model_form(
     FlaskForm,
     exclude=[
         'auths',
+        'cashups',
         'created_at',
         'categories',
         'orders',
