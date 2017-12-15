@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import json
 import requests
 
 from auth.models import db
@@ -66,8 +67,7 @@ def get_transaction_type(response):
 
 @bp.route('/snapscan/notification', methods=['POST'])
 def snapscan_notification():
-    body = request.get_json()
-    print(body)
-    response = get_transaction(body['payload']['id'])
+    payload = json.loads(request.form.get('payload'))
+    response = get_transaction(payload['id'])
     update_transaction('snapscan', current_user, response)
     return 'OK'
