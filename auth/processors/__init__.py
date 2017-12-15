@@ -4,6 +4,7 @@ from auth.models import Order, Processor, Transaction
 from auth.services import db
 from auth.utils import generate_token, render_currency_amount
 from flask import flash
+from flask_security import current_user
 
 
 def init_processors(app):
@@ -24,7 +25,7 @@ def flash_transaction(transaction):
         flash('Still owed %s on %s' % ( render_currency_amount(order.currency, order.owed_amount), order), 'warning')
 
 
-def update_transaction(id, user, response):
+def update_transaction(id, response):
     processor_module = get_processor(id)
     order = Order.query.get(processor_module.get_merchant_reference(response))
     processor = Processor.query.get(id)
@@ -38,7 +39,8 @@ def update_transaction(id, user, response):
         transaction.currency_id = processor_module.get_transaction_currency(response)
         transaction.processor = processor
         transaction.processor_reference = processor_reference
-        transaction.user = user
+        if current_user.is_authenticated:
+            transaction.user_id = current_user.id
         transaction.type = processor_module.transaction_types[processor_module.get_transaction_type(response)]
         order.transactions.append(transaction)
 

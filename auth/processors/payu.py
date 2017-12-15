@@ -113,7 +113,7 @@ def get_transaction_type(response):
 @bp.route('/payu/return')
 def payu_return():
     response = get_transaction(request.args.get('PayUReference'))
-    transaction = update_transaction('payu', current_user, response)
+    transaction = update_transaction('payu', response)
     flash_transaction(transaction)
     return redirect(url_for('auth.transaction_show', hash=transaction.hash))
 
@@ -121,7 +121,7 @@ def payu_return():
 @bp.route('/payu/cancel')
 def payu_cancel():
     response = get_transaction(request.args.get('PayUReference'))
-    transaction = update_transaction('payu', current_user, response)
+    transaction = update_transaction('payu', response)
     flash_transaction(transaction)
     return redirect(url_for('auth.transaction_show', hash=transaction.hash))
 

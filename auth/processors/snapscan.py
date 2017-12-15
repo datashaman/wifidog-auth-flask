@@ -70,5 +70,5 @@ def get_transaction_type(response):
 def snapscan_notification():
     payload = json.loads(request.form.get('payload'))
     response = get_transaction(payload['id'])
-    update_transaction('snapscan', None, response)
+    update_transaction('snapscan', response)
     return 'OK'

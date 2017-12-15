@@ -518,7 +518,7 @@ class Order(db.Model):
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'))
     gateway = db.relationship(Gateway, backref=backref('orders', lazy='dynamic'))
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship(User, backref=backref('orders', lazy='dynamic'), foreign_keys=[user_id])
 
     status = db.Column(db.String(20), nullable=False, default='new')
@@ -615,7 +615,7 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     hash = db.Column(db.String(40), nullable=False, unique=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'))
     user = db.relationship(User, backref=backref('transactions', lazy='dynamic'))
 
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='cascade', onupdate='cascade'))

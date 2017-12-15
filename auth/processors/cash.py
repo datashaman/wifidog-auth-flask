@@ -4,7 +4,6 @@ from auth.forms import instances
 from auth.processors import flash_transaction, update_transaction
 from auth.utils import generate_token
 from flask import Blueprint, render_template, redirect, url_for
-from flask_security import current_user
 from flask_wtf import FlaskForm
 from wtforms import FloatField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -38,7 +37,7 @@ def pay_order(order):
             'hash': generate_token(),
             'merchant_reference': order.id,
         }
-        transaction = update_transaction('cash', current_user, response)
+        transaction = update_transaction('cash', response)
         flash_transaction(transaction)
         return redirect(url_for('.order_index'))
     return render_template('order/cash.html', form=form, order=order)
