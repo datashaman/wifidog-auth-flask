@@ -57,29 +57,25 @@ def resource_query(resource):
 
 def resource_instance(resource, param, param_name='id'):
     model = RESOURCE_MODELS[resource]
-    query = resource_query(resource).filter(model.id == param)
+    query = resource_filters[resource](resource_query(resource)).filter(model.id == param)
     return query.first_or_404()
 
 
-resource_filters = defaultdict(lambda: lambda query: query.all())
+resource_filters = defaultdict(lambda: lambda query: query)
 
 resource_filters.update({
-    'category': lambda query: query.order_by(Category.title).all(),
+    'category': lambda query: query.order_by(Category.title),
     'order': lambda query: query.filter(Order.status != 'archived')
-                                .order_by(Order.created_at.desc())
-                                .all(),
-    'product': lambda query: query.order_by(Product.code).all(),
+                                .order_by(Order.created_at.desc()),
+    'product': lambda query: query.order_by(Product.code),
     'transaction': lambda query: query.filter(Transaction.status != 'archived')
-                                      .order_by(Transaction.created_at.desc())
-                                      .all(),
-    'user': lambda query: query.order_by(User.email).all(),
+                                      .order_by(Transaction.created_at.desc()),
+    'user': lambda query: query.order_by(User.email),
     'voucher': lambda query: query.filter(Voucher.status != 'archived')
-                                  .order_by(Voucher.status, Voucher.created_at.desc())
-                                  .all(),
+                                  .order_by(Voucher.status, Voucher.created_at.desc()),
 })
 
 
 def resource_instances(resource):
-    """Return instances"""
     query = resource_filters[resource](resource_query(resource))
     return query
