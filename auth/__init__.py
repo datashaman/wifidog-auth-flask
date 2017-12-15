@@ -14,7 +14,6 @@ from auth.processors import init_processors
 from auth.services import login_manager, logos, mail, menu, security
 from auth.utils import render_currency_amount
 from auth.views import bp
-
 from flask import Flask, render_template, request
 from flask_babelex import Babel
 from flask_uploads import configure_uploads
