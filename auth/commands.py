@@ -496,6 +496,9 @@ def migrate():
                     row['country_id'] = u'ZA'
                     row['gateway_type_id'] = 'cafe'
 
+                if entity.__tablename__ == 'products':
+                    row['category_id'] = Category.query.filter_by(code='vouchers').first_or_404().id
+
                 new_session.execute(entity.__table__.insert(row))
 
         new_session.commit()
