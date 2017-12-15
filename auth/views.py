@@ -110,9 +110,10 @@ def resource_delete(resource, id):
     """Handle a resource delete request"""
     instance = resource_instance(resource, id)
     if request.method == 'POST':
+        instance_label = str(instance)
         db.session.delete(instance)
         db.session.commit()
-        flash('Delete %s successful' % instance)
+        flash('Delete %s successful' % instance_label)
         return redirect(url_for('.%s_index' % resource))
     return render_template('shared/delete.html',
                            instance=instance,
@@ -669,9 +670,9 @@ def order_new():
 
 
 def _recalculate_total(order):
-    order.total = 0
+    order.total_amount = 0
     for item in order.items:
-        order.total += item.price * item.quantity
+        order.total_amount += item.price * item.quantity
 
 
 @bp.route('/orders/<int:id>', methods=['GET', 'POST'])

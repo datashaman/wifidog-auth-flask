@@ -10,7 +10,10 @@
         </thead>
 
         <tbody>
-            <tr><th>Amount</th><td>{{ render_currency_amount(transaction.currency, transaction.amount) }}</td></tr>
+            {% if transaction.tip_amount %}
+            <tr><th>Tip</th><td>{{ render_currency_amount(transaction.currency, transaction.tip_amount) }}</td></tr>
+            {% endif %}
+            <tr><th>Total</th><td>{{ render_currency_amount(transaction.currency, transaction.total_amount) }}</td></tr>
             <tr><th>Description</th><td>{{ transaction.description }}</td></tr>
         </tbody>
 

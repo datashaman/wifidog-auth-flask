@@ -2,49 +2,50 @@
 {% from 'helpers/form.html' import group %}
 
 {% set page_title = 'Show Order' %}
+{% set show_network = current_user.has_role('super-admin') %}
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
 
 {% block content %}
 <div class="order-show content">
+    {% if show_network %}
+    <div>
+            <strong>Network</strong> {{ order.network }}
+        </div>
+    {% endif %}
+
     {% if show_gateway %}
-        <div class="pure-u-1">
+        <div>
             <strong>Gateway</strong> {{ order.gateway }}
         </div>
     {% endif %}
 
-    <div class="pure-u-1">
+    <div>
         <strong>User</strong> {{ order.user }}
     </div>
 
-    <div class="pure-u-1">
+    <div>
         <strong>Status</strong> {{ order.status }}
     </div>
 
-    <hr class="divider" />
-
-    {% for item in order.items %}
-        <form method="post" action="{{ url_for('.order_item_edit', id=order.id, item_id=item.id) }}" class="order-item pure-form pure-g">
-            <div class="pure-u-2-3 product">
-                <div class="order-item">
-                    {{ item.quantity }} x {{ item.product }}
-                </div>
-            </div>
-        </form>
-    {% endfor %}
-
-    <hr class="divider" />
-
     <h3>
-        Total: {{ render_currency_amount(order.network.currency, order.total) }}
+        Items
     </h3>
 
+    <ul>
+        {% for item in order.items %}
+        <li>{{ item.quantity }} x {{ item.product }}
+        {% endfor %}
+    </ul>
+
     {% if order.transactions %}
-        <hr class="divider" />
+        <h3>
+            Transactions
+        </h3>
 
         <ul>
             {% for transaction in order.transactions %}
             <li>
-                {{ transaction.type[0].upper() + transaction.type[1:] }} {{ transaction.status }} for {{ render_currency_amount(transaction.currency, transaction.amount) }} via {{ transaction.processor }}.
+                <a href="{{ url_for('.transaction_show', hash=transaction.hash) }}">{{ transaction }}</a> - {{ transaction.type[0].upper() + transaction.type[1:] }} {{ transaction.status }} for {{ render_currency_amount(transaction.currency, transaction.total_amount) }} via {{ transaction.processor }}.
             </li>
             {% endfor %}
         </ul>

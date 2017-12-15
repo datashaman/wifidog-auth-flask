@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-import json
+import simplejson as json
 import requests
 
 from auth.models import db
@@ -50,8 +50,12 @@ def get_processor_reference(response):
     return response['id']
 
 
+def get_tip_amount(response):
+    return response['tipAmount'] / 100
+
+
 def get_transaction_amount(response):
-    return int(response['totalAmount']) / 100
+    return response['totalAmount'] / 100
 
 
 def get_transaction_currency(response):

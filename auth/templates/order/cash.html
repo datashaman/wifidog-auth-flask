@@ -11,9 +11,9 @@
             <fieldset>
                 <div class="pure-controls">
                     <ul>
-                        <li>Total: {{ render_currency_amount(order.currency, order.total) }}</li>
+                        <li>Total: {{ render_currency_amount(order.currency, order.total_amount) }}</li>
                         <li>Paid: {{ render_currency_amount(order.currency, order.paid_amount) }}</li>
-                        <li>Owing: {{ render_currency_amount(order.currency, order.owed_amount) }}</li>
+                        <li>Owed: {{ render_currency_amount(order.currency, order.owed_amount) }}</li>
                     </ul>
                 </div>
 

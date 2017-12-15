@@ -1,15 +1,14 @@
 from __future__ import absolute_import
 
+from auth.models import db, Category, Country, Currency, Gateway, Network, Product, Voucher, Role, SqliteDecimal
+from auth.resources import resource_query
 from auth.utils import args_get
 from flask import current_app
 from flask_security import current_user
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, FloatField, HiddenField, IntegerField, PasswordField, StringField, SelectField, fields as f, validators
+from wtforms import fields as f, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
-from wtforms.ext.sqlalchemy.orm import converts, model_form, ModelConverter
-
-from auth.models import db, Category, Country, Currency, Gateway, Network, Product, Voucher, Role
-from auth.resources import resource_query
+from wtforms.ext.sqlalchemy.orm import converts, model_form, ModelConverter as BaseModelConverter
 
 
 def default_megabytes():
@@ -36,6 +35,19 @@ def roles():
     return []
 
 
+class ModelConverter(BaseModelConverter):
+    @converts('String', 'Unicode')
+    def conv_String(self, field_args, **extra):
+        if extra['column'].name == 'logo':
+            return f.FileField(**field_args)
+        else:
+            return BaseModelConverter.conv_String(self, field_args, **extra)
+
+    @converts('auth.models.SqliteDecimal')
+    def conv_SqliteDecimal(self, column, field_args, **extra):
+        return BaseModelConverter.handle_decimal_types(self, column, field_args, **extra)
+
+
 CategoryForm = model_form(
     Category,
     db.session,
@@ -59,6 +71,8 @@ CategoryForm = model_form(
         }
     }
 )
+
+
 CountryForm = model_form(
     Country,
     db.session,
@@ -69,6 +83,8 @@ CountryForm = model_form(
     ],
     exclude_pk=False
 )
+
+
 CurrencyForm = model_form(
     Currency,
     db.session,
@@ -119,6 +135,8 @@ GatewayForm = model_form(
     },
     converter=GatewayConverter()
 )
+
+
 NetworkForm = model_form(
     Network,
     db.session,
@@ -137,10 +155,10 @@ NetworkForm = model_form(
 
 
 class OrderForm(FlaskForm):
-    gateway = SelectField('Gateway', default=lambda: current_user.gateway)
+    gateway = f.SelectField('Gateway', default=lambda: current_user.gateway)
     product = QuerySelectField('Product', query_factory=instances('product'))
-    quantity = IntegerField('Quantity', default=1)
-    price = FloatField('Price')
+    quantity = f.IntegerField('Quantity', default=1)
+    price = f.DecimalField('Price')
 
 
 ProductForm = model_form(
@@ -161,15 +179,16 @@ ProductForm = model_form(
             'default': lambda: current_user.network,
             'query_factory': instances('network'),
         },
-    }
+    },
+    converter=ModelConverter()
 )
 
 
 class UserForm(FlaskForm):
     network = QuerySelectField('Network', allow_blank=True, default=lambda: current_user.network, query_factory=instances('network'))
     gateway = QuerySelectField('Gateway', allow_blank=True, default=lambda: current_user.gateway, query_factory=instances('gateway'))
-    email = StringField('Email')
-    password = PasswordField(
+    email = f.StringField('Email')
+    password = f.PasswordField(
         'Password',
         [
             validators.Optional(),
@@ -177,16 +196,16 @@ class UserForm(FlaskForm):
             validators.EqualTo('confirm', message='Passwords must match'),
         ]
     )
-    confirm = PasswordField('Repeat Password')
-    locale = SelectField('Locale', default=lambda: current_app.config['BABEL_DEFAULT_LOCALE'])
-    timezone = SelectField('Timezone', default=lambda: current_app.config['BABEL_DEFAULT_TIMEZONE'])
-    active = BooleanField('Active', default=True)
+    confirm = f.PasswordField('Repeat Password')
+    locale = f.SelectField('Locale', default=lambda: current_app.config['BABEL_DEFAULT_LOCALE'])
+    timezone = f.SelectField('Timezone', default=lambda: current_app.config['BABEL_DEFAULT_TIMEZONE'])
+    active = f.BooleanField('Active', default=True)
     roles = QuerySelectMultipleField('Roles', query_factory=roles)
 
 
 class MyUserForm(FlaskForm):
-    email = StringField('Email')
-    password = PasswordField(
+    email = f.StringField('Email')
+    password = f.PasswordField(
         'Password',
         [
             validators.Optional(),
@@ -194,30 +213,30 @@ class MyUserForm(FlaskForm):
             validators.EqualTo('confirm', message='Passwords must match'),
         ]
     )
-    confirm = PasswordField('Repeat Password')
-    locale = SelectField('Locale', default=lambda: current_app.config['BABEL_DEFAULT_LOCALE'])
-    timezone = SelectField('Timezone', default=lambda: current_app.config['BABEL_DEFAULT_TIMEZONE'])
+    confirm = f.PasswordField('Repeat Password')
+    locale = f.SelectField('Locale', default=lambda: current_app.config['BABEL_DEFAULT_LOCALE'])
+    timezone = f.SelectField('Timezone', default=lambda: current_app.config['BABEL_DEFAULT_TIMEZONE'])
 
 
 class NewVoucherForm(FlaskForm):
-    gateway_id = SelectField('Gateway')
-    minutes = IntegerField('Minutes', [validators.InputRequired(), validators.NumberRange(min=0)], default=default_minutes)
-    megabytes = IntegerField('Megabytes', [validators.Optional(), validators.NumberRange(min=0)], default=default_megabytes)
+    gateway_id = f.SelectField('Gateway')
+    minutes = f.IntegerField('Minutes', [validators.InputRequired(), validators.NumberRange(min=0)], default=default_minutes)
+    megabytes = f.IntegerField('Megabytes', [validators.Optional(), validators.NumberRange(min=0)], default=default_megabytes)
 
 
 class BroadcastForm(FlaskForm):
-    message = StringField('Message', [validators.InputRequired()])
+    message = f.StringField('Message', [validators.InputRequired()])
 
 
 class LoginVoucherForm(FlaskForm):
-    voucher_code = StringField('Voucher Code', [validators.InputRequired()], default=args_get('voucher'), description='The voucher code you were given at the counter')
-    name = StringField('Your Name', description='So we know what to call you')
+    voucher_code = f.StringField('Voucher Code', [validators.InputRequired()], default=args_get('voucher'), description='The voucher code you were given at the counter')
+    name = f.StringField('Your Name', description='So we know what to call you')
 
-    gw_address = HiddenField('Gateway Address', default=args_get('gw_address'))
-    gw_port = HiddenField('Gateway Port', default=args_get('gw_port'))
-    gw_id = HiddenField('Gateway ID', default=args_get('gw_id'))
-    mac = HiddenField('MAC', default=args_get('mac'))
-    url = HiddenField('URL', default=args_get('url'))
+    gw_address = f.HiddenField('Gateway Address', default=args_get('gw_address'))
+    gw_port = f.HiddenField('Gateway Port', default=args_get('gw_port'))
+    gw_id = f.HiddenField('Gateway ID', default=args_get('gw_id'))
+    mac = f.HiddenField('MAC', default=args_get('mac'))
+    url = f.HiddenField('URL', default=args_get('url'))
 
     def validate_voucher(self, form, field):
         voucher_code = field.data.upper()

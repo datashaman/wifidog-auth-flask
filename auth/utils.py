@@ -37,9 +37,9 @@ def render_currency_amount(currency, amount):
     if amount is None:
         return 'None'
 
-    return '%s%.2f%s' % (currency.prefix or '',
+    return '%s%.2f%s' % (currency.prefix if currency.prefix else '',
                          amount,
-                         currency.suffix or '')
+                         currency.suffix if currency.suffix else '')
 
 
 def generate_token():

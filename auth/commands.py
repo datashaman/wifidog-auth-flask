@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 import csv
 import datetime
-import json
+import simplejson as json
 import six
 
 from auth.constants import ROLES

@@ -34,9 +34,6 @@ ACTIONS = {
         'uncancel',
         'archive',
     ],
-    'transaction': [
-        'archive',
-    ],
     'voucher': [
         'extend',
         'block',

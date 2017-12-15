@@ -21,10 +21,9 @@
                         <th>Order</th>
                         <th>Processor</th>
                         <th>Status</th>
-                        <th>Amount</th>
+                        <th>Tip</th>
+                        <th>Total</th>
                         <th>Created At</th>
-
-                        <th class="actions">Actions</th>
                     </tr>
                 </thead>
 
@@ -53,21 +52,9 @@
                         </td>
                         <td data-label="Processor">{{ instance.processor }}</td>
                         <td data-label="Status">{{ instance.status }}</td>
-                        <td data-label="Amount">{{ render_currency_amount(instance.currency, instance.amount) }}</td>
+                        <td data-label="Tip">{{ render_currency_amount(instance.currency, instance.tip_amount) if instance.tip_amount else None }}</td>
+                        <td data-label="Total">{{ render_currency_amount(instance.currency, instance.total_amount) }}</td>
                         <td data-label="Created At">{{ instance.created_at | datetimeformat('short') }}</td>
-
-                        <td class="actions actions-instance">
-                            <div class="pure-button-group" role="group" aria-label="Actions Available">
-                                {% for action, defn in six.iteritems(instance.available_actions) %}
-                                <a href="{{ url_for('.transaction_action', hash=instance.hash, action=action) }}" class="pure-button" title="{{ action }}">
-                                    {% if defn.icon %}
-                                    <span class="oi" data-glyph={{ defn.icon }} aria-hidden="true"></span>
-                                    {% endif %}
-                                    {{ action }}
-                                </a>
-                                {% endfor %}
-                            </div>
-                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

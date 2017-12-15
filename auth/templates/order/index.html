@@ -45,7 +45,7 @@
                         {% endif %}
                         <td data-label="User">{{ instance.user | default('-') }}</td>
                         <td data-label="Status">{{ instance.status }}</td>
-                        <td data-label="Total">{{ render_currency_amount(instance.network.currency, instance.total) }}</td>
+                        <td data-label="Total">{{ render_currency_amount(instance.network.currency, instance.total_amount) }}</td>
                         <td data-label="Created At">{{ instance.created_at | datetimeformat('short') }}</td>
 
                         <td class="actions actions-instance">

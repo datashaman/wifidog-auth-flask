@@ -51,6 +51,11 @@ def get_processor_reference(response):
     return response['hash']
 
 
+def get_tip_amount(response):
+    # TODO Think about how to do this
+    return 0
+
+
 def get_transaction_amount(response):
     return response['amount']
 

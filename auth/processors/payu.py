@@ -94,6 +94,10 @@ def get_processor_reference(response):
     return response.payUReference
 
 
+def get_tip_amount(response):
+    return 0
+
+
 def get_transaction_amount(response):
     return int(response.basket.amountInCents) / 100
 

@@ -12,6 +12,7 @@ https://github.com/lepture/flask-wtf/archive/master.zip#egg=Flask-WTF
 healthcheck
 pillow
 requests
+simplejson
 six
 https://github.com/armooo/suds_requests/archive/master.zip#egg=suds_requests
 wheel

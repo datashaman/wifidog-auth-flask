@@ -3,25 +3,36 @@ from __future__ import division
 
 import base64
 import datetime
-import flask
-import json
+import simplejson as json
 import re
 import six
 import string
+import sqlalchemy.types as types
 
-from auth import constants
 from auth.graphs import transaction_actions, transaction_states, voucher_actions, voucher_states, order_actions, order_states
 from auth.services import db
 from auth.utils import render_currency_amount
-
+from decimal import Decimal
 from flask import current_app
 from flask_security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore
 from random import choice
-
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import backref
 from sqlalchemy.schema import UniqueConstraint
+
+
+class SqliteDecimal(types.TypeDecorator):
+    impl = types.INTEGER
+
+    def load_dialect_impl(self, dialect):
+        return dialect.type_descriptor(types.INTEGER)
+
+    def process_bind_param(self, value, dialect):
+        return None if value is None else int(value * 100)
+
+    def process_result_value(self, value, dialect):
+        return None if value is None else Decimal(value / 100)
 
 
 def available_actions(actions, states, status, interface):
@@ -401,7 +412,7 @@ class Product(db.Model):
 
     description = db.Column(db.UnicodeText)
 
-    price = db.Column(db.Float, nullable=False)
+    price = db.Column(SqliteDecimal, nullable=False)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
@@ -413,6 +424,7 @@ class Product(db.Model):
 
     def __str__(self):
         return '%s - %s' % (self.title, render_currency_amount(self.network.currency, self.price))
+
 
 class Order(db.Model):
     __tablename__ = 'orders'
@@ -433,7 +445,7 @@ class Order(db.Model):
     currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', onupdate='cascade'), nullable=False)
     currency = db.relationship(Currency, backref=backref('orders', lazy='dynamic'))
 
-    total = db.Column(db.Float, nullable=False)
+    total_amount = db.Column(SqliteDecimal, nullable=False)
 
     created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_by = db.relationship(User, backref=backref('orders_created', lazy='dynamic'), foreign_keys=[created_by_id])
@@ -463,11 +475,11 @@ class Order(db.Model):
 
     @property
     def paid_amount(self):
-        return sum(t.amount for t in self.paid_transactions)
+        return Decimal(sum(t.total_amount for t in self.paid_transactions))
 
     @property
     def owed_amount(self):
-        return self.total - self.paid_amount
+        return self.total_amount - self.paid_amount
 
     def __str__(self):
         return 'Order #%08d' % self.id
@@ -481,23 +493,23 @@ class OrderItem(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     order = db.relationship(Order, backref=backref('items', lazy='dynamic'))
 
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id', onupdate='cascade'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id', ondelete='set null', onupdate='cascade'), nullable=False)
     product = db.relationship(Product, backref=backref('order_items', lazy='dynamic'))
 
     description = db.Column(db.Unicode(40))
 
     quantity = db.Column(db.Integer, default=1, nullable=False)
-    price = db.Column(db.Float, nullable=False)
+    price = db.Column(SqliteDecimal, nullable=False)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
 
     @property
-    def total(self):
+    def total_amount(self):
         return self.quantity * self.price
 
     def __str__(self):
-        return '%d x %s - %s' % (self.quantity, self.product.title, render_currency_amount(self.order.currency, self.total))
+        return '%d x %s - %s' % (self.quantity, self.product.title, render_currency_amount(self.order.currency, self.total_amount))
 
 
 class Processor(db.Model):
@@ -538,7 +550,8 @@ class Transaction(db.Model):
     currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', onupdate='cascade'), nullable=False)
     currency = db.relationship(Currency, backref=backref('transactions', lazy='dynamic'))
 
-    amount = db.Column(db.Float, nullable=False)
+    total_amount = db.Column(SqliteDecimal, nullable=False)
+    tip_amount = db.Column(SqliteDecimal)
 
     payload = db.Column(db.UnicodeText)
 

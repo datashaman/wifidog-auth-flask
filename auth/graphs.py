@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import simplejson as json
+
 order_actions = {
     'cancel': {
         'interface': 'admin',
@@ -26,17 +28,8 @@ order_states = {
     },
 }
 
-transaction_actions = {
-    'archive': {
-        'interface': 'admin',
-        'icon': 'x'
-    },
-}
-
+transaction_actions = {}
 transaction_states = {}
-
-for state in ('successful', 'failed'):
-    transaction_states[state] = {'archive': 'archived'}
 
 voucher_actions = {
     'archive': {
