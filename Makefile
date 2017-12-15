@@ -83,7 +83,7 @@ setup:
 	sudo -H npm -g install gulp
 
 development-install:
-	pip install -r requirements.txt
+	pip install -r requirements-tests.txt
 	npm install
 	gulp --dev
 
