@@ -31,9 +31,10 @@ def init_app(app):
 
 
 def pay_order(order):
-    return redirect('https://pos.snapscan.io/qr/%s?id=%d&amount=%d' % (current_app.config['SNAPSCAN_SNAP_CODE'],
-                                                                       order.id,
-                                                                       int(order.total * 100)))
+    return redirect('https://pos.snapscan.io/qr/%s?id=%d&amount=%d&strict=true' % \
+                    (current_app.config['SNAPSCAN_SNAP_CODE'],
+                     order.id,
+                     int(order.total * 100)))
 
 
 def get_transaction(id):
