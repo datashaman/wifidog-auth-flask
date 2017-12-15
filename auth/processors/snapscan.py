@@ -64,9 +64,10 @@ def get_transaction_type(response):
     return 'payment'
 
 
-@bp.route('/snapscan/notification')
+@bp.route('/snapscan/notification', methods=['POST'])
 def snapscan_notification():
     body = request.json()
+    print(body)
     response = get_transaction(body['payload']['id'])
     update_transaction('snapscan', current_user, response)
     return 'OK'
