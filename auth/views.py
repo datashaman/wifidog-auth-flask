@@ -12,6 +12,7 @@ import six
 from auth import constants
 
 from auth.forms import \
+    CashupForm, \
     CategoryForm, \
     CountryForm, \
     CurrencyForm, \
@@ -25,14 +26,11 @@ from auth.forms import \
     UserForm
 
 from auth.models import \
-    Category, \
-    Country, \
-    Currency, \
+    Cashup, \
     Gateway, \
     Network, \
     Order, \
     OrderItem, \
-    Processor, \
     Product, \
     Transaction, \
     User, \
@@ -44,7 +42,7 @@ from auth.services import \
         environment_dump, \
         healthcheck as healthcheck_service, \
         logos
-from auth.utils import generate_token, has_role, is_logged_in
+from auth.utils import generate_uuid, has_role, is_logged_in
 from auth.vouchers import process_auth
 
 from flask import \
@@ -106,6 +104,13 @@ def resource_edit(resource, id, form_class):
                            instance=instance)
 
 
+def resource_show(resource, id):
+    """Handle a resource show request"""
+    instance = resource_instance(resource, id)
+    return render_template('%s/show.html' % resource,
+                           instance=instance)
+
+
 def resource_delete(resource, id):
     """Handle a resource delete request"""
     instance = resource_instance(resource, id)
@@ -131,7 +136,7 @@ def resource_action(resource, id, action, param_name='id'):
             return redirect(url_for('.%s_index' % resource))
         else:
             abort(404)
-    action_url = url_for('.%s_action'  % resource, **{'action': action, param_name: getattr(instance, param_name)})
+    action_url = url_for('.%s_action' % resource, **{'action': action, param_name: getattr(instance, param_name)})
     return render_template('shared/action.html',
                            action=action,
                            action_url=action_url,
@@ -255,6 +260,7 @@ def network_delete(id):
 def gateway_index():
     return resource_index('gateway')
 
+
 def handle_logo(form):
     if request.files['logo']:
         filename = form.logo.data = logos.save(request.files['logo'], name='%s.' % form.id.data)
@@ -263,6 +269,7 @@ def handle_logo(form):
         im.save(logos.path(filename))
     else:
         del form.logo
+
 
 @bp.route('/gateways/new', methods=['GET', 'POST'])
 @login_required
@@ -637,11 +644,8 @@ def order_new():
 
     if order_form.validate_on_submit():
         order = Order()
-
         order.gateway_id = gateway.id
         order.network_id = gateway.network_id
-
-        order.created_by_id = current_user.id
         order.currency_id = gateway.network.currency_id
         order.user_id = current_user.id
 
@@ -658,7 +662,7 @@ def order_new():
         db.session.commit()
 
         flash('Create %s successful' % order)
-        return redirect(url_for('.order_edit', id=order.id))
+        return redirect(url_for('.order_edit', hash=order.hash))
 
     prices = dict((p.id, p.price) for p in Product.query.all())
     price = '%.2f' % (list(prices.values())[0])
@@ -675,11 +679,11 @@ def _recalculate_total(order):
         order.total_amount += item.price * item.quantity
 
 
-@bp.route('/orders/<int:id>', methods=['GET', 'POST'])
+@bp.route('/orders/<hash>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def order_edit(id):
-    order = resource_instance('order', id)
+def order_edit(hash):
+    order = resource_instance('order', hash, 'hash')
 
     if order.status == 'new':
         order_form = OrderForm(obj=order)
@@ -715,7 +719,7 @@ def order_edit(id):
             db.session.commit()
 
             flash('Create %s successful' % order)
-            return redirect(url_for('.order_edit', id=order.id))
+            return redirect(url_for('.order_edit', hash=order.hash))
 
         prices = dict((p.id, p.price) for p in Product.query.all())
         price = '%.2f' % (list(prices.values())[0])
@@ -730,18 +734,18 @@ def order_edit(id):
 
 
 
-@bp.route('/orders/<int:id>/delete', methods=['GET', 'POST'])
+@bp.route('/orders/<id>/delete', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def order_delete(id):
     return resource_delete('order', id)
 
 
-@bp.route('/orders/<int:id>/<int:item_id>', methods=['POST'])
+@bp.route('/orders/<hash>/<int:item_id>', methods=['POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def order_item_edit(id, item_id):
-    order = Order.query.filter_by(id=id).first_or_404()
+def order_item_edit(hash, item_id):
+    order = Order.query.filter_by(hash=hash).first_or_404()
     order_item = OrderItem.query.filter_by(id=item_id).first_or_404()
     order_item_label = str(order_item)
 
@@ -758,21 +762,69 @@ def order_item_edit(id, item_id):
     db.session.commit()
 
     flash('%s %s successful' % (action[0].upper() + action[1:], order_item_label))
-    return redirect(url_for('.order_edit', id=id))
+    return redirect(url_for('.order_edit', hash=hash))
 
 
-@bp.route('/orders/<int:id>/pay/<processor_id>', methods=['GET', 'POST'])
-def order_pay(id, processor_id):
-    order = resource_instance('order', id)
+@bp.route('/orders/<hash>/pay/<processor_id>', methods=['GET', 'POST'])
+def order_pay(hash, processor_id):
+    order = resource_instance('order', hash, 'hash')
     processor = resource_instance('processor', processor_id)
     return processor.pay_order(order)
 
 
-@bp.route('/orders/<int:id>/<action>', methods=['GET', 'POST'])
+@bp.route('/orders/<hash>/<action>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def order_action(id, action):
-    return resource_action('order', id, action)
+def order_action(hash, action):
+    return resource_action('order', hash, action, 'hash')
+
+
+@bp.route('/cashups')
+@login_required
+@roles_accepted('super-admin')
+@register_menu(
+    bp,
+    '.cashups',
+    'Cashups',
+    visible_when=has_role('super-admin'),
+    order=99
+)
+def cashup_index():
+    return resource_index('cashup')
+
+
+@bp.route('/cashups/new', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def cashup_new():
+    form = CashupForm(data={'user': current_user})
+    if form.validate_on_submit():
+        instance = Cashup()
+        form.populate_obj(instance)
+        db.session.add(instance)
+        db.session.commit()
+        Transaction.query \
+            .filter(Transaction.updated_at < instance.created_at) \
+            .update({'cashup_id': instance.id})
+        db.session.commit()
+        flash('Create %s successful' % instance)
+        return redirect(url_for('.cashup_index'))
+    print(form.errors)
+    return render_template('cashup/new.html', form=form)
+
+
+@bp.route('/cashups/<id>/delete', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def cashup_delete(id):
+    return resource_delete('cashup', id)
+
+
+@bp.route('/cashups/<id>', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def cashup_show(id):
+    return resource_show('cashup', id)
 
 
 @bp.route('/transactions')
@@ -793,7 +845,7 @@ def transaction_index():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def transaction_show(hash):
-    transaction = Transaction.query.filter(Transaction.hash == hash).first_or_404()
+    transaction = Transaction.query.filter_by(hash=hash).first_or_404()
     return render_template('transaction/show.html', transaction=transaction)
 
 
@@ -801,7 +853,7 @@ def transaction_show(hash):
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def transaction_action(hash, action):
-    return resource_action('transaction', hash, action, 'hash')
+    return resource_action('transaction', slug, action, 'hash')
 
 
 @bp.route('/new-voucher', methods=['GET', 'POST'])
@@ -889,7 +941,7 @@ def wifidog_login():
             return redirect(request.referrer)
 
         form.populate_obj(voucher)
-        voucher.token = generate_token()
+        voucher.token = generate_uuid()
         db.session.commit()
 
         session['voucher_token'] = voucher.token

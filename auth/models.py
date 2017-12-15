@@ -1,21 +1,17 @@
 from __future__ import absolute_import
 from __future__ import division
 
-import base64
 import datetime
 import simplejson as json
-import re
 import six
-import string
 import sqlalchemy.types as types
 
 from auth.graphs import transaction_actions, transaction_states, voucher_actions, voucher_states, order_actions, order_states
 from auth.services import db
-from auth.utils import render_currency_amount
+from auth.utils import render_currency_amount, generate_code, generate_order_hash, generate_uuid
 from decimal import Decimal
 from flask import current_app
 from flask_security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore
-from random import choice
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import backref
@@ -50,20 +46,11 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.close()
 
 
-chars = string.ascii_lowercase + string.digits
-
-
-def generate_code():
-    source = ''.join(choice(chars) for _ in range(4))
-    encoded = base64.b32encode(source.encode()).decode()
-    result = re.sub(r'=*$', '', encoded)
-    return result
-
-
 roles_users = db.Table('roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('roles.id'))
 )
+
 
 class Role(db.Model, RoleMixin):
     __tablename__ = 'roles'
@@ -428,6 +415,7 @@ class Order(db.Model):
     __tablename__ = 'orders'
 
     id = db.Column(db.Integer, primary_key=True)
+    hash = db.Column(db.String(40), unique=True, nullable=False, default=generate_order_hash)
 
     network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', onupdate='cascade'), nullable=False)
     network = db.relationship(Network, backref=backref('orders', lazy='dynamic'))
@@ -444,9 +432,6 @@ class Order(db.Model):
     currency = db.relationship(Currency, backref=backref('orders', lazy='dynamic'))
 
     total_amount = db.Column(SqliteDecimal, nullable=False)
-
-    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    created_by = db.relationship(User, backref=backref('orders_created', lazy='dynamic'), foreign_keys=[created_by_id])
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.datetime.utcnow)
@@ -530,17 +515,19 @@ class Transaction(db.Model):
     __tablename__ = 'transactions'
 
     id = db.Column(db.Integer, primary_key=True)
-    hash = db.Column(db.String(40), nullable=False, unique=True)
+    hash = db.Column(db.String(40), default=generate_uuid, nullable=False, unique=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'))
+    status = db.Column(db.String(20), nullable=False, default='new')
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     user = db.relationship(User, backref=backref('transactions', lazy='dynamic'))
 
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='cascade', onupdate='cascade'))
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     order = db.relationship(Order, backref=backref('transactions', lazy='dynamic'))
 
     type = db.Column(db.String(20), nullable=False, default='payment')
 
-    processor_id = db.Column(db.Integer, db.ForeignKey('processors.id', ondelete='cascade', onupdate='cascade'))
+    processor_id = db.Column(db.Integer, db.ForeignKey('processors.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     processor = db.relationship(Processor, backref=backref('transactions', lazy='dynamic'))
 
     processor_reference = db.Column(db.String(40))
@@ -553,7 +540,8 @@ class Transaction(db.Model):
 
     payload = db.Column(db.UnicodeText)
 
-    status = db.Column(db.String(20), nullable=False, default='new')
+    cashup_id = db.Column(db.String(40), db.ForeignKey('cashups.id', onupdate='cascade'))
+    cashup = db.relationship('Cashup', backref=backref('transactions', lazy='dynamic'))
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
@@ -571,4 +559,21 @@ class Transaction(db.Model):
         return available_actions(transaction_actions, transaction_states, self.status, 'admin')
 
     def __str__(self):
-        return '#%08d' % self.id
+        return 'Transaction #%08d' % self.id
+
+
+class Cashup(db.Model):
+    __tablename__ = 'cashups'
+
+    id = db.Column(db.String(40), primary_key=True, default=generate_uuid)
+
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'), nullable=False)
+    gateway = db.relationship(Gateway, backref=backref('cashups', lazy='dynamic'))
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'), nullable=False)
+    user = db.relationship(User, backref=backref('cashups', lazy='dynamic'))
+
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+    def __str__(self):
+        return self.id

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from auth.forms import instances
 from auth.processors import flash_transaction, update_transaction
-from auth.utils import generate_token
+from auth.utils import generate_uuid
 from flask import Blueprint, render_template, redirect, url_for
 from flask_wtf import FlaskForm
 from wtforms import FloatField
@@ -34,7 +34,7 @@ def pay_order(order):
         response = {
             'amount': max(float(form.cash.data), order.owed_amount),
             'currency': form.currency.data.id,
-            'hash': generate_token(),
+            'hash': generate_uuid(),
             'merchant_reference': order.id,
         }
         transaction = update_transaction('cash', response)

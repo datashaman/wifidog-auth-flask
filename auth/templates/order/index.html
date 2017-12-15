@@ -31,7 +31,7 @@
                 <tbody>
                     {% for instance in instances %}
                     <tr data-id={{ instance.id }} class="network {{ 'pure-table-' + loop.cycle('odd', 'even') }}">
-                        <td data-label="ID"><a href="{{ url_for('.order_edit', id=instance.id) }}">{{ instance }}</a></td>
+                        <td data-label="ID"><a href="{{ url_for('.order_edit', hash=instance.hash) }}">{{ instance }}</a></td>
                         {% if show_network or show_gateway %}
                         <td data-label="Network & Gateway">
                             {% if show_network %}
@@ -63,14 +63,14 @@
                                             <ul class="pure-menu-children">
                                                 {% for processor in instance.gateway.country.processors if processor.active %}
                                                 <li class="pure-menu-item">
-                                                    <a href="{{ url_for('.order_pay', id=instance.id, processor_id=processor.id) }}" class="pure-menu-link">{{ processor.title }}</a>
+                                                    <a href="{{ url_for('.order_pay', hash=instance.hash, processor_id=processor.id) }}" class="pure-menu-link">{{ processor.title }}</a>
                                                 </li>
                                                 {% endfor %}
                                             </ul>
                                         </li>
                                     {% else %}
                                         <li class="pure-menu-item">
-                                            <a href="{{ url_for('.order_action', id=instance.id, action=action) }}" class="pure-menu-link" title="{{ action }}">
+                                            <a href="{{ url_for('.order_action', hash=instance.hash, action=action) }}" class="pure-menu-link" title="{{ action }}">
                                                 {% if defn.icon %}
                                                 <span class="oi" data-glyph={{ defn.icon }} aria-hidden="true"></span>
                                                 {% endif %}

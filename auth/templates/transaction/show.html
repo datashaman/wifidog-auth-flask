@@ -1,6 +1,6 @@
 {% extends 'layouts/default.html' %}
 
-{% set page_title = 'Transaction %s' % transaction %}
+{% set page_title = transaction %}
 
 {% block content %}
 <div class="content">
@@ -23,7 +23,7 @@
 
         <tbody>
             <tr><th>User</th><td><a href="{{ url_for('.user_edit', id=transaction.user_id) }}">{{ transaction.user }}</a></td></tr>
-            <tr><th>Order</th><td><a href="{{ url_for('.order_edit', id=transaction.order_id) }}">{{ transaction.order }}</a></td></tr>
+            <tr><th>Order</th><td><a href="{{ url_for('.order_edit', hash=transaction.order.hash) }}">{{ transaction.order }}</a></td></tr>
             <tr><th>Processor</th><td>{{ transaction.processor }}</td></tr>
             <tr><th>Reference</th><td>{{ transaction.processor_reference }}</td></tr>
             <tr><th>Status</th><td>{{ transaction.status }}</td></tr>

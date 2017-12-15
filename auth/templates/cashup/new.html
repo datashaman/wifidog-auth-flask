@@ -1,0 +1,23 @@
+{% extends 'layouts/default.html' %}
+{% from 'helpers/form.html' import group %}
+
+{% set page_title = 'New Cashup' %}
+{% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
+
+{% block content %}
+<div class="content">
+    <form method="post" action={{ url_for('.cashup_new') }} class="order-item pure-form pure-form-aligned">
+        {{ form.csrf_token }}
+
+        {% if show_gateway %}
+            {{ group(form.gateway) }}
+        {% endif %}
+
+        <div class="pure-controls">
+            <button type="submit" class="pure-button pure-button-primary">
+                Add
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

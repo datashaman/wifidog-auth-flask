@@ -1,0 +1,45 @@
+{% extends 'layouts/default.html' %}
+
+{% set page_title = 'Cashups' %}
+{% set new_title = 'New Cashup' %}
+{% set new_url = url_for('.cashup_new') %}
+
+{% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
+
+{% block content %}
+    <div class="content">
+        {% if instances %}
+            <table id="cashups" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        {% if show_gateway %}
+                        <th>
+                            Gateway
+                        </th>
+                        {% endif %}
+                        <th>User</th>
+                        <th>Transactions</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for instance in instances %}
+                    <tr data-id={{ instance.id }} class="cashup {{ 'pure-table-' + loop.cycle('odd', 'even') }}">
+                        <td data-label="ID"><a href="{{ url_for('.cashup_show', id=instance.id) }}">{{ instance }}</a></td>
+                        {% if show_gateway %}
+                        <td data-label="Gateway">
+                            {{ instance.gateway }}
+                        </td>
+                        {% endif %}
+                        <td data-label="User">{{ instance.user | default('-') }}</td>
+                        <td data-label="Transactions">{{ instance.transactions.count() }}</td>
+                        <td data-label="Created At">{{ instance.created_at | datetimeformat('short') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

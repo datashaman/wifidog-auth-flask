@@ -5,7 +5,7 @@
 
 {% block content %}
     <div class="order-cash content">
-        <form method="post" action="{{ url_for('.order_pay', hash=order.hash, processor_id='cash') }}" class="pure-form pure-form-aligned">
+        <form method="post" action="{{ url_for('.order_pay', id=order.id, processor_id='cash') }}" class="pure-form pure-form-aligned">
             {{ form.csrf_token }}
 
             <fieldset>

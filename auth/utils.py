@@ -1,9 +1,14 @@
 from __future__ import absolute_import
 
+import base64
+import random
+import re
+import string
 import uuid
 
-from flask import request, current_app
+from flask import request
 from flask_security import current_user
+from random import choice
 
 
 def is_logged_out():
@@ -42,6 +47,19 @@ def render_currency_amount(currency, amount):
                        currency.suffix if currency.suffix else '')
 
 
-def generate_token():
-    """Generate token for the voucher session"""
-    return uuid.uuid4().hex
+chars = string.ascii_lowercase + string.digits
+
+
+def generate_code(input_length=4):
+    source = ''.join(choice(chars) for _ in range(input_length))
+    encoded = base64.b32encode(source.encode()).decode()
+    result = re.sub(r'=*$', '', encoded)
+    return result
+
+
+def generate_order_hash():
+    return str(uuid.uuid1())
+
+
+def generate_uuid():
+    return str(uuid.uuid4())

@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from auth.models import db, Category, Country, Currency, Gateway, Network, Product, Voucher, Role, SqliteDecimal
+from auth.models import db, Cashup, Category, Country, Currency, Gateway, Network, Product, Voucher, Role, SqliteDecimal
 from auth.resources import resource_query
 from auth.utils import args_get
 from flask import current_app
@@ -46,6 +46,16 @@ class ModelConverter(BaseModelConverter):
     @converts('auth.models.SqliteDecimal')
     def conv_SqliteDecimal(self, column, field_args, **extra):
         return BaseModelConverter.handle_decimal_types(self, column, field_args, **extra)
+
+
+CashupForm = model_form(
+    Cashup,
+    db.session,
+    FlaskForm,
+    exclude=[
+        'transactions',
+    ]
+)
 
 
 CategoryForm = model_form(

@@ -1,0 +1,33 @@
+{% extends 'layouts/default.html' %}
+{% from 'helpers/form.html' import group %}
+
+{% set page_title = 'Show Cashup' %}
+{% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
+
+{% block content %}
+<div class="cashup-show content">
+    {% if show_gateway %}
+        <div>
+            <strong>Gateway</strong> {{ instance.gateway }}
+        </div>
+    {% endif %}
+
+    <div>
+        <strong>User</strong> {{ instance.user }}
+    </div>
+
+    {% if instance.transactions.count() %}
+        <h3>
+            Transactions
+        </h3>
+
+        <ul>
+            {% for transaction in instance.transactions %}
+            <li>
+                <a href="{{ url_for('.transaction_show', hash=transaction.hash) }}">{{ transaction }}</a> - {{ transaction.type[0].upper() + transaction.type[1:] }} {{ transaction.status }} for {{ render_currency_amount(transaction.currency, transaction.total_amount) }} via {{ transaction.processor }}.
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+{% endblock %}

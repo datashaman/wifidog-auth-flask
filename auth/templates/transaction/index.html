@@ -8,7 +8,7 @@
 {% block content %}
     <div class="content">
         {% if instances %}
-            <table id="orders" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+            <table id="transactions" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -21,8 +21,9 @@
                         <th>Order</th>
                         <th>Processor</th>
                         <th>Status</th>
-                        <th>Tip</th>
-                        <th>Total</th>
+                        <th>
+                            Tip / Total
+                        </th>
                         <th>Created At</th>
                     </tr>
                 </thead>
@@ -45,15 +46,18 @@
                         <td data-label="User"><a href="{{ url_for('.user_edit', id=instance.user_id) }}">{{ instance.user }}</a></td>
                         <td data-label="Order">
                             {% if instance.order_id %}
-                                <a href="{{ url_for('.order_edit', id=instance.order_id) }}">{{ instance.order }}</a></td>
+                                <a href="{{ url_for('.order_edit', hash=instance.order.hash) }}">{{ instance.order }}</a></td>
                             {% else %}
                                 None
                             {% endif %}
                         </td>
                         <td data-label="Processor">{{ instance.processor }}</td>
                         <td data-label="Status">{{ instance.status }}</td>
-                        <td data-label="Tip">{{ render_currency_amount(instance.currency, instance.tip_amount) if instance.tip_amount else None }}</td>
-                        <td data-label="Total">{{ render_currency_amount(instance.currency, instance.total_amount) }}</td>
+                        <td data-label="Tip / Total">
+                            {{ render_currency_amount(instance.currency, instance.tip_amount) if instance.tip_amount else None }}
+                            /
+                            {{ render_currency_amount(instance.currency, instance.total_amount) }}
+                        </td>
                         <td data-label="Created At">{{ instance.created_at | datetimeformat('short') }}</td>
                     </tr>
                     {% endfor %}

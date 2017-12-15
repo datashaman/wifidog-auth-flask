@@ -2,7 +2,7 @@ import sys
 
 from auth.models import Order, Processor, Transaction
 from auth.services import db
-from auth.utils import generate_token, render_currency_amount
+from auth.utils import render_currency_amount
 from flask import flash
 from flask_security import current_user
 
@@ -34,7 +34,6 @@ def update_transaction(id, response):
 
     if transaction is None:
         transaction = Transaction()
-        transaction.hash = generate_token()
         transaction.tip_amount = processor_module.get_tip_amount(response)
         transaction.total_amount = processor_module.get_transaction_amount(response)
         transaction.currency_id = processor_module.get_transaction_currency(response)

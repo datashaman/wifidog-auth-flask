@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="order-edit content">
-        <form method="post" action="{{ url_for('.order_edit', id=order.id) }}" class="order-item pure-form pure-g">
+        <form method="post" action="{{ url_for('.order_edit', hash=order.hash) }}" class="order-item pure-form pure-g">
             {{ order_form.csrf_token }}
 
             {% if show_gateway %}
@@ -33,7 +33,7 @@
         <hr class="divider" />
 
         {% for item in order.items %}
-            <form method="post" action="{{ url_for('.order_item_edit', id=order.id, item_id=item.id) }}" class="order-item pure-form pure-g">
+            <form method="post" action="{{ url_for('.order_item_edit', hash=order.hash, item_id=item.id) }}" class="order-item pure-form pure-g">
                 <div class="pure-u-2-3 product">
                     {{ order_form.product(value=item.product) }}
                 </div>

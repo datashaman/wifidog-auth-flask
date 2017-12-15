@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from auth.models import \
+    Cashup, \
     Category, \
     Country, \
     Currency, \
@@ -17,6 +18,7 @@ from flask_security import current_user
 
 
 RESOURCE_MODELS = {
+    'cashup': Cashup,
     'category': Category,
     'country': Country,
     'currency': Currency,
@@ -57,7 +59,7 @@ def resource_query(resource):
 
 def resource_instance(resource, param, param_name='id'):
     model = RESOURCE_MODELS[resource]
-    query = resource_filters[resource](resource_query(resource)).filter(model.id == param)
+    query = resource_filters[resource](resource_query(resource)).filter(getattr(model, param_name) == param)
     return query.first_or_404()
 
 
