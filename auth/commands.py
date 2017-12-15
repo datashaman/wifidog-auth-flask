@@ -57,6 +57,8 @@ def bootstrap_reference(bind=None, users_csv=None):
 
     create_country('ZA', 'South Africa')
     create_currency('ZA', 'ZAR', 'South African Rand', 'R')
+    create_processor('cash', 'Cash', 'ZA', active=True)
+    create_processor('snapscan', 'SnapScan', 'ZA', active=True)
     create_processor('payu', 'PayU', 'ZA', active=True)
     create_gateway_types()
     create_roles()
@@ -489,12 +491,12 @@ def migrate():
                 if '_sa_instance_state' in row:
                     del row['_sa_instance_state']
 
-                if entity.__tablename__ == 'networks':
-                    row['currency_id'] = u'ZAR'
-
                 if entity.__tablename__ == 'gateways':
                     row['country_id'] = u'ZA'
                     row['gateway_type_id'] = 'cafe'
+
+                if entity.__tablename__ == 'networks':
+                    row['currency_id'] = u'ZAR'
 
                 if entity.__tablename__ == 'products':
                     row['category_id'] = Category.query.filter_by(code='vouchers').first_or_404().id

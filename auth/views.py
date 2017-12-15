@@ -25,7 +25,6 @@ from auth.forms import \
     UserForm
 
 from auth.models import \
-    Auth, \
     Category, \
     Country, \
     Currency, \
@@ -46,6 +45,7 @@ from auth.services import \
         healthcheck as healthcheck_service, \
         logos
 from auth.utils import generate_token, has_role, is_logged_in
+from auth.vouchers import process_auth
 
 from flask import \
     Blueprint, \
@@ -931,7 +931,7 @@ def wifidog_ping():
 
 @bp.route('/wifidog/auth/')
 def wifidog_auth():
-    auth = Auth(
+    args = dict(
         user_agent=request.user_agent.string,
         stage=request.args.get('stage'),
         ip=request.args.get('ip'),
@@ -939,37 +939,10 @@ def wifidog_auth():
         token=request.args.get('token'),
         incoming=int(request.args.get('incoming')),
         outgoing=int(request.args.get('outgoing')),
-        gateway_id=request.args.get('gw_id')
+        gateway_id=request.args.get('gw_id'),
     )
-
-    (auth.status, auth.messages) = auth.process_request()
-
-    db.session.add(auth)
-    db.session.commit()
-
-    def generate_point(measurement):
-        return {
-            "measurement": 'auth_%s' % measurement,
-            "tags": {
-                "source": "auth",
-                "network_id": auth.gateway.network_id,
-                "gateway_id": auth.gateway_id,
-                "user_agent": auth.user_agent,
-                "stage": auth.stage,
-                "ip": auth.ip,
-                "mac": auth.mac,
-                "token": auth.token,
-            },
-            "time": auth.created_at,
-            "fields": {
-                "value": getattr(auth, measurement),
-            }
-        }
-
-    # points = [generate_point(m) for m in [ 'incoming', 'outgoing' ]]
-    # influx_db.connection.write_points(points)
-
-    return ("Auth: %s\nMessages: %s\n" % (auth.status, auth.messages), 200)
+    (status, messages) = process_auth(args)
+    return ("Auth: %s\nMessages: %s\n" % (status, messages), 200)
 
 
 @bp.route('/wifidog/portal/')

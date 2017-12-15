@@ -9,7 +9,7 @@ from flask_security import current_user
 
 def init_processors(app):
     cash.init_app(app)
-    payu.init_app(app)
+    # payu.init_app(app)
     snapscan.init_app(app)
 
 
