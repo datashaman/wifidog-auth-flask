@@ -55,8 +55,10 @@ def resource_query(resource):
     return query
 
 
-def resource_instance(resource, id, param_name='id'):
-    return resource_query(resource).filter_by(**{param_name: id}).first_or_404()
+def resource_instance(resource, param, param_name='id'):
+    model = RESOURCE_MODELS[resource]
+    query = resource_query(resource).filter(model.id == param)
+    return query.first_or_404()
 
 
 resource_filters = defaultdict(lambda: lambda query: query.all())
