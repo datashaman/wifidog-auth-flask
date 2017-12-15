@@ -26,7 +26,7 @@ transaction_statuses = {
 def init_app(app):
     global session
     session = requests.Session()
-    session.auth = (app.config['SNAPSCAN_API_KEY'],)
+    session.auth = (app.config['SNAPSCAN_API_KEY'], '')
     app.register_blueprint(bp)
 
 
