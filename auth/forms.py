@@ -79,6 +79,7 @@ CountryForm = model_form(
     FlaskForm,
     exclude=[
         'created_at',
+        'gateways',
         'updated_at',
     ],
     exclude_pk=False
