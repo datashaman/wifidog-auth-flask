@@ -92,6 +92,7 @@ def resource_new(resource, form):
 
 
 def resource_edit(resource, id, form_class):
+    """Handle a resource edit request"""
     instance = resource_instance(resource, id)
     form = form_class(obj=instance)
     if form.validate_on_submit():
@@ -105,6 +106,7 @@ def resource_edit(resource, id, form_class):
 
 
 def resource_delete(resource, id):
+    """Handle a resource delete request"""
     instance = resource_instance(resource, id)
     if request.method == 'POST':
         db.session.delete(instance)
@@ -117,6 +119,7 @@ def resource_delete(resource, id):
 
 
 def resource_action(resource, id, action, param_name='id'):
+    """Handle a resource action request"""
     instance = resource_instance(resource, id, param_name)
     if request.method == 'POST':
         if action in constants.ACTIONS[resource]:
@@ -384,6 +387,7 @@ def user_edit(id):
 
         flash('Update %s successful' % instance)
         return redirect(url_for('.user_index'))
+
     return render_template('user/edit.html', form=form, instance=instance)
 
 

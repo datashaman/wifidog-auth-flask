@@ -16,6 +16,9 @@ serve-production:
 sqlite3:
 	sqlite3 data/local.db
 
+sqlite3-tests:
+	sqlite3 tests/tests.db
+
 db-reset:
 	rm -rf data/local.db
 	python manage.py bootstrap_instance
@@ -107,6 +110,6 @@ graphs:
 dot:
 	dot -Tpng -O auth/graphs.dot && eog auth/graphs.dot.png
 
-migrate:
+migrate: bootstrap-reference
 	rm -f data/new.db
 	python manage.py migrate

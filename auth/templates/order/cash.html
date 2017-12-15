@@ -1,7 +1,7 @@
 {% extends 'layouts/default.html' %}
 {% from 'helpers/form.html' import group %}
 
-{% set page_title = 'Order Cash' %}
+{% set page_title = 'Pay Cash' %}
 
 {% block content %}
     <div class="order-cash content">
@@ -18,7 +18,7 @@
                 </div>
 
                 {{ group(form.currency) }}
-                {{ group(form.cash, type='number', min=0, max=order.owed_amount, value='%.2f' % order.owed_amount) }}
+                {{ group(form.cash, type='number', min=0, value='%.2f' % order.owed_amount) }}
 
                 <div class="pure-controls">
                     <button type="submit" class="pure-button pure-button-primary">Ok</button>

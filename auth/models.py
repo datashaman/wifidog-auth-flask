@@ -86,9 +86,6 @@ class User(db.Model, UserMixin):
 
     mobile = db.Column(db.String(20))
 
-    country_id = db.Column(db.String(3), db.ForeignKey('countries.id', onupdate='cascade'))
-    country = db.relationship('Country', backref=backref('users', lazy='dynamic'))
-
     active = db.Column(db.Boolean, default=True)
 
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
@@ -206,6 +203,9 @@ class Gateway(db.Model):
     default_megabytes = db.Column(db.BigInteger)
 
     support_email = db.Column(db.Unicode(255))
+
+    country_id = db.Column(db.String(3), db.ForeignKey('countries.id', onupdate='cascade'), nullable=False, default=lambda: current_app.config['DEFAULT_COUNTRY'])
+    country = db.relationship('Country', backref=backref('gateways', lazy='dynamic'))
 
     last_ping_ip = db.Column(db.String(15))
     last_ping_at = db.Column(db.DateTime)
@@ -442,10 +442,6 @@ class Change(db.Model):
     user = db.relationship(User, backref=backref('changes', lazy='dynamic'))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
-product_categories = db.Table('product_categories',
-    db.Column('product_id', db.Integer, db.ForeignKey('products.id')),
-    db.Column('category_id', db.Integer, db.ForeignKey('categories.id')),
-)
 
 class Category(db.Model):
     __tablename__ = 'categories'
@@ -490,7 +486,8 @@ class Product(db.Model):
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', onupdate='cascade'))
     gateway = db.relationship(Gateway, backref=backref('products', lazy='dynamic'))
 
-    categories = db.relationship(Category, secondary=product_categories, backref=db.backref('products', lazy='dynamic'))
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id', onupdate='cascade'), nullable=False)
+    category = db.relationship(Category, backref=backref('products', lazy='dynamic'))
 
     code = db.Column(db.Unicode(10), nullable=False)
     title = db.Column(db.Unicode(40), nullable=False)

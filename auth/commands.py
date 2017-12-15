@@ -27,7 +27,6 @@ from auth.models import \
     country_currencies, \
     country_processors, \
     db, \
-    product_categories, \
     roles_users, \
     users
 from auth.services import manager
@@ -87,16 +86,16 @@ def bootstrap_tests():
     create_gateway(u'other-network', u'other-gateway1', u'cafe', u'Other Gateway #1')
     create_gateway(u'other-network', u'other-gateway2', u'cafe', u'Other Gateway #2')
 
-    create_user(u'super-admin@example.com', u'admin', u'super-admin', country_id=u'ZA')
+    create_user(u'super-admin@example.com', u'admin', u'super-admin')
 
-    create_user(u'main-network@example.com', u'admin', u'network-admin', u'main-network', country_id=u'ZA')
-    create_user(u'other-network@example.com', u'admin', u'network-admin', u'other-network', country_id=u'ZA')
+    create_user(u'main-network@example.com', u'admin', u'network-admin', u'main-network')
+    create_user(u'other-network@example.com', u'admin', u'network-admin', u'other-network')
 
-    create_user(u'main-gateway1@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway1', country_id=u'ZA')
-    create_user(u'main-gateway2@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway2', country_id=u'ZA')
+    create_user(u'main-gateway1@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway1')
+    create_user(u'main-gateway2@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway2')
 
-    create_user(u'other-gateway1@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway1', country_id=u'ZA')
-    create_user(u'other-gateway2@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway2', country_id=u'ZA')
+    create_user(u'other-gateway1@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway1')
+    create_user(u'other-gateway2@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway2')
 
     create_voucher(u'main-gateway1', 60, 'main-1-1')
     create_voucher(u'main-gateway1', 60, 'main-1-2')
@@ -107,15 +106,32 @@ def bootstrap_tests():
     create_voucher(u'other-gateway2', 60, 'other-2-1')
     create_voucher(u'other-gateway2', 60, 'other-2-2')
 
-    create_product(u'main-network', None, u'90MIN', u'90 Minute Voucher', 30, 'available')
+    create_category(u'main-network', None, u'vouchers', u'Vouchers')
+    create_product(u'main-network', None, u'vouchers', u'90MIN', u'90 Minute Voucher', 30, 'available')
 
 
 @manager.command
-def create_product(network_id, gateway_id, code, title, price, status='new', quiet=True):
+def create_category(network_id, gateway_id, code, title, description=None, quiet=True):
+    category = Category()
+    category.network_id = network_id
+    category.gateway_id = gateway_id
+    category.code = code
+    category.title = title
+    category.description = description
+    db.session.add(category)
+    db.session.commit()
+
+    if not quiet:
+        print('Category created')
+
+
+@manager.command
+def create_product(network_id, gateway_id, category_code, code, title, price, status='new', quiet=True):
     product = Product()
 
     product.network_id = network_id
     product.gateway_id = gateway_id
+    product.category = Category.query.filter_by(code=category_code).first_or_404()
     product.code = code
     product.title = title
     product.price = price
@@ -216,7 +232,7 @@ def create_gateway(network, id, type, title, description=None, email=None, phone
 
 
 @manager.command
-def create_user(email, password, role, network=None, gateway=None, country_id=None, quiet=True):
+def create_user(email, password, role, network=None, gateway=None, quiet=True):
     if email is None:
         email = prompt('Email')
 
@@ -248,7 +264,6 @@ def create_user(email, password, role, network=None, gateway=None, country_id=No
 
     user.network_id = network
     user.gateway_id = gateway
-    user.country_id = country_id
     user.confirmed_at = datetime.datetime.now()
 
     if role is not None:
@@ -423,10 +438,9 @@ def migrate():
         country_processors,
         Network,
         Gateway,
-        Product,
         Voucher,
         Category,
-        product_categories,
+        Product,
         User,
         roles_users,
         Change,
@@ -480,9 +494,6 @@ def migrate():
 
                 if entity.__tablename__ == 'gateways':
                     row['gateway_type_id'] = 'cafe'
-
-                if entity.__tablename__ == 'users':
-                    row['country_id'] = u'ZA'
 
                 new_session.execute(entity.__table__.insert(row))
 

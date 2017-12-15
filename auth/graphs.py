@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 order_actions = {
-    'archive': {
+    'cancel': {
         'interface': 'admin',
         'icon': 'x'
     },
@@ -9,20 +9,22 @@ order_actions = {
         'interface': 'admin',
         'icon': 'check'
     },
+    'uncancel': {
+        'interface': 'admin',
+    },
 }
 
-order_states = {}
-
-for state in ('new','paid'):
-    order_states[state] = { 'archive': 'archived' }
-
-for ( source, method, destination) in (
-    ( 'new', 'pay', 'paid' ),
-):
-    if source not in order_states:
-        order_states[source] = {'archive': 'archived'}
-
-    order_states[source][method] = destination
+order_states = {
+    'cancelled': {
+        'uncancel': 'new',
+    },
+    'new': {
+        'pay': 'paid',
+        'cancel': 'cancelled',
+    },
+    'paid': {
+    },
+}
 
 transaction_actions = {
     'archive': {

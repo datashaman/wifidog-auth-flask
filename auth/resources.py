@@ -77,5 +77,4 @@ resource_filters.update({
 
 
 def resource_instances(resource):
-    query = resource_filters[resource](resource_query(resource))
-    return query
+    return resource_filters[resource](resource_query(resource)).all()

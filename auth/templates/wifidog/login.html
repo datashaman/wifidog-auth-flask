@@ -35,15 +35,16 @@
 {% endblock %}
 
 {% block script %}
-    <script>
-        Zepto(function ($) {
-            $('#voucher-login').on('click', function (e) {
-                dataLayer.push({
-                    event: 'trackEvent',
-                    eventCategory: 'voucher',
-                    eventAction: 'login'
-                });
+<script>
+    Zepto(function ($) {
+        $('#voucher-login').on('click', function (e) {
+            dataLayer.push({
+                event: 'trackEvent',
+                eventCategory: 'voucher',
+                eventAction: 'login'
             });
         });
-    </script>
+        $('#voucher_code').focus();
+    });
+</script>
 {% endblock %}

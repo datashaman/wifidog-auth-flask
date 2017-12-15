@@ -148,7 +148,6 @@ ProductForm = model_form(
     db.session,
     FlaskForm,
     exclude=[
-        'categories',
         'created_at',
         'order_items',
         'updated_at',
@@ -179,7 +178,6 @@ class UserForm(FlaskForm):
         ]
     )
     confirm = PasswordField('Repeat Password')
-    country = QuerySelectField('Country', default=lambda: current_app.config['DEFAULT_COUNTRY'], query_factory=instances('country'))
     locale = SelectField('Locale', default=lambda: current_app.config['BABEL_DEFAULT_LOCALE'])
     timezone = SelectField('Timezone', default=lambda: current_app.config['BABEL_DEFAULT_TIMEZONE'])
     active = BooleanField('Active', default=True)
@@ -197,7 +195,6 @@ class MyUserForm(FlaskForm):
         ]
     )
     confirm = PasswordField('Repeat Password')
-    country = QuerySelectField('Country', default=lambda: current_app.config['DEFAULT_COUNTRY'], query_factory=instances('country'))
     locale = SelectField('Locale', default=lambda: current_app.config['BABEL_DEFAULT_LOCALE'])
     timezone = SelectField('Timezone', default=lambda: current_app.config['BABEL_DEFAULT_TIMEZONE'])
 
