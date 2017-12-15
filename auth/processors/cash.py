@@ -33,7 +33,7 @@ def pay_order(order):
     form = CashForm()
     if form.validate_on_submit():
         response = {
-            'amount': form.cash.data,
+            'amount': max(float(form.cash.data), order.owed_amount),
             'currency': form.currency.data.id,
             'hash': generate_token(),
             'merchant_reference': order.id,

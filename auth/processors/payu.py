@@ -60,7 +60,7 @@ def pay_order(order):
             supportedPaymentMethods='CREDITCARD',
         ),
         Basket=dict(
-            amountInCents=int(order.total * 100),
+            amountInCents=int(order.owed_amount * 100),
             currencyCode=order.currency.id,
         ),
         Customer=dict(
