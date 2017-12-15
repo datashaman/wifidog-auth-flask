@@ -42,25 +42,25 @@ def process_auth(auth):
                 return (constants.AUTH_ALLOWED, 'Token is already in use but details match: %s' % auth['token'])
             return (constants.AUTH_DENIED, 'Token is already in use: %s' % auth['token'])
     elif auth['stage'] in [ constants.STAGE_LOGOUT, constants.STAGE_COUNTERS ]:
-        messages = ''
+        messages = []
 
         if auth['incoming'] is not None or auth['outgoing'] is not None:
             if auth['incoming'] > voucher.incoming:
                 voucher.incoming = auth['incoming']
             else:
-                messages += '| Warning: Incoming counter is smaller than stored value; counter not updated'
+                messages.append('Warning: Incoming counter is smaller than stored value; counter not updated')
 
             if auth['outgoing'] > voucher.outgoing:
                 voucher.outgoing = auth['outgoing']
             else:
-                messages += '| Warning: Outgoing counter is smaller than stored value; counter not updated'
+                messages.append('Warning: Outgoing counter is smaller than stored value; counter not updated')
         else:
-            messages += '| Incoming or outgoing counter is missing; counters not updated'
+            messages.append('Incoming or outgoing counter is missing; counters not updated')
 
         if auth['stage'] == constants.STAGE_LOGOUT:
             # Ignore this, when you login the timer starts, that's it
             # (at least it is for this model)
-            messages += '| Logout is not implemented'
+            messages.append('Logout is not implemented')
 
         if voucher.should_end():
             voucher.end()
@@ -70,6 +70,6 @@ def process_auth(auth):
             voucher.end()
             return (constants.AUTH_DENIED, 'Token megabytes are finished: %s' % auth['token'])
 
-        return (constants.AUTH_ALLOWED, messages)
+        return (constants.AUTH_ALLOWED, ' | ' .join(messages))
     else:
         return (constants.AUTH_ERROR, 'Unknown stage: %s' % auth['stage'])

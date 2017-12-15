@@ -215,7 +215,7 @@ class LoginVoucherForm(FlaskForm):
 
     gw_address = HiddenField('Gateway Address', default=args_get('gw_address'))
     gw_port = HiddenField('Gateway Port', default=args_get('gw_port'))
-    gateway_id = HiddenField('Gateway ID', default=args_get('gw_id'))
+    gw_id = HiddenField('Gateway ID', default=args_get('gw_id'))
     mac = HiddenField('MAC', default=args_get('mac'))
     url = HiddenField('URL', default=args_get('url'))
 

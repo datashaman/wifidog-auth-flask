@@ -66,6 +66,7 @@ from flask_security import \
     roles_accepted
 from PIL import Image
 from pytz import common_timezones
+from sqlalchemy import func
 
 
 bp = Blueprint('auth', __name__)
@@ -876,7 +877,7 @@ def wifidog_login():
 
     if form.validate_on_submit():
         voucher_code = form.voucher_code.data.upper()
-        voucher = Voucher.query.filter_by(code=voucher_code).first()
+        voucher = Voucher.query.filter(func.upper(Voucher.code) == voucher_code).first()
 
         if voucher is None:
             flash(
@@ -900,14 +901,14 @@ def wifidog_login():
         return redirect(url)
 
     if request.method == 'GET':
-        gateway_id = request.args.get('gw_id')
+        gw_id = request.args.get('gw_id')
     else:
-        gateway_id = form.gateway_id.data
+        gw_id = form.gw_id.data
 
-    if gateway_id is None:
+    if gw_id is None:
         abort(404)
 
-    gateway = Gateway.query.filter_by(id=gateway_id).first_or_404()
+    gateway = Gateway.query.filter_by(id=gw_id).first_or_404()
 
     return render_template('wifidog/login.html', form=form, gateway=gateway)
 
@@ -942,7 +943,7 @@ def wifidog_auth():
         gateway_id=request.args.get('gw_id'),
     )
     (status, messages) = process_auth(args)
-    return ("Auth: %s\nMessages: %s\n" % (status, messages), 200)
+    return "Auth: %s\nMessages: %s\n" % (status, messages), 200
 
 
 @bp.route('/wifidog/portal/')
@@ -952,10 +953,10 @@ def wifidog_portal():
         voucher = Voucher.query.filter_by(token=voucher_token).first()
     else:
         voucher = None
-    gateway_id = request.args.get('gw_id')
-    if gateway_id is None:
+    gw_id = request.args.get('gw_id')
+    if gw_id is None:
         abort(404)
-    gateway = Gateway.query.filter_by(id=gateway_id).first_or_404()
+    gateway = Gateway.query.filter_by(id=gw_id).first_or_404()
     logo_url = None
     if gateway.logo:
         logo_url = logos.url(gateway.logo)
