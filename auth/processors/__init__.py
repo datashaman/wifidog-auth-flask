@@ -38,7 +38,7 @@ def update_transaction(id, user, response):
         transaction.currency_id = processor_module.get_transaction_currency(response)
         transaction.processor = processor
         transaction.processor_reference = processor_reference
-        transaction.user = user
+        transaction.user_id = getattr(user, 'id')
         transaction.type = processor_module.transaction_types[processor_module.get_transaction_type(response)]
         order.transactions.append(transaction)
 
