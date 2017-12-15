@@ -493,6 +493,7 @@ def migrate():
                     row['currency_id'] = u'ZAR'
 
                 if entity.__tablename__ == 'gateways':
+                    row['country_id'] = u'ZA'
                     row['gateway_type_id'] = 'cafe'
 
                 new_session.execute(entity.__table__.insert(row))
