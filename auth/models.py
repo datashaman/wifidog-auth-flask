@@ -25,9 +25,6 @@ from sqlalchemy.schema import UniqueConstraint
 class SqliteDecimal(types.TypeDecorator):
     impl = types.INTEGER
 
-    def load_dialect_impl(self, dialect):
-        return dialect.type_descriptor(types.INTEGER)
-
     def process_bind_param(self, value, dialect):
         return None if value is None else int(value * 100)
 
@@ -44,6 +41,7 @@ def available_actions(actions, states, status, interface):
         return result
 
     return {}
+
 
 @event.listens_for(Engine, 'connect')
 def set_sqlite_pragma(dbapi_connection, connection_record):
