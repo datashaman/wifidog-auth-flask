@@ -5,7 +5,6 @@ from __future__ import absolute_import
 import csv
 import datetime
 import simplejson as json
-import six
 
 from auth.constants import ROLES
 from auth.models import \
@@ -286,7 +285,7 @@ def auth_token(email):
 @manager.command
 def create_roles(quiet=True):
     if Role.query.count() == 0:
-        for name, description in six.iteritems(ROLES):
+        for name, description in ROLES.items():
             create_role(name, description, quiet)
         if not quiet:
             print('Roles created')
@@ -356,7 +355,7 @@ def create_gateway_types(quiet=True):
         'wifi-zone': u'Wi-Fi Zone',
     }
 
-    for id, title in six.iteritems(types):
+    for id, title in types.items():
         gateway_type = GatewayType()
         gateway_type.id = id
         gateway_type.title = title

@@ -51,7 +51,7 @@
                         <td class="actions actions-instance">
                             <div class="pure-menu pure-menu-horizontal">
                                 <ul class="pure-menu-list">
-                                    {% for action, defn in six.iteritems(instance.available_actions) %}
+                                    {% for action, defn in instance.available_actions.items() %}
                                     {% if action == 'pay' %}
                                         <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
                                             <a href="#" class="pure-menu-link" title="{{ action }}">

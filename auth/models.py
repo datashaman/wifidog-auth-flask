@@ -3,7 +3,6 @@ from __future__ import division
 
 import datetime
 import simplejson as json
-import six
 import sqlalchemy.types as types
 
 from auth.graphs import transaction_actions, transaction_states, voucher_actions, voucher_states, order_actions, order_states
@@ -31,7 +30,7 @@ class SqliteDecimal(types.TypeDecorator):
 def available_actions(actions, states, status, interface):
     if status in states:
         result = {}
-        for action, defn in six.iteritems(actions):
+        for action, defn in actions.items():
             if action in states[status] and defn['interface'] == interface:
                 result[action] = defn
         return result

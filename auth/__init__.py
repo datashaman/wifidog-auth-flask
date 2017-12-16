@@ -5,7 +5,6 @@ Create app
 
 from __future__ import absolute_import
 
-import six
 import logging
 
 from auth import constants
@@ -87,8 +86,7 @@ def create_app(config=None):
     def context_processor():
         """Context processors for use in templates"""
         return dict(constants=constants,
-                    render_currency_amount=render_currency_amount,
-                    six=six)
+                    render_currency_amount=render_currency_amount)
 
     @app.errorhandler(404)
     def error_handler_404(error):

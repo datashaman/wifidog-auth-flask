@@ -7,7 +7,6 @@ from __future__ import division
 
 import datetime
 import os
-import six
 
 from auth import constants
 
@@ -150,6 +149,11 @@ def resource_action(resource, id, action, param_name='id'):
                            resource=resource)
 
 
+def set_locale_choices(form):
+    form.locale.choices = [(id, title) for id, title in constants.LOCALES.items()]
+    form.timezone.choices = [(timezone, timezone) for timezone in common_timezones]
+
+
 @bp.route('/network', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('network-admin')
@@ -202,9 +206,7 @@ def my_gateway():
 )
 def my_account():
     form = MyUserForm(obj=current_user)
-
-    form.locale.choices = list((id, title) for id, title in six.iteritems(constants.LOCALES))
-    form.timezone.choices = list((timezone, timezone) for timezone in common_timezones)
+    set_locale_choices(form)
 
     if form.validate_on_submit():
         if form.password.data == '':
@@ -348,9 +350,7 @@ def user_index():
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def user_new():
     form = UserForm()
-
-    form.locale.choices = list((id, title) for id, title in six.iteritems(constants.LOCALES))
-    form.timezone.choices = list((timezone, timezone) for timezone in common_timezones)
+    set_locale_choices(form)
 
     if current_user.has_role('gateway-admin'):
         del form.roles
@@ -382,9 +382,7 @@ def user_edit(id):
         abort(403)
 
     form = UserForm(obj=instance)
-
-    form.locale.choices = list((id, title) for id, title in six.iteritems(constants.LOCALES))
-    form.timezone.choices = list((timezone, timezone) for timezone in common_timezones)
+    set_locale_choices(form)
 
     if current_user.has_role('network-admin'):
         del form.gateway
