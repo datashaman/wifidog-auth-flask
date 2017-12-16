@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+python -V
+pip -V
+
 tempdir=$(mktemp -d /tmp/auth-XXXXX)
 BUILD_HOME=${BUILD_HOME:-$(pwd)/build}
 (cd $tempdir; tar -xvf "$BUILD_HOME/build.tgz")

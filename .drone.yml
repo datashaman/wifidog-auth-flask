@@ -9,6 +9,8 @@ pipeline:
   test:
     image: python:3.6-slim-jessie
     commands:
+    - python -V
+    - pip -V
     - pip install -r requirements-tests.txt
     - python -m unittest discover -s tests
     - bash build.sh
