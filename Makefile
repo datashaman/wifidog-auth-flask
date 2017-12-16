@@ -108,5 +108,8 @@ migrate: bootstrap-reference
 	rm -f data/new.db
 	python manage.py migrate
 
+reference-update: bootstrap-reference
+	scp data/reference.db docker.datashaman.com:config/auth-staging/data
+
 packer-build:
 	packer build packer.json

@@ -118,7 +118,6 @@ def create_category(network_id, gateway_id, code, title, quiet=True, **kwargs):
 @manager.command
 def create_product(network_id, gateway_id, category_code, code, title, price, status='new', quiet=True):
     product = Product()
-
     product.network_id = network_id
     product.gateway_id = gateway_id
     product.category = Category.query.filter_by(code=category_code).first_or_404()
