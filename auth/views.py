@@ -76,6 +76,7 @@ bp = Blueprint('auth', __name__)
 
 def redirect_url():
     return request.args.get('next') or \
+        session.get('next_url') or \
         request.referrer or \
         url_for('.home')
 
@@ -1056,6 +1057,7 @@ def wifidog_login():
         voucher.token = generate_uuid()
         db.session.commit()
 
+        session['next_url'] = form.url.data
         session['voucher_token'] = voucher.token
 
         url = ('http://%s:%s/wifidog/auth?token=%s' %
@@ -1125,9 +1127,11 @@ def wifidog_portal():
     logo_url = None
     if gateway.logo:
         logo_url = logos.url(gateway.logo)
+    next_url = session.pop('next_url', None)
     return render_template('wifidog/portal.html',
                            gateway=gateway,
                            logo_url=logo_url,
+                           next_url=next_url,
                            voucher=voucher)
 
 

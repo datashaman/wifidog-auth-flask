@@ -25,11 +25,14 @@
             <h2 class="content-subhead">{{ gateway.subhead }}</h2>
         {% endif %}
 
-        {% if voucher and voucher.time_left %}
-            <ul class="flashes">
-                <li class="success"><span id="time_left">{{ voucher.time_left }}</span> minutes left</li>
-            </ul>
-        {% endif %}
+        <ul class="flashes">
+            {% if voucher and voucher.time_left %}
+            <li class="success"><span id="time_left">{{ voucher.time_left }}</span> minutes left</li>
+            {% endif %}
+            {% if next_url %}
+            <li class="success"><a href="{{ next_url }}">The page you wanted to see.</a></li>
+            {% endif %}
+        </ul>
 
         {% if gateway.description %}
             <div class="description">
