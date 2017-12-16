@@ -16,5 +16,3 @@ simplejson
 six
 https://github.com/armooo/suds_requests/archive/master.zip#egg=suds_requests
 wheel
-
-functools32 ; python_version < '3'
