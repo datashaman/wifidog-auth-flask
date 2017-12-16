@@ -328,6 +328,19 @@ class Voucher(db.Model):
     def available_actions(self):
         return available_actions(voucher_actions, voucher_states, self.status, 'admin')
 
+    @property
+    def row_class(self):
+        if self.status == 'new':
+            return 'table-success'
+        if self.status == 'active':
+            return 'table-active'
+        if self.status == 'expired':
+            return 'table-info'
+        if self.status == 'ended':
+            return 'table-info'
+        if self.status == 'blocked':
+            return 'table-warning'
+
     def __str__(self):
         return self.code
 
@@ -465,6 +478,13 @@ class Order(db.Model):
     def owed_amount(self):
         return self.total_amount - self.paid_amount
 
+    @property
+    def row_class(self):
+        if self.status == 'new':
+            return 'table-active'
+        if self.status == 'paid':
+            return 'table-success'
+
     def __str__(self):
         return 'Order #%08d' % self.id
 
@@ -558,6 +578,17 @@ class Transaction(db.Model):
     @property
     def available_actions(self):
         return available_actions(transaction_actions, transaction_states, self.status, 'admin')
+
+    @property
+    def row_class(self):
+        if self.status == 'new':
+            return 'table-active'
+        if self.cashup:
+            return 'table-info'
+        if self.status == 'failed':
+            return 'table-danger'
+        if self.status == 'successful':
+            return 'table-success'
 
     def __str__(self):
         return 'Transaction #%08d' % self.id

@@ -30,7 +30,7 @@
 
                 <tbody>
                     {% for instance in instances %}
-                    <tr data-id={{ instance.id }} class="network {{ 'pure-table-' + loop.cycle('odd', 'even') }}">
+                    <tr data-id={{ instance.id }} class="order {{ instance.row_class }}">
                         <td data-label="ID"><a href="{{ url_for('.order_edit', hash=instance.hash) }}">{{ instance }}</a></td>
                         {% if show_network or show_gateway %}
                         <td data-label="Network & Gateway">
