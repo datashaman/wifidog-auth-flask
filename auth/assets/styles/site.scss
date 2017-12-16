@@ -449,6 +449,21 @@ form .description {
     background-color: rgba(0, 0, 0, 0.075);
 }
 
+.table-danger,
+.table-danger > th,
+.table-danger > td {
+    background-color: #f5c6cb;
+}
+
+.table-hover .table-danger:hover {
+    background-color: #f1b0b7;
+}
+
+.table-hover .table-danger:hover > td,
+.table-hover .table-danger:hover > th {
+    background-color: #f1b0b7;
+}
+
 table-info,
 .table-info > th,
 .table-info > td {
@@ -479,17 +494,17 @@ table-success,
     background-color: #b1dfbb;
 }
 
-.table-danger,
-.table-danger > th,
-.table-danger > td {
-    background-color: #f5c6cb;
+table-warning,
+.table-warning > th,
+.table-warning > td {
+    background-color: #ffeeba;
 }
 
-.table-hover .table-danger:hover {
-    background-color: #f1b0b7;
+.table-hover .table-warning:hover {
+    background-color: #ffe8a1;
 }
 
-.table-hover .table-danger:hover > td,
-.table-hover .table-danger:hover > th {
-    background-color: #f1b0b7;
+.table-hover .table-warning:hover > td,
+.table-hover .table-warning:hover > th {
+    background-color: #ffe8a1;
 }
