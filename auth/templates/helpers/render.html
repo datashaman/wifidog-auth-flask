@@ -1,7 +1,19 @@
 {% macro times(row) %}
-    {{ row.created_at | timeformat('short') }}
-    {% if row.started_at %}
-        {{ row.started_at | timeformat('short') }}
-        {{ row.end_at | timeformat('short') }}
-    {% endif %}
+{{ row.created_at | timeformat('short') }}
+{% if row.started_at %}
+{{ row.started_at | timeformat('short') }}
+{{ row.end_at | timeformat('short') }}
+{% endif %}
+{% endmacro %}
+
+{% macro render_pagination(pagination, endpoint) %}
+{% if pagination.pages > 1 %}
+<ul class="pagination">
+    {%- for page in pagination.iter_pages() %}
+    <li class="page-item">
+        <a class="page-link {{ 'active' if page == pagination.page }}" href="{{ url_for(endpoint, page=page, per_page=request.args.get('per_page')) }}">{{ page }}</a>
+    </li>
+    {%- endfor %}
+</ul>
+{% endif %}
 {% endmacro %}

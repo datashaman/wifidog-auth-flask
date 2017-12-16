@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="content">
-        {% if instances %}
+        {% if pagination.items %}
             <table id="networks" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
                 <thead>
                     <tr>
@@ -20,7 +20,7 @@
                 </thead>
 
                 <tbody>
-                    {% for instance in instances %}
+                    {% for instance in pagination.items %}
                     <tr data-id={{ instance.id }} class="network {{ 'pure-table-' + loop.cycle('odd', 'even') }}">
                         <td data-label="ID"><a href="{{ url_for('.network_edit', id=instance.id) }}">{{ instance.id }}</a></td>
                         <td data-label="Title">{{ instance.title | default('-') }}</td>

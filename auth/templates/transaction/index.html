@@ -7,7 +7,7 @@
 
 {% block content %}
     <div class="content">
-        {% if instances %}
+        {% if pagination.items %}
             <table id="transactions" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
                 <thead>
                     <tr>
@@ -29,7 +29,7 @@
                 </thead>
 
                 <tbody>
-                    {% for instance in instances %}
+                    {% for instance in pagination.items %}
                     <tr data-id={{ instance.id }} class="transaction table-{{ instance.class_hint }}">
                         <td data-label="ID"><a href="{{ url_for('.transaction_show', hash=instance.hash) }}">{{ instance }}</a></td>
                         {% if show_network or show_gateway %}

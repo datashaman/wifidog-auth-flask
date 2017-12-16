@@ -80,4 +80,4 @@ resource_filters.update({
 
 
 def resource_instances(resource):
-    return resource_filters[resource](resource_query(resource)).all()
+    return resource_filters[resource](resource_query(resource))

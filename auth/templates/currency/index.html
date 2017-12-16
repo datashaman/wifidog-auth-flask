@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="content">
-        {% if instances %}
+        {% if pagination.items %}
             <table width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
                 <thead>
                     <tr>
@@ -20,7 +20,7 @@
                 </thead>
 
                 <tbody>
-                    {% for instance in instances %}
+                    {% for instance in pagination.items %}
                         <tr data-id={{ instance.id }} class={{ 'pure-table-' + loop.cycle('odd', 'even') }}>
                             <td class="id" data-label="ID"><a href={{ url_for('.currency_edit', id=instance.id) }}>{{ instance.id }}</a></td>
                             <td class="title" data-label="Title">{{ instance.title }}</td>

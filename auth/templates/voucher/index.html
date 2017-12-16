@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="content">
-        {% if instances %}
+        {% if pagination.items %}
             <table id="vouchers" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
                 <thead>
                     <tr>
@@ -22,7 +22,7 @@
                 </thead>
 
                 <tbody>
-                    {% for instance in instances %}
+                    {% for instance in pagination.items %}
                     <tr data-id="{{ instance.id }}" data-code="{{ instance.code }}" class="voucher table-{{ instance.class_hint }}">
                             <td class="code" data-label="Code">{{ instance.code }}</td>
                             <td class="name" data-label="Name">{{ instance.name or '-' }}</td>

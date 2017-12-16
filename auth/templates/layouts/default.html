@@ -1,3 +1,5 @@
+{% from 'helpers/render.html' import render_pagination %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,14 +79,24 @@
 
                     <h1>{{ page_title }}</h1>
 
-                    {% if new_url %}
-                        <div class="actions-collection">
-                            <a href="{{ new_url }}" class="pure-button pure-button-primary">
-                                <span class="oi" data-glyph="file" title="{{ new_title }}" aria-hidden="true"></span>
-                                {{ new_title }}
-                            </a>
+                    <div class="pure-g">
+                        <div class="pure-u-1-2">
+                            {% if new_url %}
+                                <div class="actions-collection">
+                                    <a href="{{ new_url }}" class="pure-button pure-button-primary">
+                                        <span class="oi" data-glyph="file" title="{{ new_title }}" aria-hidden="true"></span>
+                                        {{ new_title }}
+                                    </a>
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
+
+                        <div class="pure-u-1-2 pagination-container">
+                            {% if pagination %}
+                            {{ render_pagination(pagination, '.%s_index' % resource) }}
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             {% endblock %}
 

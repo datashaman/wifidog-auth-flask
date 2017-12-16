@@ -77,10 +77,10 @@ def redirect_url():
 
 def resource_index(resource, form=None):
     """Handle a resource index request"""
-    instances = resource_instances(resource)
+    pagination = resource_instances(resource).paginate()
     return render_template('%s/index.html' % resource,
                            form=form,
-                           instances=instances,
+                           pagination=pagination,
                            resource=resource)
 
 
