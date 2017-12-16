@@ -36,8 +36,7 @@ pipeline:
     - /var/run/docker.sock:/var/run/docker.sock
     build_args:
     - XDG_CACHE_HOME=/cache
-    purge: false
-    privileged: true
+    purge: true
     when:
       event: push
     secrets:
