@@ -80,7 +80,8 @@ def resource_index(resource, form=None):
     instances = resource_instances(resource)
     return render_template('%s/index.html' % resource,
                            form=form,
-                           instances=instances)
+                           instances=instances,
+                           resource=resource)
 
 
 def resource_new(resource, form):
@@ -92,7 +93,7 @@ def resource_new(resource, form):
         db.session.commit()
         flash('Create %s successful' % instance)
         return redirect(url_for('.%s_index' % resource))
-    return render_template('%s/new.html' % resource, form=form)
+    return render_template('%s/new.html' % resource, form=form, resource=resource)
 
 
 def resource_edit(resource, id, form_class):
@@ -106,14 +107,16 @@ def resource_edit(resource, id, form_class):
         return redirect(url_for('.%s_index' % resource))
     return render_template('%s/edit.html' % resource,
                            form=form,
-                           instance=instance)
+                           instance=instance,
+                           resource=resource)
 
 
 def resource_show(resource, id):
     """Handle a resource show request"""
     instance = resource_instance(resource, id)
     return render_template('%s/show.html' % resource,
-                           instance=instance)
+                           instance=instance,
+                           resource=resource)
 
 
 def resource_delete(resource, id):

@@ -23,7 +23,7 @@
 
                 <tbody>
                     {% for instance in instances %}
-                    <tr data-id="{{ instance.id }}" data-code="{{ instance.code }}" class="voucher {{ instance.row_class }}">
+                    <tr data-id="{{ instance.id }}" data-code="{{ instance.code }}" class="voucher table-{{ instance.class_hint }}">
                             <td class="code" data-label="Code">{{ instance.code }}</td>
                             <td class="name" data-label="Name">{{ instance.name or '-' }}</td>
                             <td class="status" data-label="Status"><span class="oi" data-glyph={{ constants.STATUS_ICONS[instance.status] }} title={{ instance.status }} aria-hidden="true"></span></td>

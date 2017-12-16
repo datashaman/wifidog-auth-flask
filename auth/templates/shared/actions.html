@@ -1,0 +1,32 @@
+<div class="pure-menu pure-menu-horizontal">
+    <ul class="pure-menu-list">
+        {% for action, defn in instance.available_actions.items() %}
+        {% if instance.__class__.__name__ == 'Order' and action == 'pay' %}
+            <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                <a href="#" class="pure-menu-link" title="{{ action }}">
+                    {% if defn.icon %}
+                    <span class="oi" data-glyph={{ defn.icon }} aria-hidden="true"></span>
+                    {% endif %}
+                    {{ action }}
+                </a>
+                <ul class="pure-menu-children">
+                    {% for processor in instance.gateway.country.processors if processor.active %}
+                    <li class="pure-menu-item">
+                        <a href="{{ url_for('.order_pay', hash=instance.hash, processor_id=processor.id) }}" class="pure-menu-link">{{ processor.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% else %}
+            <li class="pure-menu-item">
+                <a href="{{ url_for('.%s_action' % resource, hash=instance.hash, action=action) }}" class="pure-menu-link" title="{{ action }}">
+                    {% if defn.icon %}
+                    <span class="oi" data-glyph={{ defn.icon }} aria-hidden="true"></span>
+                    {% endif %}
+                    {{ action }}
+                </a>
+            </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</div>

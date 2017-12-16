@@ -329,17 +329,15 @@ class Voucher(db.Model):
         return available_actions(voucher_actions, voucher_states, self.status, 'admin')
 
     @property
-    def row_class(self):
-        if self.status == 'new':
-            return 'table-success'
-        if self.status == 'active':
-            return 'table-active'
-        if self.status == 'expired':
-            return 'table-info'
-        if self.status == 'ended':
-            return 'table-info'
-        if self.status == 'blocked':
-            return 'table-warning'
+    def class_hint(self):
+        choices = {
+            'new': 'success',
+            'active': 'active',
+            'expired': 'info',
+            'ended': 'info',
+            'blocked': 'warning',
+        }
+        return choices.get(self.status, 'default')
 
     def __str__(self):
         return self.code
@@ -479,11 +477,12 @@ class Order(db.Model):
         return self.total_amount - self.paid_amount
 
     @property
-    def row_class(self):
-        if self.status == 'new':
-            return 'table-active'
-        if self.status == 'paid':
-            return 'table-success'
+    def class_hint(self):
+        choices = {
+            'new': 'active',
+            'paid': 'success',
+        }
+        return choices.get(self.status, 'default')
 
     def __str__(self):
         return 'Order #%08d' % self.id
@@ -580,15 +579,16 @@ class Transaction(db.Model):
         return available_actions(transaction_actions, transaction_states, self.status, 'admin')
 
     @property
-    def row_class(self):
-        if self.status == 'new':
-            return 'table-active'
+    def class_hint(self):
         if self.cashup:
-            return 'table-info'
-        if self.status == 'failed':
-            return 'table-danger'
-        if self.status == 'successful':
-            return 'table-success'
+            return 'info'
+
+        choices = {
+            'new': 'active',
+            'failed': 'danger',
+            'successful': 'success',
+        }
+        return choices.get(self.status, 'default')
 
     def __str__(self):
         return 'Transaction #%08d' % self.id
