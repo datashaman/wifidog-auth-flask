@@ -1,8 +1,3 @@
-matrix:
-  PYTHON_VERSION:
-  - 2.7
-  - 3.6
-
 pipeline:
   restore-cache:
     image: drillster/drone-volume-cache
@@ -12,7 +7,7 @@ pipeline:
     volumes:
     - /cache:/cache
   test:
-    image: python:${PYTHON_VERSION}-slim-jessie
+    image: python:3.6-slim-jessie
     commands:
     - pip install -r requirements-tests.txt
     - python -m unittest discover -s tests
@@ -25,7 +20,7 @@ pipeline:
   put-build:
     image: samepagelabs/s3cmd
     commands:
-    - /usr/local/bin/s3cmd --host=$${SPACES_ENDPOINT} --host-bucket="%(bucket)s.$${SPACES_ENDPOINT}" --access_key=$${SPACES_ACCESS_KEY} --secret_key=$${SPACES_SECRET_KEY} put ./build/build.tgz s3://$${SPACES_BUCKET}/builds/auth/${DRONE_BUILD_NUMBER}/python-${PYTHON_VERSION}.tgz
+        - /usr/local/bin/s3cmd --host=$${SPACES_ENDPOINT} --host-bucket="%(bucket)s.$${SPACES_ENDPOINT}" --access_key=$${SPACES_ACCESS_KEY} --secret_key=$${SPACES_SECRET_KEY} put ./build/build.tgz s3://$${SPACES_BUCKET}/builds/auth/${DRONE_BUILD_NUMBER}.tgz
     secrets:
     - spaces_access_key
     - spaces_bucket
@@ -43,8 +38,6 @@ pipeline:
     privileged: true
     when:
       event: push
-      matrix:
-        PYTHON_VERSION: 3.6
     secrets:
     - docker_password
     - docker_username

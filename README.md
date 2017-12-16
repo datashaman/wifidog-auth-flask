@@ -5,6 +5,8 @@
 
 Voucher authentication server for Wifidog Captive Portal written in Python Flask. WIP.
 
+Python 3.6 is the only version tested.
+
 Set a time limit or transfer limit (in MB) before the voucher is invalidated. User accounts coming soon.
 
 ## Docker
