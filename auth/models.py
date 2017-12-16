@@ -11,7 +11,7 @@ from auth.utils import render_currency_amount, generate_code, generate_order_has
 from decimal import Decimal
 from flask import current_app
 from flask_security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore
-from sqlalchemy import event, func
+from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import backref
 from sqlalchemy.schema import UniqueConstraint
@@ -45,6 +45,13 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.close()
 
 
+@event.listens_for(Engine, 'close')
+def optimize_on_close(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute('PRAGMA optimize')
+    cursor.close()
+
+
 roles_users = db.Table('roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('roles.id'))
@@ -63,6 +70,7 @@ class Role(db.Model, RoleMixin):
 
     def __str__(self):
         return self.description
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -100,7 +108,9 @@ class User(db.Model, UserMixin):
     def __str__(self):
         return self.email
 
+
 users = SQLAlchemyUserDatastore(db, User, Role)
+
 
 country_currencies = db.Table('country_currencies',
     db.Column('country_id', db.String(3), db.ForeignKey('countries.id')),
@@ -366,7 +376,7 @@ class Category(db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey('categories.id', ondelete='cascade', onupdate='cascade'), nullable=True)
     children = db.relationship('Category', backref=backref('sub_categories', remote_side=[id]))
 
-    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', ondelete='cascade', onupdate='cascade'), nullable=False)
+    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', ondelete='cascade', onupdate='cascade'))
     network = db.relationship(Network, backref=backref('categories', lazy='dynamic'))
 
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', ondelete='cascade', onupdate='cascade'))
@@ -377,7 +387,8 @@ class Category(db.Model):
 
     description = db.Column(db.UnicodeText)
 
-    status = db.Column(db.String(20), nullable=False, default='new')
+    read_only = db.Column(db.Boolean, nullable=False, default=False)
+    properties = db.Column(db.UnicodeText)
 
     created_at = db.Column(db.DateTime, default=current_timestamp)
     updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
@@ -410,6 +421,7 @@ class Product(db.Model):
     description = db.Column(db.UnicodeText)
 
     price = db.Column(SqliteDecimal, nullable=False)
+    properties = db.Column(db.UnicodeText)
 
     created_at = db.Column(db.DateTime, default=current_timestamp)
     updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
@@ -520,8 +532,8 @@ class Processor(db.Model):
 
     id = db.Column(db.Unicode(20), primary_key=True)
     title = db.Column(db.Unicode(40))
-
     active = db.Column(db.Boolean, nullable=False, default=True)
+    international = db.Column(db.Boolean, nullable=False, default=False)
 
     def pay_order(self, order):
         from auth.processors import get_processor

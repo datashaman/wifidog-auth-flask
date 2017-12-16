@@ -1,6 +1,6 @@
 import sys
 
-from auth.models import Order, Processor, Transaction
+from auth.models import Order, Processor, Transaction, Voucher
 from auth.services import db
 from auth.utils import render_currency_amount
 from flask import flash
@@ -50,6 +50,21 @@ def update_transaction(id, response):
         order.status = 'paid'
 
     db.session.commit()
+
+    if order.status == 'paid':
+        for item in order.items:
+            gateway = item.product.gateway
+
+            if item.product.category.code == 'vouchers':
+                for index in range(item.quantity):
+                    voucher = Voucher()
+                    voucher.minutes = item.product.attributes['minutes']
+                    voucher.megabytes = item.product.attributes['megabytes']
+                    gateway.vouchers.append(voucher)
+                    order.vouchers.append(voucher)
+
+        db.session.commit()
+
 
     return transaction
 

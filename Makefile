@@ -56,6 +56,8 @@ browser-sync:
 lint:
 	pylint auth
 
+bootstrap: bootstrap-reference bootstrap-local
+
 bootstrap-local: bootstrap-tests
 	cp tests/tests.db data/local.db
 
@@ -91,14 +93,6 @@ production-install:
 	pip install -r requirements.txt
 	npm install
 	gulp
-
-bootstrap:
-	$(PYTHON) bootstrap.py
-
-remove-db:
-	rm -f local.db
-
-reboot: remove-db bootstrap
 
 clean:
 	find . -name '*.pyc' -delete

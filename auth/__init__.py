@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import logging
 
 from auth import constants
-from auth.models import db, users
+from auth.models import db, Processor, users
 from auth.processors import init_processors
 from auth.services import login_manager, logos, mail, menu, security
 from auth.utils import render_currency_amount
@@ -86,6 +86,9 @@ def create_app(config=None):
     def context_processor():
         """Context processors for use in templates"""
         return dict(constants=constants,
+                    international_processors=lambda: Processor.query
+                                                              .filter_by(international=True, active=True)
+                                                              .all(),
                     render_currency_amount=render_currency_amount)
 
     @app.errorhandler(404)

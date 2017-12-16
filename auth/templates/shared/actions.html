@@ -10,7 +10,7 @@
                     {{ action }}
                 </a>
                 <ul class="pure-menu-children">
-                    {% for processor in instance.gateway.country.processors if processor.active %}
+                    {% for processor in international_processors() + instance.gateway.country.processors if processor.active %}
                     <li class="pure-menu-item">
                         <a href="{{ url_for('.order_pay', hash=instance.hash, processor_id=processor.id) }}" class="pure-menu-link">{{ processor.title }}</a>
                     </li>

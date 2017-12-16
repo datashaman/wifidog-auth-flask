@@ -48,6 +48,8 @@ class ModelConverter(BaseModelConverter):
         return BaseModelConverter.handle_decimal_types(self, column, field_args, **extra)
 
 
+model_converter = ModelConverter()
+
 CashupForm = model_form(
     Cashup,
     db.session,
@@ -81,7 +83,8 @@ CategoryForm = model_form(
             'default': lambda: current_user.network,
             'query_factory': instances('network'),
         }
-    }
+    },
+    converter=model_converter
 )
 
 
@@ -194,7 +197,7 @@ ProductForm = model_form(
             'query_factory': instances('network'),
         },
     },
-    converter=ModelConverter()
+    converter=model_converter
 )
 
 

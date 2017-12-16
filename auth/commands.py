@@ -41,7 +41,9 @@ from sqlalchemy.orm import Session
 def bootstrap_instance(country_id, country_title, bind=None, users_csv=None):
     db.create_all(bind=bind)
 
+    create_category(None, None, u'vouchers', u'Vouchers', read_only=True)
     create_country(country_id, country_title)
+    create_processor('cash', 'Cash', active=True, international=True)
     create_gateway_types()
     create_roles()
 
@@ -53,31 +55,15 @@ def bootstrap_instance(country_id, country_title, bind=None, users_csv=None):
 
 @manager.command
 def bootstrap_reference(bind=None, users_csv=None):
-    db.create_all(bind=bind)
-
-    create_country('ZA', 'South Africa')
+    bootstrap_instance('ZA', 'South Africa', bind=bind, users_csv=users_csv)
     create_currency('ZA', 'ZAR', 'South African Rand', 'R')
-    create_processor('cash', 'Cash', 'ZA', active=True)
     create_processor('snapscan', 'SnapScan', 'ZA', active=True)
     create_processor('payu', 'PayU', 'ZA', active=True)
-    create_gateway_types()
-    create_roles()
-
-    if users_csv:
-        with open(users_csv) as f:
-            for user in csv.reader(f):
-                create_user(*user)
 
 
 @manager.command
 def bootstrap_tests():
-    bootstrap_instance(u'ZA', u'South Africa')
-
-    create_processor(u'cash', u'Cash', countries=u'ZA', active=True)
-    create_processor(u'snapscan', u'SnapScan', countries=u'ZA', active=True)
-    create_processor(u'payu', u'PayU', countries=u'ZA', active=True)
-
-    create_currency(u'ZA', u'ZAR', u'South African Rand', u'R')
+    bootstrap_reference()
 
     create_network(u'main-network', u'Network', u'ZAR')
     create_network(u'other-network', u'Other Network', u'ZAR')
@@ -88,7 +74,7 @@ def bootstrap_tests():
     create_gateway(u'other-network', u'other-gateway1', u'cafe', u'Other Gateway #1')
     create_gateway(u'other-network', u'other-gateway2', u'cafe', u'Other Gateway #2')
 
-    create_user(u'super-admin@example.com', u'admin', u'super-admin')
+    create_user(u'super-admin@example.com', 'admin', u'super-admin')
 
     create_user(u'main-network@example.com', u'admin', u'network-admin', u'main-network')
     create_user(u'other-network@example.com', u'admin', u'network-admin', u'other-network')
@@ -108,18 +94,18 @@ def bootstrap_tests():
     create_voucher(u'other-gateway2', 60, 'other-2-1')
     create_voucher(u'other-gateway2', 60, 'other-2-2')
 
-    create_category(u'main-network', None, u'vouchers', u'Vouchers')
     create_product(u'main-network', None, u'vouchers', u'90MIN', u'90 Minute Voucher', 30, 'available')
 
 
 @manager.command
-def create_category(network_id, gateway_id, code, title, description=None, quiet=True):
+def create_category(network_id, gateway_id, code, title, description=None, read_only=False, quiet=True):
     category = Category()
     category.network_id = network_id
     category.gateway_id = gateway_id
     category.code = code
     category.title = title
     category.description = description
+    category.read_only = read_only
     db.session.add(category)
     db.session.commit()
 
@@ -302,14 +288,16 @@ def create_role(name, description, quiet=True):
 
 
 @manager.command
-def create_processor(id, title, countries=None, active=False, quiet=True):
+def create_processor(id, title, countries=None, active=False, international=False, quiet=True):
     processor = Processor()
     processor.id = id
     processor.title = title
     processor.active = active
-    for country_id in countries.split(','):
-        country = Country.query.get(country_id)
-        processor.countries.append(country)
+    processor.international = international
+    if countries:
+        for country_id in countries.split(','):
+            country = Country.query.get(country_id)
+            processor.countries.append(country)
     db.session.add(processor)
     db.session.commit()
 

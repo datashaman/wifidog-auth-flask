@@ -34,7 +34,11 @@
                             {% if show_gateway %}
                                 <td data-label="Gateway">{{ instance.gateway | default('-') }}</td>
                             {% endif %}
+                            {% if instance.read_only %}
+                            <td class="code" data-label="Code">{{ instance.code }}</td>
+                            {% else %}
                             <td class="code" data-label="Code"><a href={{ url_for('.category_edit', id=instance.id) }}>{{ instance.code }}</a></td>
+                            {% endif %}
                             <td class="title" data-label="Title">{{ instance.title }}</td>
 
                             <td class="actions actions-instance">

@@ -44,6 +44,7 @@ from auth.services import \
 from auth.utils import generate_uuid, has_role, is_logged_in
 from auth.vouchers import process_auth
 
+from decimal import Decimal
 from flask import \
     Blueprint, \
     abort, \
@@ -468,6 +469,9 @@ def category_delete(id):
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def category_edit(id):
+    category = resource_instance('category', id)
+    if category.read_only:
+        return redirect(redirect_url())
     return resource_edit('category', id, CategoryForm)
 
 
@@ -659,7 +663,7 @@ def order_new():
         order_item = OrderItem()
         order_item.order = order
         order_item.product_id = order_form.product.data.id
-        order_item.price = order_form.price.data
+        order_item.price = Decimal(order_form.price.data)
         order_item.quantity = order_form.quantity.data
 
         _recalculate_total(order)
@@ -714,7 +718,7 @@ def order_edit(hash):
             order_item = OrderItem()
             order_item.order = order
             order_item.product_id = order_form.product.data.id
-            order_item.price = order_form.price.data
+            order_item.price = Decimal(order_form.price.data)
             order_item.quantity = order_form.quantity.data
 
             order.gateway = gateway
@@ -763,7 +767,7 @@ def order_item_edit(hash, item_id):
     else:
         order_item.product = Product.query.get(request.form.get('product'))
         order_item.quantity = int(request.form.get('quantity'))
-        order_item.price = float(request.form.get('price'))
+        order_item.price = Decimal(request.form.get('price'))
 
     _recalculate_total(order)
     db.session.commit()
