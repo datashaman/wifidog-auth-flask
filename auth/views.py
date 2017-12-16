@@ -70,6 +70,12 @@ from sqlalchemy import func
 bp = Blueprint('auth', __name__)
 
 
+def redirect_url():
+    return request.args.get('next') or \
+        request.referrer or \
+        url_for('.home')
+
+
 def resource_index(resource, form=None):
     """Handle a resource index request"""
     instances = resource_instances(resource)
@@ -634,7 +640,7 @@ def order_new():
 
         if choices == []:
             flash('Define a network and gateway first.')
-            return redirect(request.referrer)
+            return redirect(redirect_url())
 
         order_form.gateway.choices = choices
         gateway = Gateway.query.get(order_form.gateway.data)
@@ -695,7 +701,7 @@ def order_edit(hash):
 
             if choices == []:
                 flash('Define a network and gateway first.')
-                return redirect(request.referrer)
+                return redirect(redirect_url())
 
             order_form.gateway.choices = choices
             gateway = Gateway.query.get(order_form.gateway.data)
@@ -797,17 +803,24 @@ def cashup_index():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def cashup_new():
+    if Transaction.query.filter(Transaction.cashup == None).count() == 0:
+        flash('No new transactions since last cashup', 'warning')
+        return redirect(redirect_url())
+
     form = CashupForm(data={'user': current_user})
     if form.validate_on_submit():
-        instance = Cashup()
-        form.populate_obj(instance)
-        db.session.add(instance)
+        cashup = Cashup()
+        cashup.user = current_user
+        form.populate_obj(cashup)
+        db.session.add(cashup)
         db.session.commit()
-        Transaction.query \
-            .filter(Transaction.updated_at < instance.created_at) \
-            .update({'cashup_id': instance.id})
+
+        for transaction in db.session.query(Transaction) \
+                             .filter(Transaction.created_at < cashup.created_at, Transaction.cashup == None):
+            cashup.transactions.append(transaction)
         db.session.commit()
-        flash('Create %s successful' % instance)
+
+        flash('Create %s successful' % cashup)
         return redirect(url_for('.cashup_index'))
     print(form.errors)
     return render_template('cashup/new.html', form=form)
@@ -903,7 +916,7 @@ def voucher_new():
 
     if choices == []:
         flash('Define a network and gateway first.')
-        return redirect(request.referrer)
+        return redirect(redirect_url())
 
     form.gateway_id.choices = choices
 
@@ -938,7 +951,7 @@ def wifidog_login():
                 'error'
             )
 
-            return redirect(request.referrer)
+            return redirect(redirect_url())
 
         form.populate_obj(voucher)
         voucher.token = generate_uuid()

@@ -35,7 +35,7 @@
                         {% endif %}
                         <td data-label="User">{{ instance.user | default('-') }}</td>
                         <td data-label="Transactions">{{ instance.transactions.count() }}</td>
-                        <td data-label="Created At">{{ instance.created_at | datetimeformat('short') }}</td>
+                        <td data-label="Created At">{{ instance.created_at | datetimeformat }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

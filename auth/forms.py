@@ -53,7 +53,9 @@ CashupForm = model_form(
     db.session,
     FlaskForm,
     exclude=[
+        'created_at',
         'transactions',
+        'user',
     ]
 )
 

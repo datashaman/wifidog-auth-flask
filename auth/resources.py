@@ -66,6 +66,7 @@ def resource_instance(resource, param, param_name='id'):
 resource_filters = defaultdict(lambda: lambda query: query)
 
 resource_filters.update({
+    'cashup': lambda query: query.order_by(Cashup.created_at.desc()),
     'category': lambda query: query.order_by(Category.title),
     'order': lambda query: query.filter(Order.status != 'archived')
                                 .order_by(Order.created_at.desc()),
