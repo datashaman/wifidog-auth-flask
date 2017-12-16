@@ -113,3 +113,6 @@ dot:
 migrate: bootstrap-reference
 	rm -f data/new.db
 	python manage.py migrate
+
+packer-build:
+	packer build packer.json

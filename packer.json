@@ -7,7 +7,12 @@
         "api_token": "{{user `api_token`}}",
         "image": "ubuntu-17-10-x64",
         "region": "nyc3",
-        "size": "512mb",
-        "ssh_username": "root"
+        "size": "1gb",
+        "ssh_username": "root",
+        "monitoring": true
+    }],
+    "provisioners": [{
+        "type": "shell",
+        "script": "provision.sh"
     }]
 }
