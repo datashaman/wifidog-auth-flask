@@ -1,0 +1,13 @@
+{
+    "variables": {
+        "api_token": "{{env `DO_API_TOKEN`}}"
+    },
+    "builders": [{
+        "type": "digitalocean",
+        "api_token": "{{user `api_token`}}",
+        "image": "ubuntu-17-10-x64",
+        "region": "nyc3",
+        "size": "512mb",
+        "ssh_username": "root"
+    }]
+}

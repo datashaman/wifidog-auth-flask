@@ -85,7 +85,7 @@ class User(db.Model, UserMixin):
 
     active = db.Column(db.Boolean, default=True)
 
-    created_at = db.Column(db.DateTime, nullable=False, default=current_timestamp)
+    created_at = db.Column(db.DateTime, default=current_timestamp)
     confirmed_at = db.Column(db.DateTime())
 
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
@@ -150,7 +150,7 @@ class Network(db.Model):
     currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', onupdate='cascade'), nullable=False)
     currency = db.relationship(Currency, backref=backref('networks', lazy='dynamic'))
 
-    created_at = db.Column(db.DateTime, nullable=False, default=current_timestamp)
+    created_at = db.Column(db.DateTime, default=current_timestamp)
 
     def __str__(self):
         return self.title
@@ -212,7 +212,7 @@ class Gateway(db.Model):
     last_ping_sys_memfree = db.Column(db.Integer)
     last_ping_sys_load = db.Column(db.Integer)
 
-    created_at = db.Column(db.DateTime, nullable=False, default=current_timestamp)
+    created_at = db.Column(db.DateTime, default=current_timestamp)
 
     def __str__(self):
         return self.title
@@ -245,8 +245,8 @@ class Voucher(db.Model):
 
     minutes = db.Column(db.Integer, nullable=False)
     megabytes = db.Column(db.BigInteger)
-    created_at = db.Column(db.DateTime, nullable=False, default=current_timestamp)
-    updated_at = db.Column(db.DateTime, nullable=False, default=current_timestamp, onupdate=current_timestamp)
+    created_at = db.Column(db.DateTime, default=current_timestamp)
+    updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
     started_at = db.Column(db.DateTime)
     gw_address = db.Column(db.String(15))
     gw_port = db.Column(db.String(5))
@@ -355,7 +355,7 @@ class Change(db.Model):
     args = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'))
     user = db.relationship(User, backref=backref('changes', lazy='dynamic'))
-    created_at = db.Column(db.DateTime, nullable=False, default=current_timestamp)
+    created_at = db.Column(db.DateTime, default=current_timestamp)
 
 
 class Category(db.Model):
@@ -379,8 +379,8 @@ class Category(db.Model):
 
     status = db.Column(db.String(20), nullable=False, default='new')
 
-    created_at = db.Column(db.DateTime, nullable=False, default=current_timestamp)
-    updated_at = db.Column(db.DateTime, nullable=False, default=current_timestamp, onupdate=current_timestamp)
+    created_at = db.Column(db.DateTime, default=current_timestamp)
+    updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
 
     __table_args__ = (
             UniqueConstraint('network_id', 'gateway_id', 'parent_id', 'code'),
@@ -411,8 +411,8 @@ class Product(db.Model):
 
     price = db.Column(SqliteDecimal, nullable=False)
 
-    created_at = db.Column(db.DateTime, nullable=False, default=current_timestamp)
-    updated_at = db.Column(db.DateTime, nullable=False, default=current_timestamp, onupdate=current_timestamp)
+    created_at = db.Column(db.DateTime, default=current_timestamp)
+    updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
 
     __table_args__ = (
             UniqueConstraint('network_id', 'gateway_id', 'code'),
@@ -445,8 +445,8 @@ class Order(db.Model):
 
     total_amount = db.Column(SqliteDecimal, nullable=False)
 
-    created_at = db.Column(db.DateTime, nullable=False, default=current_timestamp)
-    updated_at = db.Column(db.DateTime, nullable=False, default=current_timestamp, onupdate=current_timestamp)
+    created_at = db.Column(db.DateTime, default=current_timestamp)
+    updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
 
     @record_change
     def cancel(self):
@@ -504,8 +504,8 @@ class OrderItem(db.Model):
     quantity = db.Column(db.Integer, default=1, nullable=False)
     price = db.Column(SqliteDecimal, nullable=False)
 
-    created_at = db.Column(db.DateTime, nullable=False, default=current_timestamp)
-    updated_at = db.Column(db.DateTime, nullable=False, default=current_timestamp, onupdate=current_timestamp)
+    created_at = db.Column(db.DateTime, default=current_timestamp)
+    updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
 
     @property
     def total_amount(self):
@@ -563,8 +563,8 @@ class Transaction(db.Model):
     cashup_id = db.Column(db.String(40), db.ForeignKey('cashups.id', ondelete='cascade', onupdate='cascade'))
     cashup = db.relationship('Cashup', backref=backref('transactions', lazy='dynamic'))
 
-    created_at = db.Column(db.DateTime, nullable=False, default=current_timestamp)
-    updated_at = db.Column(db.DateTime, nullable=False, default=current_timestamp, onupdate=current_timestamp)
+    created_at = db.Column(db.DateTime, default=current_timestamp)
+    updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
 
     __table_args__ = (
         UniqueConstraint('processor_id', 'processor_reference'),
@@ -605,7 +605,7 @@ class Cashup(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     user = db.relationship(User, backref=backref('cashups', lazy='dynamic'))
 
-    created_at = db.Column(db.DateTime, nullable=False, default=current_timestamp)
+    created_at = db.Column(db.DateTime, default=current_timestamp)
 
     def __str__(self):
         return self.id

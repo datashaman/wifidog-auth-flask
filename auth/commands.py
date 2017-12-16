@@ -8,6 +8,7 @@ import simplejson as json
 
 from auth.constants import ROLES
 from auth.models import \
+    Cashup, \
     Category, \
     Change, \
     Country, \
@@ -448,6 +449,7 @@ def migrate():
         Order,
         OrderItem,
         Transaction,
+        Cashup
     ]
 
     reference_engine = db.get_engine(current_app, 'reference')
