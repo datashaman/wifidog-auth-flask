@@ -22,7 +22,7 @@ pipeline:
   put-build:
     image: samepagelabs/s3cmd
     commands:
-        - /usr/local/bin/s3cmd --host=$${SPACES_ENDPOINT} --host-bucket="%(bucket)s.$${SPACES_ENDPOINT}" --access_key=$${SPACES_ACCESS_KEY} --secret_key=$${SPACES_SECRET_KEY} put ./build/build.tgz s3://$${SPACES_BUCKET}/builds/auth/${DRONE_BUILD_NUMBER}.tgz
+        - /usr/local/bin/s3cmd --host=$${SPACES_ENDPOINT} --host-bucket="%(bucket)s.$${SPACES_ENDPOINT}" --access_key=$${SPACES_ACCESS_KEY} --secret_key=$${SPACES_SECRET_KEY} put ./build/build.tgz s3://$${SPACES_BUCKET}/builds/auth/auth-${DRONE_BUILD_NUMBER}.tgz
     secrets:
     - spaces_access_key
     - spaces_bucket
