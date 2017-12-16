@@ -820,7 +820,6 @@ def cashup_new():
 
         flash('Create %s successful' % cashup)
         return redirect(url_for('.cashup_index'))
-    print(form.errors)
     return render_template('cashup/new.html', form=form)
 
 
