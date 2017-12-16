@@ -1,6 +1,7 @@
 pipeline:
   restore-cache:
     image: drillster/drone-volume-cache
+    pull: true
     restore: true
     mount:
     - ./cache
@@ -8,6 +9,7 @@ pipeline:
     - /cache:/cache
   test:
     image: python:3.6-slim-jessie
+    pull: true
     commands:
     - python -V
     - pip -V
@@ -21,6 +23,7 @@ pipeline:
       event: push
   put-build:
     image: samepagelabs/s3cmd
+    pull: true
     commands:
         - /usr/local/bin/s3cmd --host=$${SPACES_ENDPOINT} --host-bucket="%(bucket)s.$${SPACES_ENDPOINT}" --access_key=$${SPACES_ACCESS_KEY} --secret_key=$${SPACES_SECRET_KEY} put ./build/build.tgz s3://$${SPACES_BUCKET}/builds/auth/auth-${DRONE_BUILD_NUMBER}.tgz
     secrets:
@@ -30,13 +33,9 @@ pipeline:
     - spaces_secret_key
   publish:
     image: plugins/docker
+    pull: true
     repo: datashaman/wifidog-auth-flask
     tags: ${DRONE_COMMIT_BRANCH/master/latest}
-    volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    build_args:
-    - XDG_CACHE_HOME=/cache
-    purge: true
     when:
       event: push
     secrets:
@@ -51,6 +50,7 @@ pipeline:
     - /cache:/cache
   notify:
     image: plugins/slack
+    pull: true
     channel: ci
     when:
       status: [ success, failure ]
