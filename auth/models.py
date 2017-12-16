@@ -51,7 +51,7 @@ roles_users = db.Table('roles_users',
     db.Column('role_id', db.Integer(), db.ForeignKey('roles.id'))
 )
 
-current_timestamp = func.current_timestamp()
+current_timestamp = datetime.datetime.utcnow
 
 
 class Role(db.Model, RoleMixin):
