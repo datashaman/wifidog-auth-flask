@@ -22,10 +22,13 @@ from auth.forms import \
     NewVoucherForm, \
     OrderForm, \
     ProductForm, \
+    SelectCategoryForm, \
+    SelectNetworkGatewayForm, \
     UserForm
 
 from auth.models import \
     Cashup, \
+    Category, \
     Gateway, \
     Network, \
     Order, \
@@ -65,6 +68,7 @@ from flask_security import \
 from PIL import Image
 from pytz import common_timezones
 from sqlalchemy import func
+from wtforms import fields as f, validators
 
 
 bp = Blueprint('auth', __name__)
@@ -493,8 +497,58 @@ def product_index():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def product_new():
-    form = ProductForm()
-    return resource_new('product', form)
+    select_network_gateway_form = SelectNetworkGatewayForm()
+
+    if request.method == 'GET':
+        return render_template('shared/select-network-gateway.html',
+                               action_url=url_for('.product_new'),
+                               form=select_network_gateway_form)
+    else:
+        category = request.form.get('category')
+
+        if category is None:
+            class Form(SelectCategoryForm):
+                pass
+
+            network = select_network_gateway_form.network.data
+            gateway = select_network_gateway_form.gateway.data
+
+            Form.network = f.HiddenField()
+            Form.gateway = f.HiddenField()
+
+            choices = Category.query.filter(Category.network == None, Category.gateway == None).all()
+
+            if network:
+                choices += Category.query.filter(Category.network == network,
+                                                Category.gateway == None).all()
+
+            if network and gateway:
+                choices += Category.query.filter(Category.network == network,
+                                                Category.gateway == gateway).all()
+
+            select_category_form = Form(data={'network': network, 'gateway': gateway})
+            select_category_form.category.choices = [(c.code, c.title) for c in choices]
+
+            return render_template('shared/select-category.html',
+                                action_url=url_for('.product_new'),
+                                form=select_category_form,
+                                gateway=gateway,
+                                network=network)
+        else:
+            data = {
+                'category': Category.query.filter_by(code=request.form['category']).first(),
+                'network': Network.query.get(request.form['network']) if request.form['network'] else None,
+                'gateway': Gateway.query.get(request.form['gateway']) if request.form['gateway'] else None,
+            }
+
+            class Form(ProductForm):
+                pass
+
+            for name in data['category'].properties.split('\n'):
+                setattr(Form, name, f.StringField(name[0].upper() +  name[1:]))
+
+            product_form = Form(data=data)
+            return render_template('product/new.html', form=product_form, **data)
 
 
 @bp.route('/products/<int:id>/delete', methods=['GET', 'POST'])
@@ -508,7 +562,48 @@ def product_delete(id):
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def product_edit(id):
-    return resource_edit('product', id, ProductForm)
+    product = resource_instance('product', id)
+
+    class Form(ProductForm):
+        pass
+
+    names = product.category.properties
+    names = names.split('\n') if names else []
+
+    if product.properties:
+        lines = product.properties.split('\n')
+        for line in lines:
+            (k, v) = line.split('=')
+            setattr(product, k, v)
+
+    for name in names:
+        setattr(Form,
+                name,
+                f.StringField(name[0].upper() + name[1:],
+                                   validators=[
+                                       validators.InputRequired(),
+                                   ],
+                                   _name=name))
+
+    form = Form(obj=product)
+
+    if form.validate_on_submit():
+        form.populate_obj(product)
+        if names:
+            values = {}
+            for name in names:
+                values[name] = getattr(form, name).data
+            product.properties = '\n'.join('%s=%s' % (k, v) for k, v in values.items())
+
+        db.session.commit()
+        flash('Update %s successful' % product)
+        return redirect(url_for('.product_index'))
+
+    return render_template('product/edit.html',
+                           category=product.category,
+                           form=form,
+                           instance=product,
+                           resource='product')
 
 
 @bp.route('/countries')

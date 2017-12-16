@@ -33,9 +33,23 @@
 
     <ul>
         {% for item in order.items %}
-        <li>{{ item.quantity }} x {{ item.product }}
+        <li>{{ item }}</li>
         {% endfor %}
     </ul>
+
+    {% if order.vouchers %}
+        <h3>
+            Vouchers
+        </h3>
+
+        <ul>
+            {% for voucher in order.vouchers %}
+            <li>
+                <strong>{{ voucher }}</strong> / {{ voucher.minutes }}m / {{ voucher.megabytes }}MB
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
     {% if order.transactions %}
         <h3>

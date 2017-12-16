@@ -264,6 +264,9 @@ class Voucher(db.Model):
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', ondelete='cascade',  onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('vouchers', lazy='dynamic'))
 
+    order_id = db.Column(db.Unicode(20), db.ForeignKey('orders.id', ondelete='cascade',  onupdate='cascade'))
+    order = db.relationship('Order', backref=backref('vouchers', lazy='dynamic'))
+
     code = db.Column(db.String(20), default=generate_code, nullable=False)
 
     mac = db.Column(db.String(20))
@@ -433,6 +436,13 @@ class Product(db.Model):
 
     def __str__(self):
         return '%s - %s' % (self.title, render_currency_amount(self.network.currency, self.price))
+
+    def __getattr__(self, name):
+        if 'properties' in self.__dict__ and self.__dict__['properties']:
+            for line in self.__dict__['properties'].split('\n'):
+                (k, v) = line.split('=')
+                if k == name:
+                    return v
 
 
 class Order(db.Model):

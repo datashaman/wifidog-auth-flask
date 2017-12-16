@@ -1,0 +1,25 @@
+{% extends 'layouts/default.html' %}
+{% from 'helpers/form.html' import group %}
+
+{% set page_title = 'Select Category' %}
+
+{% block content %}
+    <div class="content">
+        <form method="post" action="{{ action_url }}" class="pure-form pure-form-aligned">
+            {{ form.csrf_token }}
+            {% if form.network %}
+            {{ form.network }}
+            {% endif %}
+            {% if form.gateway %}
+            {{ form.gateway }}
+            {% endif %}
+            <fieldset>
+                {{ group(form.category) }}
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button pure-button-primary">Ok</button>
+                    <button type="button" class="pure-button" onclick="history.back()">Cancel</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+{% endblock %}

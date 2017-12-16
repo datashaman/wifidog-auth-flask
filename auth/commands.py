@@ -41,7 +41,7 @@ from sqlalchemy.orm import Session
 def bootstrap_instance(country_id, country_title, bind=None, users_csv=None):
     db.create_all(bind=bind)
 
-    create_category(None, None, u'vouchers', u'Vouchers', read_only=True)
+    create_category(None, None, u'vouchers', u'Vouchers', properties='minutes\nmegabytes', read_only=True)
     create_country(country_id, country_title)
     create_processor('cash', 'Cash', active=True, international=True)
     create_gateway_types()
@@ -98,14 +98,16 @@ def bootstrap_tests():
 
 
 @manager.command
-def create_category(network_id, gateway_id, code, title, description=None, read_only=False, quiet=True):
+def create_category(network_id, gateway_id, code, title, quiet=True, **kwargs):
     category = Category()
     category.network_id = network_id
     category.gateway_id = gateway_id
     category.code = code
     category.title = title
-    category.description = description
-    category.read_only = read_only
+
+    for k, v in kwargs.items():
+        setattr(category, k, v)
+
     db.session.add(category)
     db.session.commit()
 

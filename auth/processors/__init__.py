@@ -53,14 +53,13 @@ def update_transaction(id, response):
 
     if order.status == 'paid':
         for item in order.items:
-            gateway = item.product.gateway
-
             if item.product.category.code == 'vouchers':
                 for index in range(item.quantity):
                     voucher = Voucher()
-                    voucher.minutes = item.product.attributes['minutes']
-                    voucher.megabytes = item.product.attributes['megabytes']
-                    gateway.vouchers.append(voucher)
+                    print(item.product.properties)
+                    voucher.minutes = item.product.minutes
+                    voucher.megabytes = item.product.megabytes
+                    order.gateway.vouchers.append(voucher)
                     order.vouchers.append(voucher)
 
         db.session.commit()

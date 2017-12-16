@@ -18,6 +18,7 @@ from flask_babelex import Babel
 from flask_uploads import configure_uploads
 from flask_security import current_user
 from logging.handlers import SMTPHandler
+from wtforms import fields
 
 
 def create_app(config=None):
@@ -86,6 +87,7 @@ def create_app(config=None):
     def context_processor():
         """Context processors for use in templates"""
         return dict(constants=constants,
+                    f=fields,
                     international_processors=lambda: Processor.query
                                                               .filter_by(international=True, active=True)
                                                               .all(),
