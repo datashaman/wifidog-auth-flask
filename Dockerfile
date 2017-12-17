@@ -6,14 +6,15 @@ WORKDIR /var/app
 
 RUN apt-get update -q \
     && apt-get install -q -y --no-install-recommends \
-        wget
+        curl
 
-RUN wget -O - https://deb.nodesource.com/setup_8.x | bash -
+RUN curl -L https://deb.nodesource.com/setup_8.x | bash -
 
 RUN apt-get install -q -y --no-install-recommends \
         nodejs \
-        tzdata \
-    && rm -rf /var/lib/apt/lists/*
+        tzdata
+
+RUN curl -L https://yarnpkg.com/install.sh | bash -
 
 COPY \
     deploy.sh \
@@ -22,12 +23,13 @@ COPY \
     manage.py \
     package.json \
     package-lock.json \
+    yarn.lock \
     ./
 
 COPY build build/
 
 RUN ./deploy.sh
-RUN npm install
+RUN yarn
 
 COPY auth/assets auth/assets/
 
@@ -37,7 +39,11 @@ COPY auth auth/
 COPY data/reference.db data/
 COPY settings settings/
 
-RUN rm -rf /tmp/* /usr/share/doc /usr/share/info
+RUN rm -rf \
+    /tmp/* \
+    /usr/share/doc \
+    /usr/share/info \
+    /var/lib/apt/lists/*
 
 EXPOSE 5000
 
