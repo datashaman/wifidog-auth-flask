@@ -1143,6 +1143,12 @@ def favicon():
                                mimetype='image/vnd.microsoft.icon')
 
 
+@bp.route('/uploads/<path:path>')
+def uploads(path):
+    directory = os.path.join(current_app.instance_path, 'uploads')
+    return send_from_directory(directory, path)
+
+
 @bp.route('/auth-token')
 @login_required
 def auth_token():

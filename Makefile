@@ -10,17 +10,14 @@ tmuxp:
 serve:
 	PORT=5000 python serve.py
 
-serve-production:
-	gunicorn --reload -b '127.0.0.1:5000' 'auth:create_app()'
+sqlite3-development:
+	sqlite3 instance/data/development.db
 
-sqlite3:
-	sqlite3 data/local.db
-
-sqlite3-tests:
-	sqlite3 tests/tests.db
+sqlite3-test:
+	sqlite3 data/test.db
 
 db-reset:
-	rm -rf data/local.db
+	rm -rf instance/data/development.db
 	python manage.py bootstrap_instance
 
 build-static:
@@ -56,19 +53,18 @@ browser-sync:
 lint:
 	pylint auth
 
-bootstrap: bootstrap-reference bootstrap-local
+bootstrap: bootstrap-reference bootstrap-development
 
-bootstrap-local: bootstrap-tests
-	cp tests/tests.db data/local.db
+bootstrap-development: bootstrap-test
+	cp data/test.db instance/data/development.db
 
 bootstrap-reference:
-	rm -f data/local.db
-	$(PYTHON) manage.py bootstrap_reference
-	mv data/local.db data/reference.db
+	rm -rf data/reference.db
+	FLASK_ENV=reference $(PYTHON) manage.py bootstrap_reference
 
-bootstrap-tests:
-	rm -rf tests/tests.db
-	FLASK_ENV=test $(PYTHON) manage.py bootstrap_tests
+bootstrap-test:
+	rm -rf data/test.db
+	FLASK_ENV=test $(PYTHON) manage.py bootstrap_test
 
 watch:
 	while inotifywait -e close_write -r ./auth/*.py ./auth/templates ./tests; do make test; done
@@ -105,7 +101,7 @@ dot:
 	dot -Tpng -O auth/graphs.dot && eog auth/graphs.dot.png
 
 migrate: bootstrap-reference
-	rm -f data/new.db
+	rm -f instance/data/new.db
 	python manage.py migrate
 
 reference-update: bootstrap-reference

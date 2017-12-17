@@ -43,7 +43,7 @@ RUN rm -rf /tmp/* /usr/share/doc /usr/share/info
 
 EXPOSE 5000
 
-VOLUME ["/var/app/build", "/var/app/data", "/var/app/auth/static/uploads"]
+VOLUME ["/var/app/build", "/var/app/instance"]
 
 ENTRYPOINT ["python", "manage.py"]
 CMD ["runserver", "-h", "0.0.0.0", "-p", "5000"]

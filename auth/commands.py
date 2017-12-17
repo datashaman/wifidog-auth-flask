@@ -61,7 +61,7 @@ def bootstrap_reference(bind=None, users_csv=None):
 
 
 @manager.command
-def bootstrap_tests():
+def bootstrap_test():
     bootstrap_reference()
 
     create_network('main-network', 'Network', 'ZAR')

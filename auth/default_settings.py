@@ -39,13 +39,13 @@ SUPPORTED_LOCALES = ['en']
 SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
 SQLALCHEMY_BINDS = {
     'reference': 'sqlite:///../data/reference.db',
-    'old': 'sqlite:///../data/old.db',
-    'new': 'sqlite:///../data/new.db',
+    'old': 'sqlite:///../instance/data/old.db',
+    'new': 'sqlite:///../instance/data/new.db',
 }
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 THREADS_PER_PAGE = 8
-UPLOADS_DEFAULT_DEST = os.path.join(BASE_DIR, 'auth/static/uploads')
-UPLOADS_DEFAULT_URL = '/static/uploads'
+UPLOADS_DEFAULT_DEST = os.path.join(BASE_DIR, 'instance/uploads')
+UPLOADS_DEFAULT_URL = '/uploads'
 VOUCHER_MAXAGE = 60 * 24
 WTF_CSRF_ENABLED = asbool(os.environ.get('WTF_CSRF_ENABLED', True))
 WTF_CSRF_SECRET_KEY = os.environ.get('WTF_CSRF_SECRET_KEY', 'secret')
