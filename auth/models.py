@@ -443,6 +443,7 @@ class Product(db.Model):
                 (k, v) = line.split('=')
                 if k == name:
                     return v
+        return super(db.Model, self).__getattr__(name)
 
 
 class Order(db.Model):

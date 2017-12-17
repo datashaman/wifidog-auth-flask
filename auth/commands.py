@@ -116,7 +116,7 @@ def create_category(network_id, gateway_id, code, title, quiet=True, **kwargs):
 
 
 @manager.command
-def create_product(network_id, gateway_id, category_code, code, title, price, status='new', quiet=True):
+def create_product(network_id, gateway_id, category_code, code, title, price, quiet=True):
     product = Product()
     product.network_id = network_id
     product.gateway_id = gateway_id
@@ -124,8 +124,6 @@ def create_product(network_id, gateway_id, category_code, code, title, price, st
     product.code = code
     product.title = title
     product.price = price
-    product.status = status
-
     db.session.add(product)
     db.session.commit()
 
