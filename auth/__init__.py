@@ -41,7 +41,7 @@ def create_app(config=None):
         mail_handler = SMTPHandler(app.config.get('MAIL_SERVER', 'localhost'),
                                    app.config['MAIL_DEFAULT_SENDER'][1],
                                    app.config['ADMINS'],
-                                   app.config['MAIL_ERROR_SUBJECT'])
+                                   app.config.get('MAIL_ERROR_SUBJECT', 'Application Error'))
         mail_handler.setFormatter(logging.Formatter('''
     Message type:       %(levelname)s
     Location:           %(pathname)s:%(lineno)d
