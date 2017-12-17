@@ -429,7 +429,6 @@ def migrate():
         country_processors,
         Network,
         Gateway,
-        Voucher,
         Category,
         Product,
         User,
@@ -437,8 +436,9 @@ def migrate():
         Change,
         Order,
         OrderItem,
+        Voucher,
+        Cashup,
         Transaction,
-        Cashup
     ]
 
     reference_engine = db.get_engine(current_app, 'reference')
@@ -487,6 +487,12 @@ def migrate():
 
                 if entity.__tablename__ == 'networks':
                     row['currency_id'] = u'ZAR'
+
+                if entity.__tablename__ == 'orders':
+                    row['total_amount'] = row.get('amount', 0)
+
+                if entity.__tablename__ == 'transactions':
+                    row['total_amount'] = row.get('amount', 0)
 
                 if entity.__tablename__ == 'products':
                     row['category_id'] = Category.query.filter_by(code='vouchers').first_or_404().id
