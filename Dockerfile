@@ -1,7 +1,6 @@
 FROM python:3.6-slim-jessie
 
 ARG BUILD_HOME=/var/app/build
-ENV PATH="$HOME/.yarn/bin:$PATH"
 
 WORKDIR /var/app
 
@@ -30,7 +29,7 @@ COPY \
 COPY build build/
 
 RUN ./deploy.sh
-RUN yarn
+RUN /root/.yarn/bin/yarn
 
 COPY auth/assets auth/assets/
 
