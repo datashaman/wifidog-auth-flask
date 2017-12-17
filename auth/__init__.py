@@ -35,6 +35,8 @@ def create_app(config=None):
     if config is not None:
         app.config.update(**config)
 
+    mail.init_app(app)
+
     if not app.debug:
         mail_handler = SMTPHandler(app.config['MAIL_SERVER'],
                                    app.config['MAIL_DEFAULT_SENDER'][1],
@@ -59,7 +61,6 @@ def create_app(config=None):
 
     db.init_app(app)
     login_manager.init_app(app)
-    mail.init_app(app)
     menu.init_app(app)
 
     security.init_app(app, users)
