@@ -17,6 +17,7 @@ data/new.db
 data/old.db
 Dockerfile
 dependencyci.yml
+instance
 instance.cfg.example
 node_modules
 tests
