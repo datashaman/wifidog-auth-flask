@@ -85,12 +85,12 @@ setup:
 	sudo -H npm -g install gulp
 
 development-install:
-	pip install -r requirements-tests.txt
+	pip install -r requirements/development.txt -r requirements/test.txt
 	npm install
 	gulp --dev
 
 production-install:
-	pip install -r requirements.txt
+	pip install -r requirements/production.txt
 	npm install
 	gulp
 
