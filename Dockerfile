@@ -15,8 +15,6 @@ RUN apt-get install -q -y --no-install-recommends \
         tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo "SQLALCHEMY_DATABASE_URI=sqlite:////var/app/data/local.db" > .env
-
 COPY \
     deploy.sh \
     gulpfile.js \

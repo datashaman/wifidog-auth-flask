@@ -12,9 +12,7 @@
 .gitignore
 .pylintrc
 auth/static/uploads
-data/local.db
-data/new.db
-data/old.db
+data/test.db
 Dockerfile
 dependencyci.yml
 instance
