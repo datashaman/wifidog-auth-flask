@@ -2,6 +2,7 @@ import os
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
+ADMINS = ['admin@example.com']
 DATABASE_CONNECTION_OPTIONS = {}
 SECURITY_CONFIRMABLE = True
 SECURITY_PASSWORD_HASH = 'sha512_crypt'
