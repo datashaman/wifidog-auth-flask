@@ -519,7 +519,7 @@ class OrderItem(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     order = db.relationship(Order, backref=backref('items', lazy='dynamic'))
 
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id', ondelete='set null', onupdate='cascade'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     product = db.relationship(Product, backref=backref('order_items', lazy='dynamic'))
 
     description = db.Column(db.Unicode(40))

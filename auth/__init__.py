@@ -18,12 +18,14 @@ from flask_babelex import Babel
 from flask_uploads import configure_uploads
 from flask_security import current_user
 from logging.handlers import SMTPHandler
+from werkzeug.exceptions import InternalServerError, HTTPException
 from wtforms import fields
 
 
 def create_app(config=None):
     """ Create app """
     instance_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'instance')
+
     app = Flask(__name__, instance_path=instance_path, instance_relative_config=True)
     env = os.environ.get('FLASK_ENV')
     if not env:
@@ -35,13 +37,12 @@ def create_app(config=None):
     if config is not None:
         app.config.update(**config)
 
-    mail.init_app(app)
-
     if not app.debug:
         mail_handler = SMTPHandler(app.config.get('MAIL_SERVER', 'localhost'),
                                    app.config['MAIL_DEFAULT_SENDER_EMAIL'],
                                    app.config['ADMINS'],
-                                   app.config.get('MAIL_ERROR_SUBJECT', 'Application Error'))
+                                   app.config.get('MAIL_ERROR_SUBJECT',
+                                                  'Application Error'))
         mail_handler.setFormatter(logging.Formatter('''
     Message type:       %(levelname)s
     Location:           %(pathname)s:%(lineno)d
@@ -58,11 +59,10 @@ def create_app(config=None):
         app.logger.addHandler(mail_handler)
 
     init_processors(app)
-
     db.init_app(app)
     login_manager.init_app(app)
+    mail.init_app(app)
     menu.init_app(app)
-
     security.init_app(app, users)
     configure_uploads(app, (logos,))
     app.register_blueprint(bp)
@@ -74,7 +74,8 @@ def create_app(config=None):
         if not current_user.is_anonymous:
             return current_user.locale
 
-        return request.accept_languages.best_match(app.config['SUPPORTED_LOCALES'])
+        return request.accept_languages \
+                      .best_match(app.config['SUPPORTED_LOCALES'])
 
     @babel.timezoneselector
     def get_timezone():
@@ -101,18 +102,29 @@ def create_app(config=None):
                                                               .all(),
                     render_currency_amount=render_currency_amount)
 
+    @app.errorhandler(403)
+    def error_handler_403(error):
+        error_description = error.description if app.debug else None
+        return render_template('error.html',
+                               error_description=error_description,
+                               page_title='Forbidden',
+                               header=403,
+                               description="You've gone the wrong way."), 403
+
     @app.errorhandler(404)
     def error_handler_404(error):
+        error_description = error.description if app.debug else None
         return render_template('error.html',
-                               error=error,
+                               error_description=error_description,
                                page_title='Not Found',
                                header=404,
-                               description="We can't seem to find the page you're looking for."), 404
+                               description="We can't find the page you're looking for."), 404
 
     @app.errorhandler(500)
     def error_handler_500(error):
+        error_description = error.description if app.debug else None
         return render_template('error.html',
-                               error=error,
+                               error_description=error_description,
                                page_title='Internal Server Error',
                                header=500,
                                description="Oops, looks like something went wrong."), 500

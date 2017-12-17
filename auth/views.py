@@ -771,7 +771,14 @@ def order_new():
         flash('Create %s successful' % order)
         return redirect(url_for('.order_edit', hash=order.hash))
 
-    prices = dict((p.id, p.price) for p in Product.query.all())
+    # TODO This should be a union of global products,
+    # then network then gateway
+    products = Product.query
+
+    if products.count() == 0:
+        abort(404, 'No products found.')
+
+    prices = dict((p.id, p.price) for p in products)
     price = '%.2f' % (list(prices.values())[0])
 
     return render_template('order/new.html',
@@ -1165,6 +1172,12 @@ def healthcheck():
 @auth_token_required
 def environment():
     return environment_dump.dump_environment()
+
+
+@bp.route('/raise-exception')
+@login_required
+def raise_exception():
+    abort(int(request.args.get('status', 500)))
 
 
 @bp.route('/')
