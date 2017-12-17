@@ -18,8 +18,6 @@ RUN apt-get install -q -y --no-install-recommends \
 RUN echo "SQLALCHEMY_DATABASE_URI=sqlite:////var/app/data/local.db" > .env
 
 COPY \
-    config.py \
-    config.py \
     deploy.sh \
     gulpfile.js \
     healthcheck.sh \
@@ -39,6 +37,7 @@ RUN node_modules/.bin/gulp && rm -rf auth/assets gulpfile.js node_modules packag
 
 COPY auth auth/
 COPY data/reference.db data/
+COPY settings settings/
 
 RUN rm -rf /tmp/* /usr/share/doc /usr/share/info
 
