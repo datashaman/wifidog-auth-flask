@@ -4,8 +4,6 @@
 .drone.yml
 .editorconfig
 .env
-.env.example
-.env.tests
 .eslintignore
 .eslintrc
 .git
@@ -19,6 +17,7 @@ data/new.db
 data/old.db
 Dockerfile
 dependencyci.yml
+instance.cfg.example
 node_modules
 tests
 uploads

@@ -13,10 +13,10 @@ LOCALES = {
 }
 
 ROLES = {
-    u'super-admin': u'Super Admin',
-    u'network-admin': u'Network Admin',
-    u'gateway-admin': u'Gateway Admin',
-    u'service': u'Service',
+    'super-admin': 'Super Admin',
+    'network-admin': 'Network Admin',
+    'gateway-admin': 'Gateway Admin',
+    'service': 'Service',
 }
 
 STATUS_ICONS = {

@@ -67,17 +67,17 @@ bootstrap-reference:
 	mv data/local.db data/reference.db
 
 bootstrap-tests:
-	rm -rf tests/tests.db && touch tests/tests.db
-	TESTING=true $(PYTHON) manage.py bootstrap_tests
+	rm -rf tests/tests.db
+	FLASK_ENV=test $(PYTHON) manage.py bootstrap_tests
 
 watch:
 	while inotifywait -e close_write -r ./auth/*.py ./auth/templates ./tests; do make test; done
 
 test:
-	TESTING=true $(PYTHON) -m unittest discover -s tests -f
+	FLASK_ENV=test $(PYTHON) -m unittest discover -s tests -f
 
 coverage:
-	TESTING=true coverage run --include='auth/*' -m unittest discover -s tests
+	FLASK_ENV=test coverage run --include='auth/*' -m unittest discover -s tests
 	coveralls
 
 setup:

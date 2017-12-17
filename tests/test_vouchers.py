@@ -9,7 +9,7 @@ class TestVouchers(TestCase):
 
     def test_voucher_new_as_gateway(self):
         with self.app.test_request_context():
-            self.login('main-gateway1@example.com', 'admin')
+            self.login('main-gateway1@example.com', 'admin123')
 
             response = self.client.get(url_for('.voucher_new'), follow_redirects=True)
             self.assertEqual(200, response.status_code)
@@ -22,7 +22,7 @@ class TestVouchers(TestCase):
 
     def test_voucher_new_as_network(self):
         with self.app.test_request_context():
-            self.login('main-network@example.com', 'admin')
+            self.login('main-network@example.com', 'admin123')
 
             response = self.client.get(url_for('.voucher_new'), follow_redirects=True)
             self.assertEqual(200, response.status_code)
@@ -37,7 +37,7 @@ class TestVouchers(TestCase):
 
     def test_voucher_new_as_super(self):
         with self.app.test_request_context():
-            self.login('super-admin@example.com', 'admin')
+            self.login('super-admin@example.com', 'admin123')
 
             response = self.client.get(url_for('.voucher_new'), follow_redirects=True)
             self.assertEqual(200, response.status_code)
@@ -56,7 +56,7 @@ class TestVouchers(TestCase):
         self.assertLogin('/vouchers')
 
     def test_voucher_index_as_gateway(self):
-        self.login('main-gateway1@example.com', 'admin')
+        self.login('main-gateway1@example.com', 'admin123')
 
         html = self.assertOk('/vouchers')
         vouchers = html.findall('//table[@id="vouchers"]/tbody/tr')
@@ -66,7 +66,7 @@ class TestVouchers(TestCase):
         self.assertEqual('main-1-1', vouchers[1].get('data-code'))
 
     def test_voucher_index_as_network(self):
-        self.login('main-network@example.com', 'admin')
+        self.login('main-network@example.com', 'admin123')
 
         html = self.assertOk('/vouchers')
         vouchers = html.findall('//table[@id="vouchers"]/tbody/tr')
@@ -78,7 +78,7 @@ class TestVouchers(TestCase):
         self.assertEqual('main-1-1', vouchers[3].get('data-code'))
 
     def test_voucher_index_as_super(self):
-        self.login('super-admin@example.com', 'admin')
+        self.login('super-admin@example.com', 'admin123')
 
         html = self.assertOk('/vouchers')
         vouchers = html.findall('//table[@id="vouchers"]/tbody/tr')
@@ -94,7 +94,7 @@ class TestVouchers(TestCase):
         self.assertEqual('main-1-1', vouchers[7].get('data-code'))
 
     def test_voucher_archive_as_gateway(self):
-        self.login('main-gateway1@example.com', 'admin')
+        self.login('main-gateway1@example.com', 'admin123')
 
         html = self.assertOk('/vouchers')
         code = html.find('//table[@id="vouchers"]//td[@class="code"]').text
@@ -107,7 +107,7 @@ class TestVouchers(TestCase):
         assert '%s archive successful' % code in str(response.get_data())
 
     def test_voucher_archive_as_network(self):
-        self.login('main-network@example.com', 'admin')
+        self.login('main-network@example.com', 'admin123')
 
         html = self.assertOk('/vouchers')
         code = html.find('//table[@id="vouchers"]//td[@class="code"]').text
@@ -120,7 +120,7 @@ class TestVouchers(TestCase):
         assert '%s archive successful' % code in str(response.get_data())
 
     def test_voucher_archive_as_super(self):
-        self.login('super-admin@example.com', 'admin')
+        self.login('super-admin@example.com', 'admin123')
 
         html = self.assertOk('/vouchers')
         code = html.find('//table[@id="vouchers"]//td[@class="code"]').text

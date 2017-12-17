@@ -13,12 +13,12 @@ pipeline:
     commands:
     - python -V
     - pip -V
-    - pip install -r requirements-tests.txt
+    - pip install -r requirements/test.txt
     - python -m unittest discover -s tests
     - bash build.sh
     environment:
     - XDG_CACHE_HOME=./cache
-    - TESTING=true
+    - FLASK_ENV=test
     when:
       event: push
   put-build:

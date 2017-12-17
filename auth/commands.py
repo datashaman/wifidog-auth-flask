@@ -1,9 +1,8 @@
-# encoding: utf-8
-
 from __future__ import absolute_import
 
 import csv
 import datetime
+import os
 import simplejson as json
 
 from auth.constants import ROLES
@@ -41,7 +40,7 @@ from sqlalchemy.orm import Session
 def bootstrap_instance(country_id, country_title, bind=None, users_csv=None):
     db.create_all(bind=bind)
 
-    create_category(None, None, u'vouchers', u'Vouchers', properties='minutes\nmegabytes', read_only=True)
+    create_category(None, None, 'vouchers', 'Vouchers', properties='minutes\nmegabytes', read_only=True)
     create_country(country_id, country_title)
     create_processor('cash', 'Cash', active=True, international=True)
     create_gateway_types()
@@ -58,43 +57,43 @@ def bootstrap_reference(bind=None, users_csv=None):
     bootstrap_instance('ZA', 'South Africa', bind=bind, users_csv=users_csv)
     create_currency('ZA', 'ZAR', 'South African Rand', 'R')
     create_processor('snapscan', 'SnapScan', 'ZA', active=True)
-    create_processor('payu', 'PayU', 'ZA', active=True)
+    create_processor('pay', 'Pay', 'ZA', active=True)
 
 
 @manager.command
 def bootstrap_tests():
     bootstrap_reference()
 
-    create_network(u'main-network', u'Network', u'ZAR')
-    create_network(u'other-network', u'Other Network', u'ZAR')
+    create_network('main-network', 'Network', 'ZAR')
+    create_network('other-network', 'Other Network', 'ZAR')
 
-    create_gateway(u'main-network', u'main-gateway1', u'cafe', u'Main Gateway #1')
-    create_gateway(u'main-network', u'main-gateway2', u'cafe', u'Main Gateway #2')
+    create_gateway('main-network', 'main-gateway1', 'cafe', 'Main Gateway #1', 'ZA')
+    create_gateway('main-network', 'main-gateway2', 'cafe', 'Main Gateway #2', 'ZA')
 
-    create_gateway(u'other-network', u'other-gateway1', u'cafe', u'Other Gateway #1')
-    create_gateway(u'other-network', u'other-gateway2', u'cafe', u'Other Gateway #2')
+    create_gateway('other-network', 'other-gateway1', 'cafe', 'Other Gateway #1', 'ZA')
+    create_gateway('other-network', 'other-gateway2', 'cafe', 'Other Gateway #2', 'ZA')
 
-    create_user(u'super-admin@example.com', 'admin', u'super-admin')
+    create_user('super-admin@example.com', 'admin123', 'super-admin')
 
-    create_user(u'main-network@example.com', u'admin', u'network-admin', u'main-network')
-    create_user(u'other-network@example.com', u'admin', u'network-admin', u'other-network')
+    create_user('main-network@example.com', 'admin123', 'network-admin', 'main-network')
+    create_user('other-network@example.com', 'admin123', 'network-admin', 'other-network')
 
-    create_user(u'main-gateway1@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway1')
-    create_user(u'main-gateway2@example.com', u'admin', u'gateway-admin', u'main-network', u'main-gateway2')
+    create_user('main-gateway1@example.com', 'admin123', 'gateway-admin', 'main-network', 'main-gateway1')
+    create_user('main-gateway2@example.com', 'admin123', 'gateway-admin', 'main-network', 'main-gateway2')
 
-    create_user(u'other-gateway1@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway1')
-    create_user(u'other-gateway2@example.com', u'admin', u'gateway-admin', u'other-network', u'other-gateway2')
+    create_user('other-gateway1@example.com', 'admin123', 'gateway-admin', 'other-network', 'other-gateway1')
+    create_user('other-gateway2@example.com', 'admin123', 'gateway-admin', 'other-network', 'other-gateway2')
 
-    create_voucher(u'main-gateway1', 60, 'main-1-1')
-    create_voucher(u'main-gateway1', 60, 'main-1-2')
-    create_voucher(u'main-gateway2', 60, 'main-2-1')
-    create_voucher(u'main-gateway2', 60, 'main-2-2')
-    create_voucher(u'other-gateway1', 60, 'other-1-1')
-    create_voucher(u'other-gateway1', 60, 'other-1-2')
-    create_voucher(u'other-gateway2', 60, 'other-2-1')
-    create_voucher(u'other-gateway2', 60, 'other-2-2')
+    create_voucher('main-gateway1', 60, 'main-1-1')
+    create_voucher('main-gateway1', 60, 'main-1-2')
+    create_voucher('main-gateway2', 60, 'main-2-1')
+    create_voucher('main-gateway2', 60, 'main-2-2')
+    create_voucher('other-gateway1', 60, 'other-1-1')
+    create_voucher('other-gateway1', 60, 'other-1-2')
+    create_voucher('other-gateway2', 60, 'other-2-1')
+    create_voucher('other-gateway2', 60, 'other-2-2')
 
-    create_product(u'main-network', None, u'vouchers', u'90MIN', u'90 Minute Voucher', 30, 'available')
+    create_product('main-network', None, 'vouchers', '90MIN', '90 Minute Voucher', 30, 'available')
 
 
 @manager.command
@@ -200,17 +199,17 @@ def create_network(id, title, currency_id, description=None, quiet=True):
 @manager.option('-p', '--phone', help='Contact Phone')
 @manager.option('-h', '--home', help='Home URL')
 @manager.option('-f', '--facebook', help='Facebook URL')
-def create_gateway(network, id, type, title, description=None, email=None, phone=None, home=None, facebook=None, logo=None, quiet=True):
+def create_gateway(network, id, type, title, country_id, quiet=True, **kwargs):
     gateway = Gateway()
     gateway.network_id = network
     gateway.id = id
-    gateway.title = title
     gateway.gateway_type_id = type
-    gateway.description = description
-    gateway.contact_email = email
-    gateway.contact_phone = phone
-    gateway.url_home = home
-    gateway.url_facebook = facebook
+    gateway.title = title
+    gateway.country_id = country_id
+
+    for k, v in kwargs.items():
+        setattr(gateway, k, v)
+
     db.session.add(gateway)
     db.session.commit()
 
@@ -222,6 +221,10 @@ def create_gateway(network, id, type, title, description=None, email=None, phone
 def create_user(email, password, role, network=None, gateway=None, quiet=True):
     if email is None:
         email = prompt('Email')
+
+    if User.query.filter_by(email=email).count() > 0:
+        print('User exists')
+        return
 
     if password is None:
         password = prompt_pass('Password')
@@ -307,40 +310,40 @@ def create_processor(id, title, countries=None, active=False, international=Fals
 @manager.command
 def create_gateway_types(quiet=True):
     types = {
-        'airline': u'Airline',
-        'airport': u'Airport Terminal/Lounge',
-        'business-center': u'Business/Conference Center',
-        'bus-station': u'Bus Station',
-        'cafe': u'Cafe/Coffee Shop',
-        'camp-ground': u'Camp Ground',
-        'community-network': u'Community Network',
-        'convention-center': u'Convention Center',
-        'copy-center': u'Copy Center/Business Services',
-        'cruise-ship': u'Cruise Ship',
-        'entertainment-venue': u'Entertainment Venues',
-        'gas-station': u'Gas/Petrol Station',
-        'hospital': u'Hospital',
-        'hotel': u'Hotel',
-        'internet-cafe': u'Internet Cafe',
-        'kiosk': u'Kiosk',
-        'library': u'Library',
-        'marina': u'Marina/Harbour',
-        'motorway': u'Motorway Travel Center/TruckStop',
-        'office': u'Office Building/Complex',
-        'other': u'Other',
-        'park': u'Park',
-        'pay-phone': u'Pay Phone/Booth',
-        'port': u'Port/Ferry Terminal',
-        'residence': u'Residential Housing/Apt Bldg',
-        'restaurant': u'Restaurant/Bar/Pub',
-        'school': u'School/University',
-        'shopping-center': u'Shopping Center',
-        'sports-arena': u'Sports Arena/Venue',
-        'store': u'Store/Retail Shop',
-        'train-station': u'Train/Rail Station',
-        'train': u'Train',
-        'water-travel': u'Water Travel',
-        'wifi-zone': u'Wi-Fi Zone',
+        'airline': 'Airline',
+        'airport': 'Airport Terminal/Lounge',
+        'business-center': 'Business/Conference Center',
+        'bus-station': 'Bus Station',
+        'cafe': 'Cafe/Coffee Shop',
+        'camp-ground': 'Camp Ground',
+        'community-network': 'Community Network',
+        'convention-center': 'Convention Center',
+        'copy-center': 'Copy Center/Business Services',
+        'cruise-ship': 'Cruise Ship',
+        'entertainment-venue': 'Entertainment Venues',
+        'gas-station': 'Gas/Petrol Station',
+        'hospital': 'Hospital',
+        'hotel': 'Hotel',
+        'internet-cafe': 'Internet Cafe',
+        'kiosk': 'Kiosk',
+        'library': 'Library',
+        'marina': 'Marina/Harbour',
+        'motorway': 'Motorway Travel Center/TruckStop',
+        'office': 'Office Building/Complex',
+        'other': 'Other',
+        'park': 'Park',
+        'pay-phone': 'Pay Phone/Booth',
+        'port': 'Port/Ferry Terminal',
+        'residence': 'Residential Housing/Apt Bldg',
+        'restaurant': 'Restaurant/Bar/Pub',
+        'school': 'School/University',
+        'shopping-center': 'Shopping Center',
+        'sports-arena': 'Sports Arena/Venue',
+        'store': 'Store/Retail Shop',
+        'train-station': 'Train/Rail Station',
+        'train': 'Train',
+        'water-travel': 'Water Travel',
+        'wifi-zone': 'Wi-Fi Zone',
     }
 
     for id, title in types.items():
@@ -480,11 +483,11 @@ def migrate():
                     del row['_sa_instance_state']
 
                 if entity.__tablename__ == 'gateways':
-                    row['country_id'] = u'ZA'
+                    row['country_id'] = 'ZA'
                     row['gateway_type_id'] = 'cafe'
 
                 if entity.__tablename__ == 'networks':
-                    row['currency_id'] = u'ZAR'
+                    row['currency_id'] = 'ZAR'
 
                 if entity.__tablename__ == 'orders':
                     row['total_amount'] = row.get('amount', 0)

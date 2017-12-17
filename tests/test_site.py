@@ -9,7 +9,7 @@ class TestSite(TestCase):
         html = self.assertOk('/login')
         self.assertTitle(html, 'Login')
 
-        response = self.login('main-gateway1@example.com', 'admin')
+        response = self.login('main-gateway1@example.com', 'admin123')
 
         self.assertEqual(302, response.status_code)
         self.assertEqual('http://localhost/vouchers', response.headers['Location'])

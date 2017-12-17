@@ -28,10 +28,10 @@ def instances(resource):
 
 
 def roles():
-    if current_user.has_role(u'super-admin'):
+    if current_user.has_role('super-admin'):
         return db.session.query(Role).all()
-    if current_user.has_role(u'network-admin'):
-        return db.session.query(Role).filter(Role.name == u'gateway-admin').all()
+    if current_user.has_role('network-admin'):
+        return db.session.query(Role).filter(Role.name == 'gateway-admin').all()
     return []
 
 

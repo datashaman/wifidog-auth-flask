@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Create app
 """
@@ -6,6 +5,7 @@ Create app
 from __future__ import absolute_import
 
 import logging
+import os
 
 from auth import constants
 from auth.models import db, Processor, users
@@ -23,8 +23,15 @@ from wtforms import fields
 
 def create_app(config=None):
     """ Create app """
-    app = Flask(__name__)
-    app.config.from_object('config')
+    instance_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'instance')
+    app = Flask(__name__, instance_path=instance_path, instance_relative_config=True)
+    env = os.environ.get('FLASK_ENV')
+    if not env:
+        raise Exception('FLASK_ENV is not set')
+    app.config.from_object('auth.default_settings')
+    app.config.from_object('settings.%s' % env)
+    app.config.from_pyfile('%s.cfg' % env, silent=True)
+
     if config is not None:
         app.config.update(**config)
 

@@ -1,6 +1,5 @@
 asbool
 blinker
-dotenvy
 Flask
 Flask-Mail
 Flask-Menu
