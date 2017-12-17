@@ -1,6 +1,7 @@
 FROM python:3.6-slim-jessie
 
 ARG BUILD_HOME=/var/app/build
+ENV PATH="$HOME/.yarn/bin:$PATH"
 
 WORKDIR /var/app
 
