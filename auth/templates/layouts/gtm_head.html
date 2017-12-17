@@ -1,3 +1,4 @@
+{% if config['GTM_CONTAINER_ID'] %}
 <script>
 dataLayer = [
 {% if current_user.is_authenticated %}
@@ -19,3 +20,4 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','{{ config['GTM_CONTAINER_ID'] }}');
 </script>
 <!-- End Google Tag Manager -->
+{% endif %}
