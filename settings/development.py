@@ -1,3 +1,4 @@
+CSRF_SESSION_KEY = 'give-me-one-secret-in-time'
 FLASK_DEBUG = True
 MAIL_ERROR_SUBJECT = '[Dev Auth] Application Error'
 PAYU_URL = 'https://staging.payu.co.za/rpp.do'

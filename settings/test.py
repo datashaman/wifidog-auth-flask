@@ -1,3 +1,4 @@
+CSRF_SESSION_KEY = 'give-me-one-secret-in-time'
 MAIL_SERVER = 'localhost'
 MAIL_DEFAULT_SENDER = ['Test Auth', 'no-reply@test.example.com']
 SECRET_KEY = 'a-good-secret-is-hard-to-find'
