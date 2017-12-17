@@ -2,10 +2,7 @@ import os
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
-ADMINS = os.environ.get('ADMINS', '').split(',')
 DATABASE_CONNECTION_OPTIONS = {}
-HOST = os.environ.get('HOST', '127.0.0.1')
-PORT = os.environ.get('PORT', 8080)
 SECURITY_CONFIRMABLE = True
 SECURITY_PASSWORD_HASH = 'sha512_crypt'
 SECURITY_POST_LOGIN_VIEW = 'auth.voucher_index'
