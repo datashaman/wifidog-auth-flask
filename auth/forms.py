@@ -271,5 +271,5 @@ class SelectCategoryForm(FlaskForm):
     category = f.SelectField('Category')
 
 class SelectNetworkGatewayForm(FlaskForm):
-    network = QuerySelectField('Network', allow_blank=True, default=lambda: current_user.network, query_factory=instances('network'))
+    network = QuerySelectField('Network', default=lambda: current_user.network, query_factory=instances('network'))
     gateway = QuerySelectField('Gateway', allow_blank=True, default=lambda: current_user.gateway, query_factory=instances('gateway'))

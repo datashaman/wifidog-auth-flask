@@ -776,7 +776,7 @@ def order_new():
     products = Product.query
 
     if products.count() == 0:
-        abort(404, 'No products found.')
+        abort(404, 'Create a product.')
 
     prices = dict((p.id, p.price) for p in products)
     price = '%.2f' % (list(prices.values())[0])
