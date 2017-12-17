@@ -9,8 +9,12 @@ from flask_security import current_user
 
 def init_processors(app):
     cash.init_app(app)
-    # payu.init_app(app)
-    snapscan.init_app(app)
+
+    if app.config.get('PAYU_SAFEKEY'):
+        payu.init_app(app)
+
+    if app.config.get('SNAPSCAN_API_KEY'):
+        snapscan.init_app(app)
 
 
 def get_processor(id):
