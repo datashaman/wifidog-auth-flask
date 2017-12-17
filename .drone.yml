@@ -11,10 +11,10 @@ pipeline:
     image: python:3.6-slim-jessie
     pull: true
     commands:
-    - python -V
-    - pip -V
-    - pip install -r requirements/test.txt
-    - python -m unittest discover -s tests
+    - python3 -V
+    - pip3 -V
+    - pip3 install -r requirements/test.txt
+    - python3 -m unittest discover -s tests
     - bash build.sh
     environment:
     - XDG_CACHE_HOME=./cache
