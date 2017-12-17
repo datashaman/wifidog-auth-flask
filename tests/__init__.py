@@ -11,7 +11,7 @@ from auth.models import db, users, Role
 from flask_security.utils import encrypt_password
 from lxml import etree
 
-with open(BASE_DIR + '/tests/test.db', 'rb') as local_db:
+with open(BASE_DIR + '/data/test.db', 'rb') as local_db:
     content = local_db.read()
 
 class TestCase(unittest.TestCase):
