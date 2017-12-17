@@ -1,18 +1,8 @@
-FROM python:3.6-slim-jessie
+FROM okdocker/pynode:latest
 
 ARG BUILD_HOME=/var/app/build
-ARG NODE_REPO=node_8.x
 
 WORKDIR /var/app
-
-RUN apt-get update -q \
-    && apt-get install -q -y --no-install-recommends \
-        curl \
-        gnupg \
-        tzdata
-
-RUN curl -L https://deb.nodesource.com/setup_8.x | bash -
-RUN apt-get install -q -y --no-install-recommends nodejs
 
 COPY \
     deploy.sh \
@@ -21,22 +11,24 @@ COPY \
     manage.py \
     package.json \
     package-lock.json \
+    yarn.lock \
     ./
 
 COPY build build/
 
 RUN ./deploy.sh
-RUN npm install
+RUN yarn install --frozen-lockfile
 
 COPY auth/assets auth/assets/
 
-RUN node_modules/.bin/gulp && rm -rf auth/assets gulpfile.js node_modules package.json package-lock.json
+RUN node_modules/.bin/gulp && rm -rf auth/assets gulpfile.js node_modules package.json package-lock.json yarn.lock
 
 COPY auth auth/
 COPY data/reference.db data/
 COPY settings settings/
 
 RUN rm -rf \
+    /root/.cache \
     /tmp/* \
     /usr/share/doc \
     /usr/share/info \
