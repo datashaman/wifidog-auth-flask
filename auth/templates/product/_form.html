@@ -5,14 +5,14 @@
 
 <fieldset>
     {% if show_network %}
-        {{ group(form.network, disabled=True, readonly=True) }}
+        {{ group(form.network, readonly=True) }}
     {% endif %}
 
     {% if show_gateway %}
-        {{ group(form.gateway, disabled=True, readonly=True) }}
+        {{ group(form.gateway, readonly=True) }}
     {% endif %}
 
-    {{ group(form.category, disabled=True, readonly=True) }}
+    {{ group(form.category, readonly=True) }}
 
     {{ group(form.code) }}
     {{ group(form.title) }}
