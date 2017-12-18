@@ -54,7 +54,7 @@ def pay_order(order):
         TransactionType='PAYMENT',
         AdditionalInformation=dict(
             cancelUrl=url_for('payu.payu_cancel',  _external=True),
-            merchantReference=order.id,
+            merchantReference=order.hash,
             notificationUrl=url_for('payu.payu_notification', _external=True),
             returnUrl=url_for('payu.payu_return', _external=True),
             supportedPaymentMethods='CREDITCARD',
@@ -84,6 +84,10 @@ def get_transaction(payUReference):
             'payUReference': payUReference
         }
     )
+
+
+def get_order_param():
+    return 'hash'
 
 
 def get_merchant_reference(response):

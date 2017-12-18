@@ -31,16 +31,12 @@ def flash_transaction(transaction):
 
 def update_transaction(id, response):
     processor = Processor.query.get_or_404(id)
-    current_app.logger.error(processor)
     processor_module = get_processor(id)
+    order_param = processor_module.get_order_param()
     merchant_reference = processor_module.get_merchant_reference(response)
-    current_app.logger.error(merchant_reference)
-    order = Order.query.get_or_404(merchant_reference)
-    current_app.logger.error(order)
+    order = Order.query.filter_by(**{order_param: merchant_reference}).first_or_404()
     processor_reference = processor_module.get_processor_reference(response)
-    current_app.logger.error(processor_reference)
     transaction = processor.transactions.filter_by(processor_reference=processor_reference).first()
-    current_app.logger.error(transaction)
 
     if transaction is None:
         transaction = Transaction()
@@ -56,12 +52,11 @@ def update_transaction(id, response):
 
     transaction.status = processor_module.transaction_statuses[processor_module.get_transaction_status(response)]
 
-    if order.owed_amount == 0:
+    order.calculate_totals()
+
+    if order.status == 'new' and order.owed_amount == 0:
         order.status = 'paid'
 
-    db.session.commit()
-
-    if order.status == 'paid':
         for item in order.items:
             if item.product.category.code == 'vouchers':
                 for index in range(int(item.quantity)):
@@ -71,7 +66,7 @@ def update_transaction(id, response):
                     order.gateway.vouchers.append(voucher)
                     order.vouchers.append(voucher)
 
-        db.session.commit()
+    db.session.commit()
 
 
     return transaction

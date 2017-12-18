@@ -36,12 +36,16 @@ def pay_order(order):
             'amount': max(Decimal(form.cash.data), order.owed_amount),
             'currency': form.currency.data.id,
             'hash': generate_uuid(),
-            'merchant_reference': order.id,
+            'merchant_reference': order.hash,
         }
         transaction = update_transaction('cash', response)
         flash_transaction(transaction)
         return redirect(url_for('.order_index'))
     return render_template('order/cash.html', form=form, order=order)
+
+
+def get_order_param():
+    return 'hash'
 
 
 def get_merchant_reference(response):

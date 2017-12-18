@@ -812,7 +812,7 @@ def order_new():
         order_item.price = order_form.price.data
         order_item.quantity = order_form.quantity.data
 
-        _recalculate_total(order)
+        order.calculate_totals()
 
         db.session.add(order)
         db.session.add(order_item)
@@ -835,14 +835,6 @@ def order_new():
                            order_form=order_form,
                            price=price,
                            prices=prices)
-
-
-def _recalculate_total(order):
-    order.total_amount = Decimal(0)
-    order.vat_amount = Decimal(0)
-    for item in order.items:
-        order.total_amount += item.total_amount
-        order.vat_amount += item.vat_amount
 
 
 @bp.route('/orders/<hash>', methods=['GET', 'POST'])
@@ -879,7 +871,7 @@ def order_edit(hash):
             order.gateway = gateway
             order.network = gateway.network
 
-            _recalculate_total(order)
+            order.calculate_totals()
 
             db.session.add(order_item)
             db.session.commit()
@@ -924,7 +916,7 @@ def order_item_edit(hash, item_id):
         order_item.quantity = int(request.form.get('quantity'))
         order_item.price = Decimal(request.form.get('price'))
 
-    _recalculate_total(order)
+    order.calculate_totals()
     db.session.commit()
 
     flash('%s %s successful' % (action[0].upper() + action[1:], order_item_label))

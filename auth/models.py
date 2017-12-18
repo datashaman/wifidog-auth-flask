@@ -514,7 +514,7 @@ class Order(db.Model):
 
     @property
     def owed_amount(self):
-        return Decimal(max(self.total_amount - self.paid_amount, 0))
+        return Decimal(max(self.total_amount - self.paid_amount, Decimal(0)))
 
     @property
     def class_hint(self):
@@ -523,6 +523,13 @@ class Order(db.Model):
             'paid': 'success',
         }
         return choices.get(self.status, 'default')
+
+    def calculate_totals(self):
+        self.total_amount = Decimal(0)
+        self.vat_amount = Decimal(0)
+        for item in self.items:
+            self.total_amount += item.total_amount
+            self.vat_amount += item.vat_amount
 
     def __str__(self):
         return 'Order #%08d' % self.id

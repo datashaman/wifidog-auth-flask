@@ -42,6 +42,10 @@ def get_transaction(id):
     return response.json()
 
 
+def get_order_param():
+    return 'hash'
+
+
 def get_merchant_reference(response):
     return response['merchantReference']
 
@@ -73,8 +77,6 @@ def get_transaction_type(response):
 @bp.route('/snapscan/notification', methods=['POST'])
 def snapscan_notification():
     payload = json.loads(request.form.get('payload'))
-    current_app.logger.error(payload)
     response = get_transaction(payload['id'])
-    current_app.logger.error(response)
     update_transaction('snapscan', response)
     return 'OK'
