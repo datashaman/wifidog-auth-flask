@@ -43,9 +43,13 @@
                             {% endif %}
                         </td>
                         {% endif %}
+                        {% if instance.user %}
                         <td data-label="User"><a href="{{ url_for('.user_edit', id=instance.user_id) }}">{{ instance.user }}</a></td>
+                        {% else %}
+                        <td data-label="User">{{ instance.user }}</td>
+                        {% endif %}
                         <td data-label="Order">
-                            {% if instance.order_id %}
+                            {% if instance.order.hash %}
                                 <a href="{{ url_for('.order_edit', hash=instance.order.hash) }}">{{ instance.order }}</a></td>
                             {% else %}
                                 None
