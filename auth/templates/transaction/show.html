@@ -22,7 +22,16 @@
         </thead>
 
         <tbody>
-            <tr><th>User</th><td><a href="{{ url_for('.user_edit', id=transaction.user_id) }}">{{ transaction.user }}</a></td></tr>
+            <tr>
+                <th>User</th>
+                <td>
+                    {% if transaction.user %}
+                    <a href="{{ url_for('.user_edit', id=transaction.user_id) }}">{{ transaction.user }}</a>
+                    {% else %}
+                    {{ transaction.user }}
+                    {% endif %}
+                </td>
+            </tr>
             <tr><th>Order</th><td><a href="{{ url_for('.order_edit', hash=transaction.order.hash) }}">{{ transaction.order }}</a></td></tr>
             <tr><th>Processor</th><td>{{ transaction.processor }}</td></tr>
             <tr><th>Reference</th><td>{{ transaction.processor_reference }}</td></tr>
