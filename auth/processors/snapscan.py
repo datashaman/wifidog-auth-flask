@@ -73,7 +73,8 @@ def get_transaction_type(response):
 @bp.route('/snapscan/notification', methods=['POST'])
 def snapscan_notification():
     payload = json.loads(request.form.get('payload'))
+    current_app.logger.warning('snapscan notification', extra={'payload': payload})
     response = get_transaction(payload['id'])
-    current_app.logger.warning('snapscan notification', extra={'payload': payload, 'response': response})
+    current_app.logger.warning('snapscan notification', extra={'response': response})
     update_transaction('snapscan', response)
     return 'OK'

@@ -30,11 +30,17 @@ def flash_transaction(transaction):
 
 
 def update_transaction(id, response):
-    processor_module = get_processor(id)
-    order = Order.query.get_or_404(processor_module.get_merchant_reference(response))
     processor = Processor.query.get_or_404(id)
+    current_app.logger.warning('update transaction', extra={'processor': processor})
+    processor_module = get_processor(id)
+    merchant_reference = processor_module.get_merchant_reference(response)
+    current_app.logger.warning('update transaction', extra={'merchant_reference': merchant_reference})
+    order = Order.query.get_or_404(merchant_reference)
+    current_app.logger.warning('update transaction', extra={'order': order})
     processor_reference = processor_module.get_processor_reference(response)
+    current_app.logger.warning('update transaction', extra={'processor_reference': processor_reference})
     transaction = processor.transactions.filter_by(processor_reference=processor_reference).first()
+    current_app.logger.warning('update transaction', extra={'transaction': transaction})
 
     if transaction is None:
         transaction = Transaction()
