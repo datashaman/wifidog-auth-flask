@@ -1,4 +1,3 @@
-{% if config['GTM_CONTAINER_ID'] %}
 <script>
 dataLayer = [
 {% if current_user.is_authenticated %}
@@ -7,6 +6,7 @@ dataLayer = [
 ];
 </script>
 
+{% if config['GTM_CONTAINER_ID'] %}
 <!-- Google Tag Manager -->
 <noscript><iframe
         src="//www.googletagmanager.com/ns.html?id={{ config['GTM_CONTAINER_ID'] }}"

@@ -2,8 +2,18 @@
 
 {{ form.csrf_token }}
 
-<div class="tabs">
-    <div class="tabs-tab" data-title="Main">
+<div id="top">
+    <ul>
+        <li><a href="#main">Main</a></li>
+        <li><a href="#location">Location</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#sales">Sales</a></li>
+        <li><a href="#vouchers">Vouchers</a></li>
+    </ul>
+
+    <fieldset id="main">
+        <legend>Main</legend>
+
         {{ group(form.network) }}
         {{ group(form.gateway_type) }}
         {{ group(form.id) }}
@@ -18,14 +28,18 @@
         {% endif %}
 
         {{ group(form.logo) }}
-    </div>
+    </fieldset>
 
-    <div class="tabs-tab" data-title="Location">
+    <fieldset id="location">
+        <legend>Location</legend>
+
         {{ group(form.country) }}
         {{ group(form.url_map) }}
-    </div>
+    </fieldset>
 
-    <div class="tabs-tab" data-title="Contact">
+    <fieldset id="contact">
+        <legend>Contact</legend>
+
         {{ group(form.contact_email) }}
         {{ group(form.contact_phone) }}
         {{ group(form.public_email) }}
@@ -33,20 +47,24 @@
         {{ group(form.support_email) }}
         {{ group(form.url_home) }}
         {{ group(form.url_facebook) }}
-    </div>
+    </fieldset>
 
-    <div class="tabs-tab" data-title="Sales">
-        {{ group(form.vat_number) }}
-        {{ group(form.business_name) }}
-        {{ group(form.business_address) }}
-    </div>
+    <fieldset id="vouchers">
+        <legend>Vouchers</legend>
 
-    <div class="tabs-tab" data-title="Vouchers">
         {{ group(form.login_ask_name) }}
         {{ group(form.login_require_name) }}
         {{ group(form.default_minutes) }}
         {{ group(form.default_megabytes) }}
-    </div>
+    </fieldset>
+
+    <fieldset id="sales">
+        <legend>Sales</legend>
+
+        {{ group(form.vat_number) }}
+        {{ group(form.business_name) }}
+        {{ group(form.business_address) }}
+    </fieldset>
 </div>
 
 <div class="pure-controls">

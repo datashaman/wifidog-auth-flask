@@ -13,7 +13,7 @@
 
 {% macro group(f) %}
     <div class="pure-control-group">
-        {% if kwargs['required'] %}<b>{% endif %}{{ f.label }}{% if kwargs['required'] %}</b>{% endif %}
+        {% if f.flags.required %}<b>{% endif %}{{ f.label }}{% if f.flags.required %}</b>{% endif %}
         {{ field(f, **kwargs) }}
         {% if f.description %}
             <span class="description pure-form-message-inline">{{ f.description }}</span>

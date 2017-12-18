@@ -98,7 +98,12 @@ CountryForm = model_form(
         'gateways',
         'updated_at',
     ],
-    exclude_pk=False
+    exclude_pk=False,
+    field_args={
+        'id': {
+            'label': 'ID',
+        },
+    }
 )
 
 
@@ -113,7 +118,12 @@ CurrencyForm = model_form(
         'products',
         'updated_at',
     ],
-    exclude_pk=False
+    exclude_pk=False,
+    field_args={
+        'id': {
+            'label': 'ID',
+        },
+    }
 )
 
 
@@ -143,6 +153,9 @@ GatewayForm = model_form(
     ],
     exclude_pk=False,
     field_args={
+        'id': {
+            'label': 'ID',
+        },
         'gateway_type': {
             'default': lambda: GatewayType.query.get('cafe'),
         },
@@ -152,7 +165,19 @@ GatewayForm = model_form(
         'network': {
             'default': lambda: current_user.network,
             'query_factory': instances('network'),
-        }
+        },
+        'url_facebook': {
+            'label': 'Facebook Page',
+        },
+        'url_home': {
+            'label': 'Home Page',
+        },
+        'url_map': {
+            'label': 'Map URL',
+        },
+        'vat_number': {
+            'label': 'VAT Number',
+        },
     },
     converter=GatewayConverter()
 )
@@ -171,7 +196,15 @@ NetworkForm = model_form(
         'updated_at',
         'users',
     ],
-    exclude_pk=False
+    exclude_pk=False,
+    field_args={
+        'ga_tracking_id': {
+            'label': 'Google Analytics Tracking ID',
+        },
+        'id': {
+            'label': 'ID',
+        },
+    }
 )
 
 

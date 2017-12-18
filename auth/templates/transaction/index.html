@@ -31,7 +31,10 @@
                 <tbody>
                     {% for instance in pagination.items %}
                     <tr data-id={{ instance.id }} class="transaction table-{{ instance.class_hint }}">
-                        <td data-label="ID"><a href="{{ url_for('.transaction_show', hash=instance.hash) }}">{{ instance }}</a></td>
+                        <td data-label="ID">
+                            <a href="{{ url_for('.transaction_show', hash=instance.hash) }}">{{ instance }}</a><br/>
+                            {{ instance.hash }}
+                        </td>
                         {% if show_network or show_gateway %}
                         <td data-label="Network & Gateway">
                             {% if show_network %}
