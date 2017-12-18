@@ -960,8 +960,15 @@ def cashup_new():
         return redirect(redirect_url())
 
     form = CashupForm(data={'user': current_user})
+
+    gateway_admin = current_user.has_role('gateway-admin')
+
+    if gateway_admin:
+        del form.gateway
+
     if form.validate_on_submit():
         cashup = Cashup()
+        cashup.gateway = current_user.gateway if gateway_admin else form.category.data
         cashup.user = current_user
         form.populate_obj(cashup)
         db.session.add(cashup)

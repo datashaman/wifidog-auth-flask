@@ -9,15 +9,17 @@
     <form method="post" action={{ url_for('.cashup_new') }} class="order-item pure-form pure-form-aligned">
         {{ form.csrf_token }}
 
+        <p>This will mark the end of a transaction period on the system.</p>
+
         {% if show_gateway %}
-            {{ group(form.gateway) }}
+        <p>Select the gateway below.</p>
+        {{ group(form.gateway) }}
         {% endif %}
 
-        <div class="pure-controls">
-            <button type="submit" class="pure-button pure-button-primary">
-                Add
-            </button>
-        </div>
+        <p>Are you sure?</p>
+
+        <button type="submit" class="pure-button pure-button-primary">Yes</button>
+        <button type="button" class="pure-button" onclick="history.back()">No</button>
     </form>
 </div>
 {% endblock %}
