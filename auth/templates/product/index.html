@@ -22,6 +22,7 @@
                         <th>Code</th>
                         <th>Title</th>
                         <th>Price</th>
+                        <th>Unit</th>
                         <th class="actions">Actions</th>
                     </tr>
                 </thead>
@@ -38,6 +39,7 @@
                             <td class="code" data-label="Code"><a href={{ url_for('.product_edit', id=instance.id) }}>{{ instance.code }}</a></td>
                             <td class="title" data-label="Title">{{ instance.title }}</td>
                             <td class="price" data-label="Price">{{ render_currency_amount(instance.network.currency, instance.price) }}</td>
+                            <td class="unit" data-label="Unit">{{ instance.unit }}</td>
 
                             <td class="actions actions-instance">
                                 <div class="pure-button-group" role="group" aria-label="Actions Available">

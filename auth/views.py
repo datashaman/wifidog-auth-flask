@@ -171,7 +171,7 @@ def set_locale_choices(form):
     '.network',
     'My Network',
     visible_when=has_role('network-admin'),
-    order=997
+    order=110
 )
 def my_network():
     form = NetworkForm(obj=current_user.network)
@@ -193,7 +193,7 @@ def my_network():
     '.gateway',
     'My Gateway',
     visible_when=has_role('gateway-admin'),
-    order=998
+    order=120
 )
 def my_gateway():
     gateway = current_user.gateway
@@ -211,7 +211,7 @@ def my_gateway():
     '.account',
     'My Account',
     visible_when=is_logged_in,
-    order=999
+    order=130
 )
 def my_account():
     form = MyUserForm(obj=current_user)
@@ -237,7 +237,7 @@ def my_account():
     '.networks',
     'Networks',
     visible_when=has_role('super-admin'),
-    order=10
+    order=85
 )
 def network_index():
     return resource_index('network')
@@ -273,7 +273,8 @@ def network_delete(id):
     '.gateways',
     'Gateways',
     visible_when=has_role('super-admin', 'network-admin'),
-    order=20)
+    order=87
+)
 def gateway_index():
     return resource_index('gateway')
 
@@ -347,7 +348,7 @@ def gateway_delete(id):
     '.users',
     'Users',
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
-    order=40
+    order=90
 )
 def user_index():
     form = UserForm()
@@ -428,7 +429,7 @@ def user_delete(id):
     '.vouchers',
     'Vouchers',
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
-    order=5
+    order=20
 )
 def voucher_index():
     return resource_index('voucher')
@@ -449,7 +450,7 @@ def voucher_action(id, action):
     '.categories',
     'Categories',
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
-    order=99
+    order=70
 )
 def category_index():
     return resource_index('category')
@@ -488,7 +489,7 @@ def category_edit(id):
     '.products',
     'Products',
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
-    order=99
+    order=80
 )
 def product_index():
     return resource_index('product')
@@ -528,52 +529,69 @@ def update_product_properties(product, form, names):
         product.properties = '\n'.join('%s=%s' % (k, v) for k, v in values.items())
 
 
-@bp.route('/products/new/<network>/<gateway>/<category>', methods=['GET', 'POST'])
-@bp.route('/products/new/<network>/<gateway>', methods=['GET', 'POST'])
-@bp.route('/products/new/<network>', methods=['GET', 'POST'])
+@bp.route('/products/new/<network_id>/<gateway_id>/<category_id>', methods=['GET', 'POST'])
+@bp.route('/products/new/<network_id>/<gateway_id>', methods=['GET', 'POST'])
+@bp.route('/products/new/<network_id>', methods=['GET', 'POST'])
 @bp.route('/products/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def product_new(network=None, gateway=None, category=None):
-    if network is None and gateway is None:
+def product_new(network_id=None, gateway_id=None, category_id=None):
+    if network_id is None and gateway_id is None:
+        if current_user.has_role('gateway-admin'):
+            url = url_for('.product_new',
+                        network_id=current_user.network.id,
+                        gateway_id=current_user.gateway.id)
+            return redirect(url)
+
         form = SelectNetworkGatewayForm()
 
         if form.validate_on_submit():
             gateway_id = form.gateway.data.id if form.gateway.data else '__none'
             url = url_for('.product_new',
-                          network=form.network.data.id,
-                          gateway=gateway_id)
+                          network_id=form.network.data.id,
+                          gateway_id=gateway_id)
             return redirect(url)
         return render_template('shared/select-network-gateway.html',
                                action_url=url_for('.product_new'),
                                form=form)
 
-    if category is None:
+    if current_user.has_role('gateway-admin'):
+        if network_id != current_user.network.id or gateway_id != current_user.gateway.id:
+            abort(403)
+
+    if current_user.has_role('network-admin'):
+        if network_id != current_user.network.id:
+            abort(403)
+
+        if gateway_id != '__none' and current_user.network.gateways.filter_by(id=gateway_id).count() == 0:
+            abort(403)
+
+    if category_id is None:
         choices = Category.query.filter(Category.network == None, Category.gateway == None).all()
 
-        if network:
-            choices += Category.query.filter(Category.network_id == network,
+        if network_id:
+            choices += Category.query.filter(Category.network_id == network_id,
                                              Category.gateway_id == None).all()
 
-        if network and gateway:
-            choices += Category.query.filter(Category.network_id == network,
-                                             Category.gateway_id == gateway).all()
+        if network_id and gateway_id:
+            choices += Category.query.filter(Category.network_id == network_id,
+                                             Category.gateway_id == gateway_id).all()
 
         form = SelectCategoryForm()
 
         if form.validate_on_submit():
-            gateway = 'none' if gateway is None else gateway
-            url = url_for('.product_new', network=network, gateway=gateway, category=form.category.data.id)
+            gateway_id = '__none' if gateway_id is None else gateway_id
+            url = url_for('.product_new', network_id=network_id, gateway_id=gateway_id, category_id=form.category.data.id)
             return redirect(url)
 
         return render_template('shared/select-category.html',
-                               action_url=url_for('.product_new', network=network, gateway=gateway),
+                               action_url=url_for('.product_new', network_id=network_id, gateway_id=gateway_id),
                                form=form)
 
     data = {
-        'category': Category.query.get_or_404(category),
-        'network': Network.query.get_or_404(network) if network else None,
-        'gateway': Gateway.query.get_or_404(gateway) if gateway != '__none' else None,
+        'category': Category.query.get_or_404(category_id),
+        'network': Network.query.get_or_404(network_id) if network_id else None,
+        'gateway': Gateway.query.get_or_404(gateway_id) if gateway_id != '__none' else None,
     }
 
     class Form(ProductForm):
@@ -595,7 +613,7 @@ def product_new(network=None, gateway=None, category=None):
         flash('Create %s successful' % product)
         return redirect(url_for('.product_index'))
 
-    action_url = url_for('.product_new', network=network, gateway=gateway, category=category)
+    action_url = url_for('.product_new', network_id=network_id, gateway_id=gateway_id, category_id=category_id)
     return render_template('product/new.html', action_url=action_url, form=form, **data)
 
 
@@ -642,7 +660,7 @@ def product_edit(id):
     '.countries',
     'Countries',
     visible_when=has_role('super-admin'),
-    order=99
+    order=82
 )
 def country_index():
     return resource_index('country')
@@ -678,7 +696,7 @@ def country_edit(id):
     '.currencies',
     'Currencies',
     visible_when=has_role('super-admin'),
-    order=99
+    order=84
 )
 def currency_index():
     return resource_index('currency')
@@ -714,7 +732,7 @@ def currency_edit(id):
     '.orders',
     'Orders',
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
-    order=2
+    order=40
 )
 def order_index():
     return resource_index('order')
@@ -756,7 +774,7 @@ def _gateway_choices():
     '.new-order',
     'New Order',
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
-    order=0
+    order=30
 )
 def order_new():
     order_form = OrderForm()
@@ -929,13 +947,13 @@ def order_action(hash, action):
 
 @bp.route('/cashups')
 @login_required
-@roles_accepted('super-admin')
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
     bp,
     '.cashups',
     'Cashups',
-    visible_when=has_role('super-admin'),
-    order=99
+    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
+    order=60
 )
 def cashup_index():
     return resource_index('cashup')
@@ -989,7 +1007,7 @@ def cashup_show(id):
     '.transactions',
     'Transactions',
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
-    order=3
+    order=50
 )
 def transaction_index():
     return resource_index('transaction')
@@ -1018,7 +1036,7 @@ def transaction_action(hash, action):
     '.new-voucher',
     'New Voucher',
     visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
-    order=0
+    order=10
 )
 def voucher_new():
     form = NewVoucherForm()

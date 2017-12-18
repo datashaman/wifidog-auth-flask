@@ -444,7 +444,10 @@ class Product(db.Model):
     )
 
     def __str__(self):
-        return '%s - %s' % (self.title, render_currency_amount(self.network.currency, self.price))
+        return '%s %s%s' % (self.title,
+                            render_currency_amount(self.network.currency,
+                                                   self.price),
+                            ' %s' % self.unit if self.unit else '')
 
     def __getattr__(self, name):
         if 'properties' in self.__dict__ and self.__dict__['properties']:
@@ -550,7 +553,7 @@ class OrderItem(db.Model):
         return self.total_amount * percentage / (Decimal(100) + percentage)
 
     def __str__(self):
-        return '%d x %s - %s' % (self.quantity, self.product.title, render_currency_amount(self.order.currency, self.total_amount))
+        return '%d x %s' % (self.quantity, self.product)
 
 
 class Processor(db.Model):
