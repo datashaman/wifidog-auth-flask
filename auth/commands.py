@@ -22,6 +22,7 @@ from auth.models import \
     Role, \
     Transaction, \
     User, \
+    VatRate, \
     Voucher, \
     country_currencies, \
     country_processors, \
@@ -58,6 +59,9 @@ def bootstrap_reference(bind=None, users_csv=None):
     create_currency('ZA', 'ZAR', 'South African Rand', 'R')
     create_processor('snapscan', 'SnapScan', 'ZA', active=True)
     create_processor('pay', 'Pay', 'ZA', active=True)
+    create_vat_rate('standard', 'Standard Rate', 14, 'ZA')
+    create_vat_rate('zero', 'Zero Rate', 0, 'ZA')
+
 
 
 @manager.command
@@ -93,7 +97,7 @@ def bootstrap_test():
     create_voucher('other-gateway2', 60, 'other-2-1')
     create_voucher('other-gateway2', 60, 'other-2-2')
 
-    create_product('main-network', None, 'vouchers', '90MIN', '90 Minute Voucher', 30, 'available')
+    create_product('main-network', None, 'vouchers', '90MIN', '90 Minute Voucher', 30, vat_rate_id='standard')
 
 
 @manager.command
@@ -115,7 +119,7 @@ def create_category(network_id, gateway_id, code, title, quiet=True, **kwargs):
 
 
 @manager.command
-def create_product(network_id, gateway_id, category_code, code, title, price, quiet=True):
+def create_product(network_id, gateway_id, category_code, code, title, price, quiet=True, **kwargs):
     product = Product()
     product.network_id = network_id
     product.gateway_id = gateway_id
@@ -123,6 +127,10 @@ def create_product(network_id, gateway_id, category_code, code, title, price, qu
     product.code = code
     product.title = title
     product.price = price
+
+    for k, v in kwargs.items():
+        setattr(product, k, v)
+
     db.session.add(product)
     db.session.commit()
 
@@ -426,6 +434,7 @@ def migrate():
         Processor,
         Role,
         Country,
+        VatRate,
         country_currencies,
         country_processors,
         Network,
@@ -492,6 +501,9 @@ def migrate():
                 if entity.__tablename__ == 'orders':
                     row['total_amount'] = row.get('amount', 0)
 
+                if entity.__tablename__ == 'products':
+                    row['vat_rate_id'] = 'standard'
+
                 if entity.__tablename__ == 'transactions':
                     row['total_amount'] = row.get('amount', 0)
 
@@ -501,3 +513,17 @@ def migrate():
                 new_session.execute(entity.__table__.insert(row))
 
         new_session.commit()
+
+
+@manager.command
+def create_vat_rate(id, title, percentage, country_id, quiet=True):
+    vat_rate = VatRate()
+    vat_rate.id = id
+    vat_rate.title = title
+    vat_rate.country_id = country_id
+    vat_rate.percentage = percentage
+    db.session.add(vat_rate)
+    db.session.commit()
+
+    if not quiet:
+        print('Vat rate created')

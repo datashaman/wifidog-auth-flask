@@ -211,6 +211,11 @@ class Gateway(db.Model):
 
     support_email = db.Column(db.Unicode(255))
 
+    vat_number = db.Column(db.String(20))
+
+    business_name = db.Column(db.Unicode(40))
+    business_address = db.Column(db.Unicode(255))
+
     country_id = db.Column(db.String(3), db.ForeignKey('countries.id', onupdate='cascade'), nullable=False, default=lambda: current_app.config['DEFAULT_COUNTRY'])
     country = db.relationship('Country', backref=backref('gateways', lazy='dynamic'))
 
@@ -424,7 +429,11 @@ class Product(db.Model):
     description = db.Column(db.UnicodeText)
 
     price = db.Column(SqliteDecimal, nullable=False)
+
     properties = db.Column(db.UnicodeText)
+
+    vat_rate_id = db.Column(db.String(20), db.ForeignKey('vat_rates.id', onupdate='cascade'), nullable=False)
+    vat_rate = db.relationship('VatRate', backref=backref('products', lazy='dynamic'))
 
     created_at = db.Column(db.DateTime, default=current_timestamp)
     updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
@@ -632,3 +641,18 @@ class Cashup(db.Model):
 
     def __str__(self):
         return self.id
+
+
+class VatRate(db.Model):
+    __tablename__ = 'vat_rates'
+
+    id = db.Column(db.String(20), primary_key=True)
+    title = db.Column(db.String(20), nullable=False, unique=True)
+
+    country_id = db.Column(db.String(3), db.ForeignKey('countries.id', onupdate='cascade'), nullable=False, default=lambda: current_app.config['DEFAULT_COUNTRY'])
+    country = db.relationship('Country', backref=backref('vat_rates', lazy='dynamic'))
+
+    percentage = db.Column(SqliteDecimal, nullable=False)
+
+    def __str__(self):
+        return '%.2f%%' % self.percentage

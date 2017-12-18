@@ -80,8 +80,8 @@ class TestWifidog(TestCase):
 
             voucher = Voucher.query.filter(Voucher.code == voucher_code).first()
 
-            self.assertEquals(data['incoming'], voucher.incoming)
-            self.assertEquals(data['outgoing'], voucher.outgoing)
+            self.assertEqual(data['incoming'], voucher.incoming)
+            self.assertEqual(data['outgoing'], voucher.outgoing)
 
     def test_portal_without_gw_id(self):
         response = self.client.get('/wifidog/portal/')
