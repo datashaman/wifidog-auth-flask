@@ -425,7 +425,7 @@ class Product(db.Model):
 
     code = db.Column(db.Unicode(10), nullable=False)
     title = db.Column(db.Unicode(40), nullable=False)
-
+    unit = db.Column(db.String(20))
     description = db.Column(db.UnicodeText)
 
     price = db.Column(SqliteDecimal, nullable=False)
