@@ -11,6 +11,7 @@ SECURITY_POST_LOGOUT_VIEW = 'login'
 SECURITY_RECOVERABLE = True
 SECURITY_REGISTERABLE = False
 SECURITY_REGISTER_EMAIL = False
+SNAPSCAN_ENDPOINT = 'https://pos.snapscan.io/merchant/api/v1'
 SUPPORTED_LOCALES = ['en']
 SQLALCHEMY_BINDS = {
     'reference': 'sqlite:///../data/reference.db',

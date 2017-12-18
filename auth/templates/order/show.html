@@ -45,7 +45,7 @@
         {% endfor %}
     </ul>
 
-    {% if order.vouchers %}
+    {% if order.vouchers.count() %}
         <h3>
             Vouchers
         </h3>
@@ -53,13 +53,13 @@
         <ul>
             {% for voucher in order.vouchers %}
             <li>
-                <strong>{{ voucher }}</strong> / {{ voucher.minutes }}m / {{ voucher.megabytes }}MB
+                <strong>{{ voucher }}</strong> / {{ voucher.minutes }}m / {{ voucher.megabytes }}MB. Expires {{ voucher.expires_at | dateformat }} if unused.
             </li>
             {% endfor %}
         </ul>
     {% endif %}
 
-    {% if order.transactions %}
+    {% if order.transactions.count() %}
         <h3>
             Transactions
         </h3>

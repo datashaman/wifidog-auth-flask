@@ -290,7 +290,7 @@ class Voucher(db.Model):
     )
 
     def should_expire(self):
-        return self.created_at + datetime.timedelta(minutes=current_app.config.get('VOUCHER_MAXAGE')) < datetime.datetime.utcnow()
+        return self.expires_at < datetime.datetime.utcnow()
 
     def should_end(self):
         return self.started_at is not None and self.end_at < datetime.datetime.utcnow()
@@ -312,6 +312,10 @@ class Voucher(db.Model):
     def end_at(self):
         if self.started_at:
             return self.started_at + datetime.timedelta(minutes=self.minutes)
+
+    @property
+    def expires_at(self):
+        return self.created_at + datetime.timedelta(minutes=current_app.config.get('VOUCHER_MAXAGE'))
 
     @record_change
     def extend(self):
