@@ -13,27 +13,44 @@ Set a time limit or transfer limit (in MB) before the voucher is invalidated. Us
 
 Setup the following aliases to run the docker image. Put this in your _.bashrc_ or _.zshrc_:
 
-    alias wifidog-server="docker run --env-file $HOME/.config/wifidog/env -p 5000:5000 -v auth-data:/var/app/data -v auth-uploads:/var/app/uploads -i -t datashaman/wifidog-auth-flask"
-    alias wifidog="docker run --env-file $HOME/.config/wifidog/env -v auth-data:/var/app/data -v auth-uploads:/var/app/uploads --rm -it datashaman/wifidog-auth-flask"
+    alias wifidog-server="docker run --env-file $HOME/.config/wifidog/.env -p 5000:5000 -v $HOME/.config/wifidog:/var/app/instance -it datashaman/wifidog-auth-flask"
+    alias wifidog="docker run --env-file $HOME/.config/wifidog/.env -v $HOME/.config/wifidog:/var/app/instance --rm -it datashaman/wifidog-auth-flask"
 
-Create the file at _$HOME/.config/wifidog/env_ to store your secrets. Look at _.env.example_ for inspiration. Don't add _SQLALCHEMY_DATABASE_URI_, that is handled inside the container.
+Create the file at _$HOME/.config/wifidog/.env_, and it should contain the following entry:
 
-Use _wifidog-server_ to run the HTTP server. Use _wifidog_ to run CLI commands.
+    FLASK_ENV=production
+
+Copy _instance.cfg.example_ and edit:
+
+    cp instance.cfg.example $HOME/.config/wifidog/production.cfg
+
+The instance config file must match the supplied *FLASK_ENV*.
+
+Bootstrap the instance (giving the country ISO code and title to be used) and create a super-admin user.
+
+    wifidog bootstrap_instance ZA "South Africa"
+    wifidog create_user super-admin@example.com password super-admin
+
+Run the server:
+
+    wifidog-server
+
+The database and uploads will be persisted in _$HOME/.config/wifidog_ folder.
+
+NB: Use _wifidog-server_ to run the HTTP server. Use _wifidog_ to run CLI commands.
 
 That will run the latest build of the docker image, by default running the HTTP server on port 5000.
-
-It will persist the data to a local volume named *auth-data*, and the uploads to a local volume named *auth-uploads*. Change it as you see fit.
 
 Various commands are available to help you manage the service:
 
     * wifidog create_country
     * wifidog create_currency
-    * wifidog create_voucher
-    * wifidog create_network
     * wifidog create_gateway
-    * wifidog create_user
-    * wifidog create_roles
+    * wifidog create_network
     * wifidog create_product
+    * wifidog create_roles
+    * wifidog create_user
+    * wifidog create_voucher
     * wifidog process_vouchers
 
 Create roles:
@@ -67,18 +84,24 @@ To run the command:
 
 Put that (or the underlying `docker run` command) into a cron so the system keeps the vouchers list clean.
 
+When you are not running via docker, use these commands directly as follows:
+
+    python manage.py create_user ...
+
 All the commands have help text, use __--help__.
 
 ## Development
 
 Setup required (for Ubuntu or Debian):
 
-    sudo apt-get install nodejs npm python-pip virtualenvwrapper libjpeg-dev libpng-dev libffi-dev libxml2-dev libxslt-dev
-    sudo npm install -g gulp
+    sudo -H apt-get install tzdata
+    curl -L https://deb.nodesource.com/setup_8.x | bash -
+    sudo -H apt-get install nodejs python3 python3-pip python3-setuptools virtualenvwrapper libjpeg-dev libpng-dev libffi-dev libxml2-dev libxslt-dev
+    sudo -H npm install -g gulp
 
 Logout and login to activate virtualenvwrapper then:
 
-    mkvirtualenv auth
+    mkvirtualenv auth -p /usr/bin/python3
 
 Make sure you're in your projects folder and clone the repository:
 
@@ -95,10 +118,14 @@ Build the static files (see gulpfile.js for details):
 
 	gulp
 
-Copy the sample .env file to its correct place (and edit it to suit your needs):
+Create a _.env_ file:
 
-    cp .env.example .env
+    echo "FLASK_ENV=development" > .env
 
-Sensitive config is kept in the .env file, non-sensitive config is in config.py.
+Create an instance settings file. Copy the example and edit to your taste:
+
+    cp instance.cfg.example > instance/development.cfg
+
+Sensitive config is kept in the instance settings file. It must match the supplied *FLASK_ENV* variable.
 
 Please read the Makefile for many useful development shortcuts.
