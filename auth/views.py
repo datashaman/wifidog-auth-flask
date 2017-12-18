@@ -528,7 +528,7 @@ def product_new():
                                                 Category.gateway == gateway).all()
 
             select_category_form = Form(data={'network': network, 'gateway': gateway})
-            select_category_form.category.choices = [(c.code, c.title) for c in choices]
+            select_category_form.category.choices = [(c.id, c.title) for c in choices]
 
             return render_template('shared/select-category.html',
                                 action_url=url_for('.product_new'),
@@ -537,18 +537,41 @@ def product_new():
                                 network=network)
         else:
             data = {
-                'category': Category.query.filter_by(code=request.form['category']).first(),
-                'network': Network.query.get(request.form['network']) if request.form['network'] else None,
-                'gateway': Gateway.query.get(request.form['gateway']) if request.form['gateway'] else None,
+                'category': Category.query.get_or_404(request.form['category']),
+                'network': Network.query.get_or_404(request.form['network']) if request.form['network'] else None,
+                'gateway': Gateway.query.get_or_404(request.form['gateway']) if request.form['gateway'] else None,
             }
 
             class Form(ProductForm):
                 pass
 
-            for name in data['category'].properties.split('\n'):
-                setattr(Form, name, f.StringField(name[0].upper() +  name[1:]))
+            names = data['category'].properties
+            names = names.split('\n') if names else []
+
+            for name in names:
+                setattr(Form,
+                        name,
+                        f.StringField(name[0].upper() + name[1:],
+                                        validators=[
+                                            validators.InputRequired(),
+                                        ],
+                                        _name=name))
 
             product_form = Form(data=data)
+
+            if product_form.validate_on_submit():
+                product = Product()
+                product_form.populate_obj(product)
+                if names:
+                    values = {}
+                    for name in names:
+                        values[name] = getattr(product_form, name).data
+                    product.properties = '\n'.join('%s=%s' % (k, v) for k, v in values.items())
+                db.session.add(product)
+                db.session.commit()
+                flash('Create %s successful' % product)
+                return redirect(url_for('.product_index'))
+
             return render_template('product/new.html', form=product_form, **data)
 
 
