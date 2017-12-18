@@ -475,6 +475,7 @@ class Order(db.Model):
     currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     currency = db.relationship(Currency, backref=backref('orders', lazy='dynamic'))
 
+    vat_amount = db.Column(SqliteDecimal, nullable=False)
     total_amount = db.Column(SqliteDecimal, nullable=False)
 
     created_at = db.Column(db.DateTime, default=current_timestamp)
@@ -506,7 +507,7 @@ class Order(db.Model):
 
     @property
     def owed_amount(self):
-        return self.total_amount - self.paid_amount
+        return Decimal(max(self.total_amount - self.paid_amount, 0))
 
     @property
     def class_hint(self):
@@ -533,7 +534,7 @@ class OrderItem(db.Model):
 
     description = db.Column(db.Unicode(40))
 
-    quantity = db.Column(db.Integer, default=1, nullable=False)
+    quantity = db.Column(SqliteDecimal, default=1, nullable=False)
     price = db.Column(SqliteDecimal, nullable=False)
 
     created_at = db.Column(db.DateTime, default=current_timestamp)
@@ -542,6 +543,10 @@ class OrderItem(db.Model):
     @property
     def total_amount(self):
         return self.quantity * self.price
+
+    @property
+    def vat_amount(self):
+        return Decimal(self.total_amount * (1 - (1 / self.product.vat_rate.percentage)))
 
     def __str__(self):
         return '%d x %s - %s' % (self.quantity, self.product.title, render_currency_amount(self.order.currency, self.total_amount))

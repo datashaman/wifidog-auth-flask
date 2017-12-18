@@ -47,7 +47,7 @@ from auth.services import \
 from auth.utils import generate_uuid, has_role, is_logged_in
 from auth.vouchers import process_auth
 
-from decimal import Decimal
+from decimal import Decimal, getcontext
 from flask import \
     Blueprint, \
     abort, \
@@ -771,22 +771,27 @@ def order_new():
             return redirect(redirect_url())
 
         order_form.gateway.choices = choices
-        gateway = Gateway.query.get(order_form.gateway.data)
     else:
         del order_form.gateway
-        gateway = current_user.gateway
 
     if order_form.validate_on_submit():
+        if show_gateway:
+            gateway = Gateway.query.get_or_404(order_form.gateway.data)
+        else:
+            gateway = current_user.gateway
+
+        currency = gateway.network.currency
+
         order = Order()
-        order.gateway_id = gateway.id
-        order.network_id = gateway.network_id
-        order.currency_id = gateway.network.currency_id
-        order.user_id = current_user.id
+        order.gateway = gateway
+        order.network = gateway.network
+        order.currency = currency
+        order.user = current_user
 
         order_item = OrderItem()
         order_item.order = order
-        order_item.product_id = order_form.product.data.id
-        order_item.price = Decimal(order_form.price.data)
+        order_item.product = order_form.product.data
+        order_item.price = order_form.price.data
         order_item.quantity = order_form.quantity.data
 
         _recalculate_total(order)
@@ -815,9 +820,11 @@ def order_new():
 
 
 def _recalculate_total(order):
-    order.total_amount = 0
+    order.total_amount = Decimal(0)
+    order.vat_amount = Decimal(0)
     for item in order.items:
-        order.total_amount += item.price * item.quantity
+        order.total_amount += item.total_amount
+        order.vat_amount += item.vat_amount
 
 
 @bp.route('/orders/<hash>', methods=['GET', 'POST'])
@@ -847,7 +854,7 @@ def order_edit(hash):
         if order_form.validate_on_submit():
             order_item = OrderItem()
             order_item.order = order
-            order_item.product_id = order_form.product.data.id
+            order_item.product = order_form.product.data
             order_item.price = Decimal(order_form.price.data)
             order_item.quantity = order_form.quantity.data
 

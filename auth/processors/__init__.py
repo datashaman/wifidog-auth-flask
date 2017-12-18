@@ -58,9 +58,8 @@ def update_transaction(id, response):
     if order.status == 'paid':
         for item in order.items:
             if item.product.category.code == 'vouchers':
-                for index in range(item.quantity):
+                for index in range(int(item.quantity)):
                     voucher = Voucher()
-                    print(item.product.properties)
                     voucher.minutes = item.product.minutes
                     voucher.megabytes = item.product.megabytes
                     order.gateway.vouchers.append(voucher)

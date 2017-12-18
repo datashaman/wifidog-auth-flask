@@ -29,6 +29,7 @@
     {{ group(form.title) }}
     {{ group(form.description) }}
     {{ group(form.price) }}
+    {{ group(form.vat_rate) }}
 
     {% if category.properties %}
     {% for name in category.properties.split('\n') %}
