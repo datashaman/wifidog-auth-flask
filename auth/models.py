@@ -546,7 +546,8 @@ class OrderItem(db.Model):
 
     @property
     def vat_amount(self):
-        return Decimal(self.total_amount * (1 - (1 / self.product.vat_rate.percentage)))
+        percentage = self.product.vat_rate.percentage
+        return self.total_amount * percentage / (Decimal(100) + percentage)
 
     def __str__(self):
         return '%d x %s - %s' % (self.quantity, self.product.title, render_currency_amount(self.order.currency, self.total_amount))

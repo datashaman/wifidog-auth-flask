@@ -27,6 +27,14 @@
         <strong>Status</strong> {{ order.status }}
     </div>
 
+    <div>
+        <strong>VAT Amount</strong> {{ render_currency_amount(order.currency, order.vat_amount) }}
+    </div>
+
+    <div>
+        <strong>Total Amount</strong> {{ render_currency_amount(order.currency, order.total_amount) }}
+    </div>
+
     <h3>
         Items
     </h3>
