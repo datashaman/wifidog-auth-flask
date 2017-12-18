@@ -13,11 +13,10 @@
             <table width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
                 <thead>
                     <tr>
-                        {% if show_network %}
-                            <th>Network</th>
-                        {% endif %}
-                        {% if show_gateway %}
-                            <th>Gateway</th>
+                        {% if show_network or show_gateway %}
+                        <th>
+                            Network &amp; Gateway
+                        </th>
                         {% endif %}
                         <th>Code</th>
                         <th>Title</th>
@@ -30,11 +29,16 @@
                 <tbody>
                     {% for instance in pagination.items %}
                         <tr data-id={{ instance.id }} class={{ 'pure-table-' + loop.cycle('odd', 'even') }}>
-                            {% if show_network %}
-                                <td data-label="Network">{{ instance.network | default('-') }}</td>
-                            {% endif %}
-                            {% if show_gateway %}
-                                <td data-label="Gateway">{{ instance.gateway | default('-') }}</td>
+                            {% if show_network or show_gateway %}
+                            <td data-label="Network & Gateway">
+                                {% if show_network %}
+                                {{ instance.network or '' }}
+                                {% endif %}
+                                {% if show_gateway %}
+                                    {% if show_network %}<br />{% endif %}
+                                    {{ instance.gateway or '' }}
+                                {% endif %}
+                            </td>
                             {% endif %}
                             <td class="code" data-label="Code"><a href={{ url_for('.product_edit', id=instance.id) }}>{{ instance.code }}</a></td>
                             <td class="title" data-label="Title">{{ instance.title }}</td>
