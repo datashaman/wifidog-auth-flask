@@ -3,7 +3,7 @@ import sys
 from auth.models import Order, Processor, Transaction, Voucher
 from auth.services import db
 from auth.utils import render_currency_amount
-from flask import flash
+from flask import current_app, flash
 from flask_security import current_user
 
 
@@ -31,8 +31,8 @@ def flash_transaction(transaction):
 
 def update_transaction(id, response):
     processor_module = get_processor(id)
-    order = Order.query.get(processor_module.get_merchant_reference(response))
-    processor = Processor.query.get(id)
+    order = Order.query.get_or_404(processor_module.get_merchant_reference(response))
+    processor = Processor.query.get_or_404(id)
     processor_reference = processor_module.get_processor_reference(response)
     transaction = processor.transactions.filter_by(processor_reference=processor_reference).first()
 
