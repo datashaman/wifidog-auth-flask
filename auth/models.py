@@ -591,7 +591,7 @@ class Transaction(db.Model):
 
     status = db.Column(db.String(20), nullable=False, default='new')
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'))
     user = db.relationship(User, backref=backref('transactions', lazy='dynamic'))
 
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id', ondelete='cascade', onupdate='cascade'), nullable=False)
