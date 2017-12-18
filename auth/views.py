@@ -494,85 +494,109 @@ def product_index():
     return resource_index('product')
 
 
+def get_category_properties(category):
+    names = category.properties
+    return names.split('\n') if names else []
+
+
+def set_product_properties(product, names):
+    if product.properties:
+        lines = product.properties.split('\n')
+        for line in lines:
+            (k, v) = line.split('=')
+            if k in names:
+                setattr(product, k, v)
+
+
+def add_form_fields(form, names):
+    for name in names:
+        setattr(form,
+                name,
+                f.StringField(name[0].upper() + name[1:],
+                              validators=[
+                                  validators.InputRequired(),
+                              ],
+                              _name=name))
+
+
+def update_product_properties(product, form, names):
+    form.populate_obj(product)
+    if names:
+        values = {}
+        for name in names:
+            values[name] = getattr(form, name).data
+        product.properties = '\n'.join('%s=%s' % (k, v) for k, v in values.items())
+
+
+@bp.route('/products/new/<network>/<gateway>/<category>', methods=['GET', 'POST'])
+@bp.route('/products/new/<network>/<gateway>', methods=['GET', 'POST'])
+@bp.route('/products/new/<network>', methods=['GET', 'POST'])
 @bp.route('/products/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def product_new():
-    select_network_gateway_form = SelectNetworkGatewayForm()
+def product_new(network=None, gateway=None, category=None):
+    if network is None and gateway is None:
+        form = SelectNetworkGatewayForm()
 
-    if request.method == 'GET':
+        if form.validate_on_submit():
+            gateway_id = form.gateway.data.id if form.gateway.data else '__none'
+            url = url_for('.product_new',
+                          network=form.network.data.id,
+                          gateway=gateway_id)
+            return redirect(url)
         return render_template('shared/select-network-gateway.html',
                                action_url=url_for('.product_new'),
-                               form=select_network_gateway_form)
-    else:
-        category = request.form.get('category')
+                               form=form)
 
-        if category is None:
-            class Form(SelectCategoryForm):
-                pass
+    if category is None:
+        choices = Category.query.filter(Category.network == None, Category.gateway == None).all()
 
-            network = select_network_gateway_form.network.data
-            gateway = select_network_gateway_form.gateway.data
+        if network:
+            choices += Category.query.filter(Category.network_id == network,
+                                             Category.gateway_id == None).all()
 
-            Form.network = f.HiddenField()
-            Form.gateway = f.HiddenField()
+        if network and gateway:
+            choices += Category.query.filter(Category.network_id == network,
+                                             Category.gateway_id == gateway).all()
 
-            choices = Category.query.filter(Category.network == None, Category.gateway == None).all()
+        form = SelectCategoryForm()
 
-            if network:
-                choices += Category.query.filter(Category.network == network,
-                                                Category.gateway == None).all()
+        if form.validate_on_submit():
+            gateway = 'none' if gateway is None else gateway
+            url = url_for('.product_new', network=network, gateway=gateway, category=form.category.data.id)
+            return redirect(url)
 
-            if network and gateway:
-                choices += Category.query.filter(Category.network == network,
-                                                Category.gateway == gateway).all()
+        return render_template('shared/select-category.html',
+                               action_url=url_for('.product_new', network=network, gateway=gateway),
+                               form=form)
 
-            select_category_form = Form(data={'network': network, 'gateway': gateway})
-            select_category_form.category.choices = [(c.id, c.title) for c in choices]
+    data = {
+        'category': Category.query.get_or_404(category),
+        'network': Network.query.get_or_404(network) if network else None,
+        'gateway': Gateway.query.get_or_404(gateway) if gateway != '__none' else None,
+    }
 
-            return render_template('shared/select-category.html',
-                                action_url=url_for('.product_new'),
-                                form=select_category_form,
-                                gateway=gateway,
-                                network=network)
-        else:
-            data = {
-                'category': Category.query.get_or_404(request.form['category']),
-                'network': Network.query.get_or_404(request.form['network']) if request.form['network'] else None,
-                'gateway': Gateway.query.get_or_404(request.form['gateway']) if request.form['gateway'] else None,
-            }
+    class Form(ProductForm):
+        pass
 
-            class Form(ProductForm):
-                pass
+    names = get_category_properties(data['category'])
+    add_form_fields(Form, names)
 
-            names = data['category'].properties
-            names = names.split('\n') if names else []
+    form = Form(data=data)
 
-            for name in names:
-                setattr(Form,
-                        name,
-                        f.StringField(name[0].upper() + name[1:],
-                                        validators=[
-                                            validators.InputRequired(),
-                                        ],
-                                        _name=name))
+    if form.validate_on_submit():
+        product = Product()
+        product.network = data['network']
+        product.gateway = data['gateway']
+        product.category = data['category']
+        update_product_properties(product, form, names)
+        db.session.add(product)
+        db.session.commit()
+        flash('Create %s successful' % product)
+        return redirect(url_for('.product_index'))
 
-            product_form = Form(data=data)
-
-            if product_form.validate_on_submit():
-                product = Product()
-                product_form.populate_obj(product)
-                if names:
-                    values = {}
-                    for name in names:
-                        values[name] = getattr(product_form, name).data
-                    product.properties = '\n'.join('%s=%s' % (k, v) for k, v in values.items())
-                db.session.add(product)
-                db.session.commit()
-                flash('Create %s successful' % product)
-                return redirect(url_for('.product_index'))
-
-            return render_template('product/new.html', form=product_form, **data)
+    action_url = url_for('.product_new', network=network, gateway=gateway, category=category)
+    return render_template('product/new.html', action_url=action_url, form=form, **data)
 
 
 @bp.route('/products/<int:id>/delete', methods=['GET', 'POST'])
@@ -591,34 +615,14 @@ def product_edit(id):
     class Form(ProductForm):
         pass
 
-    names = product.category.properties
-    names = names.split('\n') if names else []
-
-    if product.properties:
-        lines = product.properties.split('\n')
-        for line in lines:
-            (k, v) = line.split('=')
-            setattr(product, k, v)
-
-    for name in names:
-        setattr(Form,
-                name,
-                f.StringField(name[0].upper() + name[1:],
-                                   validators=[
-                                       validators.InputRequired(),
-                                   ],
-                                   _name=name))
+    names = get_category_properties(product.category)
+    set_product_properties(product, names)
+    add_form_fields(Form, names)
 
     form = Form(obj=product)
 
     if form.validate_on_submit():
-        form.populate_obj(product)
-        if names:
-            values = {}
-            for name in names:
-                values[name] = getattr(form, name).data
-            product.properties = '\n'.join('%s=%s' % (k, v) for k, v in values.items())
-
+        update_product_properties(product, form, names)
         db.session.commit()
         flash('Update %s successful' % product)
         return redirect(url_for('.product_index'))

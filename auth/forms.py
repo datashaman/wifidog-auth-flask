@@ -185,19 +185,11 @@ ProductForm = model_form(
     FlaskForm,
     exclude=[
         'created_at',
+        'gateway',
+        'network',
         'order_items',
         'updated_at',
     ],
-    field_args={
-        'gateway': {
-            'default': lambda: current_user.gateway,
-            'query_factory': instances('gateway'),
-        },
-        'network': {
-            'default': lambda: current_user.network,
-            'query_factory': instances('network'),
-        },
-    },
     converter=model_converter
 )
 
@@ -267,8 +259,10 @@ class LoginVoucherForm(FlaskForm):
         if voucher.status != 'new':
             raise validators.ValidationError('Voucher is %s' % voucher.status)
 
+
 class SelectCategoryForm(FlaskForm):
-    category = f.SelectField('Category')
+    category = QuerySelectField('Category', query_factory=instances('category'))
+
 
 class SelectNetworkGatewayForm(FlaskForm):
     network = QuerySelectField('Network', default=lambda: current_user.network, query_factory=instances('network'))

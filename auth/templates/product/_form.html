@@ -4,15 +4,26 @@
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
 
 <fieldset>
-    {% if show_network %}
-        {{ group(form.network, readonly=True) }}
-    {% endif %}
+    <div class="pure-control-group">
+        <label for="network">
+            Network
+        </label>
+        <input id="network" type="text" readonly value="{{ instance.network if instance else network }}" />
+    </div>
 
-    {% if show_gateway %}
-        {{ group(form.gateway, readonly=True) }}
-    {% endif %}
+    <div class="pure-control-group">
+        <label for="gateway">
+            Gateway
+        </label>
+        <input id="gateway" type="text" readonly value="{{ instance.gateway if instance else gateway }}" />
+    </div>
 
-    {{ group(form.category, readonly=True) }}
+    <div class="pure-control-group">
+        <label for="category">
+            Category
+        </label>
+        <input id="category" type="text" readonly value="{{ instance.category if instance else category }}" />
+    </div>
 
     {{ group(form.code) }}
     {{ group(form.title) }}
