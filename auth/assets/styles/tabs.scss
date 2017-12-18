@@ -1,0 +1,28 @@
+.tabs-nav {
+    width: 100%;
+    height: 40px;
+    background: #FFFFFF;
+}
+
+.tabs-nav-item {
+    float: left;
+    height: 40px;
+    padding: 0 15px;
+    line-height: 40px;
+    border: 1px solid #e7e7e7;
+}
+
+.tabs-nav-item:hover,
+.tabs-nav-item.active {
+    background: #e7e7e7;
+    cursor: pointer;
+}
+
+.tabs-tab {
+    padding: 15px 0;
+    display: none;
+}
+
+.tabs-tab.active {
+    display: block;
+}

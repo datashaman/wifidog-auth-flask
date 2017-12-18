@@ -40,6 +40,7 @@ var isProduction = true,
         'node_modules/zepto/src/deferred.js',
         'node_modules/zepto/src/event.js',
         'node_modules/marked/lib/marked.js',
+        'node_modules/microlib-tabs/dist/tabs-standalone.microlib-latest.js',
         'auth/assets/scripts/**/*.js',
     ];
 

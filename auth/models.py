@@ -172,6 +172,9 @@ class GatewayType(db.Model):
     id = db.Column(db.String(20), primary_key=True)
     title = db.Column(db.Unicode(255), unique=True, nullable=False)
 
+    def __str__(self):
+        return self.title
+
 
 class Gateway(db.Model):
     __tablename__ = 'gateways'

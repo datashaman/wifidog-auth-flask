@@ -12,3 +12,16 @@
         </form>
     </div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+Zepto(function($) {
+    new ML.Tabs('.tabs', {
+        tab_class: 'tabs-tab',
+        nav_class: 'tabs-nav',
+        nav_item_class: 'tabs-nav-item',
+        active_class: 'active'
+    });
+});
+</script>
+{% endblock %}

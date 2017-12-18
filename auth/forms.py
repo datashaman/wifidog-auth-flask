@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from auth.models import db, Cashup, Category, Country, Currency, Gateway, Network, Product, Voucher, Role, SqliteDecimal
+from auth.models import db, Cashup, Category, Country, Currency, Gateway, GatewayType, Network, Product, Voucher, Role, SqliteDecimal
 from auth.resources import resource_query
 from auth.utils import args_get
 from flask import current_app
@@ -143,6 +143,9 @@ GatewayForm = model_form(
     ],
     exclude_pk=False,
     field_args={
+        'gateway_type': {
+            'default': lambda: GatewayType.query.get('cafe'),
+        },
         'logo': {
             'description': 'Images only, resampled down to 300 x 300 pixels.',
         },
