@@ -13,12 +13,12 @@ from auth.processors import init_processors
 from auth.services import login_manager, logos, mail, menu, security
 from auth.utils import render_currency_amount
 from auth.views import bp
+from decimal import Context, setcontext
 from flask import Flask, render_template, request
 from flask_babelex import Babel
 from flask_uploads import configure_uploads
 from flask_security import current_user
 from logging.handlers import SMTPHandler
-from werkzeug.exceptions import InternalServerError, HTTPException
 from wtforms import fields
 
 
@@ -128,5 +128,8 @@ def create_app(config=None):
                                page_title='Internal Server Error',
                                header=500,
                                description="Oops, looks like something went wrong."), 500
+
+    context = Context(prec=3)
+    setcontext(context)
 
     return app

@@ -77,6 +77,8 @@ def bootstrap_test():
     create_gateway('other-network', 'other-gateway1', 'cafe', 'Other Gateway #1', 'ZA')
     create_gateway('other-network', 'other-gateway2', 'cafe', 'Other Gateway #2', 'ZA')
 
+    create_user('service@example.com', 'admin123', 'service')
+
     create_user('super-admin@example.com', 'admin123', 'super-admin')
 
     create_user('main-network@example.com', 'admin123', 'network-admin', 'main-network')
@@ -97,7 +99,7 @@ def bootstrap_test():
     create_voucher('other-gateway2', 60, 'other-2-1')
     create_voucher('other-gateway2', 60, 'other-2-2')
 
-    create_product('main-network', None, 'vouchers', '90MIN', '90 Minute Voucher', 30, vat_rate_id='standard')
+    create_product('main-network', None, 'vouchers', '90MIN', '90 Minute Voucher', 50, minutes=90, megabytes=500, vat_rate_id='standard')
 
 
 @manager.command
@@ -128,8 +130,19 @@ def create_product(network_id, gateway_id, category_code, code, title, price, qu
     product.title = title
     product.price = price
 
+    names = product.category.properties
+    names = names.split('\n') if names else []
+
+    properties = {}
+
     for k, v in kwargs.items():
-        setattr(product, k, v)
+        if k in names:
+            properties[k] = v
+        else:
+            setattr(product, k, v)
+
+    if properties:
+        product.properties = '\n'.join('%s=%s' % (k, v) for k, v in properties.items())
 
     db.session.add(product)
     db.session.commit()
