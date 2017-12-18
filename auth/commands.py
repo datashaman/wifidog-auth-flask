@@ -381,36 +381,26 @@ def create_gateway_types(quiet=True):
 
 @manager.command
 def process_vouchers():
-    # Active vouchers that should end
-    vouchers = Voucher.query \
-                .filter(Voucher.status == 'active') \
-                .all()
-
-    for voucher in vouchers:
-        if voucher.should_end():
+    # Active vouchers that should end (time or megabytes are finished).
+    for voucher in Voucher.query.filter_by(status='active').all():
+        if voucher.should_end() or voucher.megabytes_are_finished():
             voucher.end()
-            db.session.add(voucher)
 
-    # New vouchers that are unused and should expire
-    max_age = current_app.config.get('VOUCHER_MAXAGE', 120)
-    vouchers = Voucher.query \
-                .filter(Voucher.status == 'new') \
-                .all()
-
-    for voucher in vouchers:
+    # New vouchers that are unused and should expire.
+    for voucher in Voucher.query.filter_by(status='new').all():
         if voucher.should_expire():
             voucher.expire()
-            db.session.add(voucher)
 
-    # Blocked, ended and expired vouchers that should be archived
+    # Blocked, ended and expired vouchers that should be archived.
+    # Keep them for a day maximum.
+    # TODO Use config
     vouchers = Voucher.query \
-        .filter(Voucher.updated_at + datetime.timedelta(minutes=max_age) < func.current_timestamp()) \
+        .filter(Voucher.updated_at + datetime.timedelta(minutes=60 * 24) < func.current_timestamp()) \
         .filter(Voucher.status.in_(['blocked', 'ended', 'expired'])) \
         .all()
 
     for voucher in vouchers:
         voucher.archive()
-        db.session.add(voucher)
 
     db.session.commit()
 
