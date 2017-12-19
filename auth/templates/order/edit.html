@@ -12,27 +12,26 @@
 
         <hr class="divider" />
 
-        <table id="order-items" style="width: 100%">
+        <table id="order-items" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
             <thead>
                 <tr>
-                    <th style="text-align: left">Product</th>
+                    <th>Product</th>
                     <th style="text-align: right">Quantity</th>
                     <th style="text-align: right">Price</th>
                     <th style="text-align: right">Unit</th>
                     <th style="text-align: right">Total</th>
-                    <th style="text-align: right">Actions</th>
-                    </th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in order.items %}
-                <tr>
-                    <td style="text-align: left">{{ item.product.title }}</td>
-                    <td style="text-align: right">{{ item.quantity }}</td>
-                    <td style="text-align: right">{{ render_currency_amount(order.network.currency, item.price) }}</td>
-                    <td style="text-align: right">{{ item.unit }}</td>
-                    <td style="text-align: right">{{ render_currency_amount(order.network.currency, item.total_amount) }}</td>
-                    <td style="text-align: right"></td>
+                <tr class="order-item">
+                    <td data-label="Product">{{ item.product.title }}</td>
+                    <td data-label="Quantity" style="text-align: right">{{ item.quantity }}</td>
+                    <td data-label="Price" style="text-align: right">{{ render_currency_amount(order.network.currency, item.price) }}</td>
+                    <td data-label="Unit" style="text-align: right">{{ item.unit or '-' }}</td>
+                    <td data-label="Total" style="text-align: right">{{ render_currency_amount(order.network.currency, item.total_amount) }}</td>
+                    <td class="actions actions-instance"></td>
                 </tr>
                 {% endfor %}
             </tbody>
