@@ -1,0 +1,13 @@
+{% from 'helpers/form.html' import group %}
+
+<fieldset>
+    {{ group(form.network) }}
+    {{ group(form.gateway) }}
+    {{ group(form.reason) }}
+    {{ group(form.amount) }}
+
+    <div class="pure-controls">
+        <button type="submit" class="pure-button pure-button-primary">Ok</button>
+        <button type="button" class="pure-button" onclick="history.back()">Cancel</button>
+    </div>
+</fieldset>

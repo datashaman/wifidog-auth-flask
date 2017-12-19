@@ -34,6 +34,9 @@ ACTIONS = {
         'uncancel',
         'archive',
     ],
+    'order_item': [
+        'delete',
+    ],
     'voucher': [
         'extend',
         'block',

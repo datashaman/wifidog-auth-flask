@@ -5,7 +5,7 @@ import datetime
 import simplejson as json
 import sqlalchemy.types as types
 
-from auth.graphs import transaction_actions, transaction_states, voucher_actions, voucher_states, order_actions, order_states
+from auth.graphs import graphs
 from auth.services import db
 from auth.utils import render_currency_amount, generate_code, generate_order_hash, generate_uuid
 from decimal import Decimal
@@ -27,28 +27,25 @@ class SqliteDecimal(types.TypeDecorator):
         return None if value is None else Decimal(value / 100)
 
 
-def available_actions(actions, states, status, interface):
-    if status in states:
-        result = {}
-        for action, defn in actions.items():
-            if action in states[status] and defn['interface'] == interface:
-                result[action] = defn
-        return result
-
-    return {}
+def available_actions(graph, status, interface):
+    result = {}
+    for action, defn in graph['actions'].items():
+        if status is None or (action in graph['states'][status] and defn['interface'] == interface):
+            result[action] = defn
+    return result
 
 
 @event.listens_for(Engine, 'connect')
 def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
-    cursor.execute('PRAGMA foreign_keys=ON')
+    cursor.execute('PRAGMA foreign_keys=ON;')
     cursor.close()
 
 
 @event.listens_for(Engine, 'close')
 def optimize_on_close(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
-    cursor.execute('PRAGMA optimize')
+    cursor.execute('PRAGMA optimize;')
     cursor.close()
 
 
@@ -351,7 +348,7 @@ class Voucher(db.Model):
 
     @property
     def available_actions(self):
-        return available_actions(voucher_actions, voucher_states, self.status, 'admin')
+        return available_actions(graphs['voucher'], self.status, 'admin')
 
     @property
     def class_hint(self):
@@ -474,7 +471,7 @@ class Order(db.Model):
     network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     network = db.relationship(Network, backref=backref('orders', lazy='dynamic'))
 
-    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', ondelete='cascade', onupdate='cascade'))
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('orders', lazy='dynamic'))
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='set null', onupdate='cascade'))
@@ -505,7 +502,7 @@ class Order(db.Model):
 
     @property
     def available_actions(self):
-        return available_actions(order_actions, order_states, self.status, 'admin')
+        return available_actions(graphs['order'], self.status, 'admin')
 
     @property
     def paid_transactions(self):
@@ -569,6 +566,10 @@ class OrderItem(db.Model):
     def __str__(self):
         return '%d x %s' % (self.quantity, self.product)
 
+    @property
+    def available_actions(self):
+        return available_actions(graphs['order_item'], None, 'admin')
+
 
 class Processor(db.Model):
     __tablename__ = 'processors'
@@ -631,7 +632,7 @@ class Transaction(db.Model):
 
     @property
     def available_actions(self):
-        return available_actions(transaction_actions, transaction_states, self.status, 'admin')
+        return available_actions(graphs['transaction'], self.status, 'admin')
 
     @property
     def class_hint(self):
@@ -679,3 +680,25 @@ class VatRate(db.Model):
 
     def __str__(self):
         return '%.2f%%' % self.percentage
+
+
+class Adjustment(db.Model):
+    __tablename__ = 'adjustments'
+
+    id = db.Column(db.Integer, primary_key=True)
+    reason = db.Column(db.UnicodeText, nullable=False)
+
+    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', ondelete='cascade', onupdate='cascade'), nullable=False)
+    network = db.relationship(Network, backref=backref('adjustments', lazy='dynamic'))
+
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', ondelete='cascade', onupdate='cascade'), nullable=False)
+    gateway = db.relationship(Gateway, backref=backref('adjustments', lazy='dynamic'))
+
+    amount = db.Column(SqliteDecimal, nullable=False)
+
+    created_at = db.Column(db.DateTime, default=current_timestamp)
+    updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
+
+    @property
+    def available_actions(self):
+        return available_actions(graphs['adjustment'], None, 'admin')

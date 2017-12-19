@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from auth.models import \
+    Adjustment, \
     Cashup, \
     Category, \
     Country, \
@@ -18,6 +19,7 @@ from flask_security import current_user
 
 
 RESOURCE_MODELS = {
+    'adjustment': Adjustment,
     'cashup': Cashup,
     'category': Category,
     'country': Country,
@@ -66,6 +68,7 @@ def resource_instance(resource, param, param_name='id'):
 resource_filters = defaultdict(lambda: lambda query: query)
 
 resource_filters.update({
+    'adjustment': lambda query: query.order_by(Adjustment.created_at.desc()),
     'cashup': lambda query: query.order_by(Cashup.created_at.desc()),
     'category': lambda query: query.order_by(Category.title),
     'order': lambda query: query.filter(Order.status != 'archived')

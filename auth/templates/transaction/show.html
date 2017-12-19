@@ -36,7 +36,16 @@
             <tr><th>Processor</th><td>{{ transaction.processor }}</td></tr>
             <tr><th>Reference</th><td>{{ transaction.processor_reference }}</td></tr>
             <tr><th>Status</th><td>{{ transaction.status }}</td></tr>
-            <tr><th>Cashup</th><td>{{ transaction.cashup }}</td></tr>
+            <tr>
+                <th>Cashup</th>
+                <td>
+                    {% if transaction.cashup %}
+                    <a href="{{ url_for('.cashup_show', id=transaction.cashup.id) }}">{{ transaction.cashup }}</a>
+                    {% else %}
+                    {{ transaction.cashup }}
+                    {% endif %}
+                </td>
+            </tr>
         </tbody>
     </div>
 </div>

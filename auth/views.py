@@ -11,6 +11,7 @@ import os
 from auth import constants
 
 from auth.forms import \
+    AdjustmentForm, \
     CashupForm, \
     CategoryForm, \
     CountryForm, \
@@ -892,28 +893,24 @@ def order_delete(id):
     return resource_delete('order', id)
 
 
-@bp.route('/orders/<hash>/<int:item_id>', methods=['POST'])
+@bp.route('/order-items/<int:id>/<action>', methods=['GET'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def order_item_edit(hash, item_id):
-    order = Order.query.filter_by(hash=hash).first_or_404()
-    order_item = OrderItem.query.filter_by(id=item_id).first_or_404()
+def order_item_action(id, action):
+    order_item = OrderItem.query.filter_by(id=id).first_or_404()
     order_item_label = str(order_item)
+    order = order_item.order
 
-    action = request.form.get('action')
-
-    if action == 'remove':
+    if action == 'delete':
         db.session.delete(order_item)
     else:
-        order_item.product = Product.query.get(request.form.get('product'))
-        order_item.quantity = int(request.form.get('quantity'))
-        order_item.price = Decimal(request.form.get('price'))
+        abort(403)
 
     order.calculate_totals()
     db.session.commit()
 
     flash('%s %s successful' % (action[0].upper() + action[1:], order_item_label))
-    return redirect(url_for('.order_edit', hash=hash))
+    return redirect(url_for('.order_edit', hash=order.hash))
 
 
 @bp.route('/orders/<hash>/pay/<processor_id>', methods=['GET', 'POST'])
@@ -1018,6 +1015,42 @@ def transaction_show(hash):
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def transaction_action(hash, action):
     return resource_action('transaction', slug, action, 'hash')
+
+
+@bp.route('/adjustments')
+@login_required
+@roles_accepted('super-admin')
+@register_menu(
+    bp,
+    '.adjustments',
+    'Adjustments',
+    visible_when=has_role('super-admin'),
+    order=84
+)
+def adjustment_index():
+    return resource_index('adjustment')
+
+
+@bp.route('/adjustments/new', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def adjustment_new():
+    form = AdjustmentForm()
+    return resource_new('adjustment', form)
+
+
+@bp.route('/adjustments/<id>/delete', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def adjustment_delete(id):
+    return resource_delete('adjustment', id)
+
+
+@bp.route('/adjustments/<id>', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def adjustment_edit(id):
+    return resource_edit('adjustment', id, AdjustmentForm)
 
 
 @bp.route('/new-voucher', methods=['GET', 'POST'])

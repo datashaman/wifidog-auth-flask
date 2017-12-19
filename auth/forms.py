@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from auth.models import db, Cashup, Category, Country, Currency, Gateway, GatewayType, Network, Product, Voucher, Role, SqliteDecimal
+from auth.models import db, Adjustment, Cashup, Category, Country, Currency, Gateway, GatewayType, Network, Product, Voucher, Role, SqliteDecimal
 from auth.resources import resource_query
 from auth.utils import args_get
 from flask import current_app
@@ -49,6 +49,18 @@ class ModelConverter(BaseModelConverter):
 
 
 model_converter = ModelConverter()
+
+AdjustmentForm = model_form(
+    Adjustment,
+    db.session,
+    FlaskForm,
+    exclude=[
+        'created_at',
+        'user',
+    ],
+    converter=model_converter
+)
+
 
 CashupForm = model_form(
     Cashup,
