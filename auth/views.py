@@ -777,7 +777,7 @@ def _gateway_choices():
     order=30
 )
 def order_new():
-    order_form = OrderForm()
+    form = OrderForm()
 
     show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin')
 
@@ -788,13 +788,13 @@ def order_new():
             flash('Define a network and gateway first.')
             return redirect(redirect_url())
 
-        order_form.gateway.choices = choices
+        form.gateway.choices = choices
     else:
-        del order_form.gateway
+        del form.gateway
 
-    if order_form.validate_on_submit():
+    if form.validate_on_submit():
         if show_gateway:
-            gateway = Gateway.query.get_or_404(order_form.gateway.data)
+            gateway = Gateway.query.get_or_404(form.gateway.data)
         else:
             gateway = current_user.gateway
 
@@ -807,15 +807,11 @@ def order_new():
         order.user = current_user
 
         order_item = OrderItem()
-        order_item.order = order
-        order_item.product = order_form.product.data
-        order_item.price = order_form.price.data
-        order_item.quantity = order_form.quantity.data
-
+        form.populate_obj(order_item)
+        order.items.append(order_item)
         order.calculate_totals()
 
         db.session.add(order)
-        db.session.add(order_item)
         db.session.commit()
 
         flash('Create %s successful' % order)
@@ -832,7 +828,7 @@ def order_new():
     price = '%.2f' % (list(prices.values())[0])
 
     return render_template('order/new.html',
-                           order_form=order_form,
+                           form=form,
                            price=price,
                            prices=prices)
 
@@ -844,7 +840,7 @@ def order_edit(hash):
     order = resource_instance('order', hash, 'hash')
 
     if order.status == 'new':
-        order_form = OrderForm(obj=order)
+        form = OrderForm(obj=order)
 
         show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin')
 
@@ -855,25 +851,22 @@ def order_edit(hash):
                 flash('Define a network and gateway first.')
                 return redirect(redirect_url())
 
-            order_form.gateway.choices = choices
-            gateway = Gateway.query.get(order_form.gateway.data)
+            form.gateway.choices = choices
+            gateway = Gateway.query.get(form.gateway.data)
         else:
-            del order_form.gateway
+            del form.gateway
             gateway = current_user.gateway
 
-        if order_form.validate_on_submit():
-            order_item = OrderItem()
-            order_item.order = order
-            order_item.product = order_form.product.data
-            order_item.price = Decimal(order_form.price.data)
-            order_item.quantity = order_form.quantity.data
-
+        if form.validate_on_submit():
             order.gateway = gateway
             order.network = gateway.network
 
+            order_item = OrderItem()
+            form.populate_obj(order_item)
+
+            order.items.append(order_item)
             order.calculate_totals()
 
-            db.session.add(order_item)
             db.session.commit()
 
             flash('Create %s successful' % order)
@@ -883,7 +876,7 @@ def order_edit(hash):
         price = '%.2f' % (list(prices.values())[0])
 
         return render_template('order/edit.html',
-                               order_form=order_form,
+                               form=form,
                                order=order,
                                price=price,
                                prices=prices)

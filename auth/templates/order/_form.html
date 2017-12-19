@@ -1,0 +1,14 @@
+{{ form.csrf_token }}
+
+{% if show_gateway %}
+    {{ group(form.gateway) }}
+{% endif %}
+
+{{ group(form.product) }}
+{{ group(form.quantity) }}
+{{ group(form.price) }}
+
+<div class="pure-controls">
+    <button type="submit" class="pure-button pure-button-primary">Add</button>
+    <button type="button" class="pure-button" onclick="history.back()">Cancel</button>
+</div>

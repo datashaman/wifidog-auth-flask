@@ -212,7 +212,7 @@ class OrderForm(FlaskForm):
     gateway = f.SelectField('Gateway', default=lambda: current_user.gateway)
     product = QuerySelectField('Product', query_factory=instances('product'))
     quantity = f.IntegerField('Quantity', default=1)
-    price = f.DecimalField('Price')
+    price = f.DecimalField('Price', [validators.Required()])
 
 
 ProductForm = model_form(
