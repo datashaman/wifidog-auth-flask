@@ -3,12 +3,14 @@
 *.so
 *~
 __pycache__/
+/anonymous-cli-metrics.json
 /bootstrap.py
 /build/
 /_cacache/
 /.cache/
 /.coverage
 /dist/
+/instance/
 /logs/
 /node_modules/
 /*.egg-info/
