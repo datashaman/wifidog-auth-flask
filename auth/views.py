@@ -961,7 +961,7 @@ def cashup_new():
 
     if form.validate_on_submit():
         cashup = Cashup()
-        cashup.gateway = current_user.gateway if gateway_admin else form.category.data
+        cashup.gateway = current_user.gateway if gateway_admin else form.gateway.data
         cashup.user = current_user
         form.populate_obj(cashup)
         db.session.add(cashup)
