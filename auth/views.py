@@ -1094,7 +1094,7 @@ def wifidog_login():
 
     if form.validate_on_submit():
         voucher_code = form.voucher_code.data.upper()
-        voucher = Voucher.query.filter(func.upper(Voucher.code) == voucher_code).first()
+        voucher = Voucher.query.filter(func.upper(Voucher.code) == voucher_code, Voucher.status == 'new').first()
 
         if voucher is None:
             flash(
