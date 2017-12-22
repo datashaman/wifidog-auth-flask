@@ -75,6 +75,10 @@ from wtforms import fields as f, validators
 bp = Blueprint('auth', __name__)
 
 
+def has_admin_role():
+    return has_role('super-admin', 'network-admin', 'gateway-admin')
+
+
 def redirect_url():
     return request.args.get('next') or \
         session.get('next_url') or \
@@ -348,7 +352,7 @@ def gateway_delete(id):
     bp,
     '.users',
     'Users',
-    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_admin_role(),
     order=90
 )
 def user_index():
@@ -429,7 +433,7 @@ def user_delete(id):
     bp,
     '.vouchers',
     'Vouchers',
-    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_admin_role(),
     order=20
 )
 def voucher_index():
@@ -450,7 +454,7 @@ def voucher_action(id, action):
     bp,
     '.categories',
     'Categories',
-    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_admin_role(),
     order=70
 )
 def category_index():
@@ -489,7 +493,7 @@ def category_edit(id):
     bp,
     '.products',
     'Products',
-    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_admin_role(),
     order=80
 )
 def product_index():
@@ -732,8 +736,8 @@ def currency_edit(id):
     bp,
     '.orders',
     'Orders',
-    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
-    order=40
+    visible_when=has_admin_role(),
+    order=36
 )
 def order_index():
     return resource_index('order')
@@ -774,7 +778,7 @@ def _gateway_choices():
     bp,
     '.new-order',
     'New Order',
-    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_admin_role(),
     order=30
 )
 def order_new():
@@ -934,7 +938,7 @@ def order_action(hash, action):
     bp,
     '.cashups',
     'Cashups',
-    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_admin_role(),
     order=60
 )
 def cashup_index():
@@ -995,8 +999,8 @@ def cashup_show(id):
     bp,
     '.transactions',
     'Transactions',
-    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
-    order=50
+    visible_when=has_admin_role(),
+    order=45
 )
 def transaction_index():
     return resource_index('transaction')
@@ -1019,13 +1023,13 @@ def transaction_action(hash, action):
 
 @bp.route('/adjustments')
 @login_required
-@roles_accepted('super-admin')
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
     bp,
     '.adjustments',
     'Adjustments',
-    visible_when=has_role('super-admin'),
-    order=84
+    visible_when=has_admin_role(),
+    order=38
 )
 def adjustment_index():
     return resource_index('adjustment')
@@ -1034,6 +1038,13 @@ def adjustment_index():
 @bp.route('/adjustments/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+@register_menu(
+    bp,
+    '.new-adjustment',
+    'New Adjustment',
+    visible_when=has_admin_role(),
+    order=42
+)
 def adjustment_new():
     form = AdjustmentForm()
     return resource_new('adjustment', form)
@@ -1060,7 +1071,7 @@ def adjustment_edit(id):
     bp,
     '.new-voucher',
     'New Voucher',
-    visible_when=has_role('super-admin', 'network-admin', 'gateway-admin'),
+    visible_when=has_admin_role(),
     order=10
 )
 def voucher_new():

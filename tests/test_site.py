@@ -6,8 +6,8 @@ class TestSite(TestCase):
         self.assertLogin('/')
 
     def test_login(self):
-        html = self.assertOk('/login')
-        self.assertTitle(html, 'Login')
+        pq = self.assertOk('/login')
+        self.assertTitle(pq, 'Login')
 
         response = self.login('main-gateway1@example.com', 'admin123')
 

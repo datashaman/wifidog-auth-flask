@@ -14,8 +14,8 @@ class TestVouchers(TestCase):
             response = self.client.get(url_for('.voucher_new'), follow_redirects=True)
             self.assertEqual(200, response.status_code)
 
-            html = self.get_html(response)
-            options = html.findall('//select[@id="gateway_id"]/option')
+            pq = self.pq(response)
+            options = pq('#gateway_id option')
 
             self.assertEqual(1, len(options))
             self.assertEqual('main-gateway1', options[0].get('value'))
@@ -27,8 +27,8 @@ class TestVouchers(TestCase):
             response = self.client.get(url_for('.voucher_new'), follow_redirects=True)
             self.assertEqual(200, response.status_code)
 
-            html = self.get_html(response)
-            options = html.findall('//select[@id="gateway_id"]/option')
+            pq = self.pq(response)
+            options = pq('#gateway_id option')
 
             self.assertEqual(2, len(options))
 
@@ -42,8 +42,8 @@ class TestVouchers(TestCase):
             response = self.client.get(url_for('.voucher_new'), follow_redirects=True)
             self.assertEqual(200, response.status_code)
 
-            html = self.get_html(response)
-            options = html.findall('//select[@id="gateway_id"]/option')
+            pq = self.pq(response)
+            options = pq('#gateway_id option')
 
             self.assertEqual(4, len(options))
 
@@ -58,8 +58,8 @@ class TestVouchers(TestCase):
     def test_voucher_index_as_gateway(self):
         self.login('main-gateway1@example.com', 'admin123')
 
-        html = self.assertOk('/vouchers')
-        vouchers = html.findall('//table[@id="vouchers"]/tbody/tr')
+        pq = self.assertOk('/vouchers')
+        vouchers = pq('#vouchers tbody tr')
 
         self.assertEqual(2, len(vouchers))
         self.assertEqual('main-1-2', vouchers[0].get('data-code'))
@@ -68,8 +68,8 @@ class TestVouchers(TestCase):
     def test_voucher_index_as_network(self):
         self.login('main-network@example.com', 'admin123')
 
-        html = self.assertOk('/vouchers')
-        vouchers = html.findall('//table[@id="vouchers"]/tbody/tr')
+        pq = self.assertOk('/vouchers')
+        vouchers = pq('#vouchers tbody tr')
 
         self.assertEqual(4, len(vouchers))
         self.assertEqual('main-2-2', vouchers[0].get('data-code'))
@@ -80,8 +80,8 @@ class TestVouchers(TestCase):
     def test_voucher_index_as_super(self):
         self.login('super-admin@example.com', 'admin123')
 
-        html = self.assertOk('/vouchers')
-        vouchers = html.findall('//table[@id="vouchers"]/tbody/tr')
+        pq = self.assertOk('/vouchers')
+        vouchers = pq('#vouchers tbody tr')
 
         self.assertEqual(8, len(vouchers))
         self.assertEqual('other-2-2', vouchers[0].get('data-code'))
@@ -96,38 +96,38 @@ class TestVouchers(TestCase):
     def test_voucher_archive_as_gateway(self):
         self.login('main-gateway1@example.com', 'admin123')
 
-        html = self.assertOk('/vouchers')
-        code = html.find('//table[@id="vouchers"]//td[@class="code"]').text
-        button = html.find('//table[@id="vouchers"]//a[@title="archive"]')
+        pq = self.assertOk('/vouchers')
+        code = pq('table#vouchers td.code')[0].text
+        button = pq('table#vouchers a[title="archive"]')[0]
 
-        html = self.assertOk(button.get('href'))
-        form = html.find('//div[@class="content"]/form')
-
+        pq = self.assertOk(button.get('href'))
+        form = pq('div.content > form')[0]
         response = self.client.post(form.get('action'), follow_redirects=True)
+
         assert '%s archive successful' % code in str(response.get_data())
 
     def test_voucher_archive_as_network(self):
         self.login('main-network@example.com', 'admin123')
 
-        html = self.assertOk('/vouchers')
-        code = html.find('//table[@id="vouchers"]//td[@class="code"]').text
-        button = html.find('//table[@id="vouchers"]//a[@title="archive"]')
+        pq = self.assertOk('/vouchers')
+        code = pq('table#vouchers td.code')[0].text
+        button = pq('table#vouchers a[title="archive"]')
 
-        html = self.assertOk(button.get('href'))
-        form = html.find('//div[@class="content"]/form')
+        pq = self.assertOk(button.attr('href'))
+        form = pq('div.content > form')
 
-        response = self.client.post(form.get('action'), follow_redirects=True)
+        response = self.client.post(form.attr('action'), follow_redirects=True)
         assert '%s archive successful' % code in str(response.get_data())
 
     def test_voucher_archive_as_super(self):
         self.login('super-admin@example.com', 'admin123')
 
-        html = self.assertOk('/vouchers')
-        code = html.find('//table[@id="vouchers"]//td[@class="code"]').text
-        button = html.find('//table[@id="vouchers"]//a[@title="archive"]')
+        pq = self.assertOk('/vouchers')
+        code = pq('table#vouchers td.code')[0].text
+        button = pq('table#vouchers a[title="archive"]')
 
-        html = self.assertOk(button.get('href'))
-        form = html.find('//div[@class="content"]/form')
+        pq = self.assertOk(button.attr('href'))
+        form = pq('div.content > form')
 
-        response = self.client.post(form.get('action'), follow_redirects=True)
+        response = self.client.post(form.attr('action'), follow_redirects=True)
         assert '%s archive successful' % code in str(response.get_data())

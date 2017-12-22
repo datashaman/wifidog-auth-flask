@@ -10,6 +10,8 @@ from auth import create_app
 from auth.models import db, users, Role
 from flask_security.utils import encrypt_password
 from lxml import etree
+from pyquery import PyQuery
+
 
 with open(BASE_DIR + '/data/test.db', 'rb') as local_db:
     content = local_db.read()
@@ -33,15 +35,14 @@ class TestCase(unittest.TestCase):
     def tearDown(self):
         os.unlink(self.filename)
 
-    def get_html(self, response):
-        data = response.get_data()
-        parser = etree.HTMLParser()
-        return etree.parse(six.StringIO(str(data)), parser)
+    def pq(self, response):
+        html = str(response.get_data())
+        return PyQuery(html)
 
     def assertOk(self, url):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        return self.get_html(response)
+        return self.pq(response)
 
     def assertRegex(self, *args, **kwargs):
         if six.PY3:
@@ -49,8 +50,8 @@ class TestCase(unittest.TestCase):
         else:
             return self.assertRegexpMatches(*args, **kwargs)
 
-    def assertTitle(self, html, title):
-        self.assertRegex(html.find('//title').text, r'^%s -' % title)
+    def assertTitle(self, pq, title):
+        self.assertRegex(pq('title').text(), r'^%s -' % title)
 
     def urlencode(self, value):
         if six.PY3:
@@ -72,15 +73,13 @@ class TestCase(unittest.TestCase):
 
     def assertForbidden(self, url):
         response = self.client.get(url, follow_redirects=True)
-        html = self.get_html(response)
-        li = html.find('//ul[@class="flashes"]/li[@class="error"]')
-        self.assertEqual('You do not have permission to view this resource.', li.text)
+        pq = self.pq(response)
+        self.assertEqual('You do not have permission to view this resource.', pq('.flashes .error').text())
 
     def assertForbiddenPost(self, url, data={}):
         response = self.client.post(url, data=data, follow_redirects=True)
-        html = self.get_html(response)
-        li = html.find('//ul[@class="flashes"]/li[@class="error"]')
-        self.assertEqual('You do not have permission to view this resource.', li.text)
+        pq = self.pq(response)
+        self.assertEqual('You do not have permission to view this resource.', pq('.flashes .error').text())
 
     def assertLogin(self, url):
         location = 'http://localhost/login'

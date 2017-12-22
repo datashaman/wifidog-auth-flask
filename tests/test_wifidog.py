@@ -33,8 +33,8 @@ class TestWifidog(TestCase):
 
             url = '/wifidog/login/?%s' % parse.urlencode(data)
 
-            html = self.assertOk(url)
-            url = html.find('//form').get('action')
+            pq = self.assertOk(url)
+            url = pq('form')[0].get('action')
 
             data.update({
                 'voucher_code': voucher_code,

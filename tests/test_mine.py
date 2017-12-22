@@ -8,17 +8,17 @@ class TestMine(TestCase):
 
     def test_my_account_as_gateway(self):
         self.login('main-gateway1@example.com', 'admin123')
-        html = self.assertOk('/user')
-        response = self.client.post(html.find('//form').get('action'), data={'email': 'main-gateway1@example.com', 'first_name': 'Another Main', 'locale': 'en', 'timezone': 'UTC'}, follow_redirects=True)
+        pq = self.assertOk('/user')
+        response = self.client.post(pq('form').attr('action'), data={'email': 'main-gateway1@example.com', 'first_name': 'Another Main', 'locale': 'en', 'timezone': 'UTC'}, follow_redirects=True)
         assert 'Update successful' in str(response.get_data())
 
     @skip('getting a 400 status, suspect file issues, can\'t duplicate irl')
     def test_my_gateway_as_gateway(self):
         self.login('main-gateway1@example.com', 'admin123')
-        html = self.assertOk('/gateway')
-        form = html.find('//form')
-        response = self.client.post(form.get('action'),
-                                    content_type=form.get('enctype'),
+        pq = self.assertOk('/gateway')
+        form = pq('form')
+        response = self.client.post(form.attr('action'),
+                                    content_type=form.attr('enctype'),
                                     data={'id': 'main-gateway1', 'title': 'Another Title', 'logo': ''},
                                     follow_redirects=True)
         output = str(response.get_data())
@@ -30,8 +30,8 @@ class TestMine(TestCase):
 
     def test_my_account_as_network(self):
         self.login('main-network@example.com', 'admin123')
-        html = self.assertOk('/user')
-        response = self.client.post(html.find('//form').get('action'), data={'email': 'main-network@example.com', 'first_name': 'Another Main', 'locale': 'en', 'timezone': 'UTC'}, follow_redirects=True)
+        pq = self.assertOk('/user')
+        response = self.client.post(pq('form').attr('action'), data={'email': 'main-network@example.com', 'first_name': 'Another Main', 'locale': 'en', 'timezone': 'UTC'}, follow_redirects=True)
         assert 'Update successful' in str(response.get_data())
 
     def test_my_gateway_as_network(self):
@@ -40,6 +40,6 @@ class TestMine(TestCase):
 
     def test_my_network_as_network(self):
         self.login('main-network@example.com', 'admin123')
-        html = self.assertOk('/network')
-        response = self.client.post(html.find('//form').get('action'), data={'id': 'main-network', 'title': 'Another Title'}, follow_redirects=True)
+        pq = self.assertOk('/network')
+        response = self.client.post(pq('form').attr('action'), data={'id': 'main-network', 'title': 'Another Title'}, follow_redirects=True)
         assert 'Update successful' in str(response.get_data())

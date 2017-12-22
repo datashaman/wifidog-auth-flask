@@ -16,8 +16,8 @@ class TestNetworks(TestCase):
     def test_networks_index_as_super(self):
         self.login('super-admin@example.com', 'admin123')
 
-        html = self.assertOk('/networks')
-        networks = html.findall('//table[@id="networks"]/tbody/tr')
+        pq = self.assertOk('/networks')
+        networks = pq('table#networks > tbody > tr')
 
         self.assertEqual(2, len(networks))
 
