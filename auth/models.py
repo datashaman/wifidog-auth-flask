@@ -402,6 +402,8 @@ class Category(db.Model):
     read_only = db.Column(db.Boolean, nullable=False, default=False)
     properties = db.Column(db.UnicodeText)
 
+    sequence = db.Column(db.Integer)
+
     created_at = db.Column(db.DateTime, default=current_timestamp)
     updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
 
@@ -436,6 +438,8 @@ class Product(db.Model):
 
     properties = db.Column(db.UnicodeText)
 
+    sequence = db.Column(db.Integer)
+
     vat_rate_id = db.Column(db.String(20), db.ForeignKey('vat_rates.id', onupdate='cascade'), nullable=False)
     vat_rate = db.relationship('VatRate', backref=backref('products', lazy='dynamic'))
 
@@ -444,7 +448,7 @@ class Product(db.Model):
 
     __table_args__ = (
             UniqueConstraint('network_id', 'gateway_id', 'code'),
-            UniqueConstraint('network_id', 'gateway_id', 'title'),
+            UniqueConstraint('network_id', 'gateway_id', 'title', 'unit'),
     )
 
     def __str__(self):

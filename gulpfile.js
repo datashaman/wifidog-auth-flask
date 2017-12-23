@@ -34,13 +34,14 @@ var isProduction = true,
         'node_modules/html5shiv/html5shiv.js'
     ],
     siteScripts = [
+        'node_modules/marked/lib/marked.js',
+        'node_modules/microlib-tabs/dist/tabs-standalone.microlib-latest.js',
+        'node_modules/sortablejs/Sortable.js',
         'node_modules/zepto/src/zepto.js',
         'node_modules/zepto/src/ajax.js',
         'node_modules/zepto/src/callbacks.js',
         'node_modules/zepto/src/deferred.js',
         'node_modules/zepto/src/event.js',
-        'node_modules/marked/lib/marked.js',
-        'node_modules/microlib-tabs/dist/tabs-standalone.microlib-latest.js',
         'auth/assets/scripts/**/*.js',
     ];
 

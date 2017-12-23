@@ -18,6 +18,7 @@
                             Network &amp; Gateway
                         </th>
                         {% endif %}
+                        <th>Seq</th>
                         <th>Code</th>
                         <th>Title</th>
                         <th>Price</th>
@@ -40,6 +41,7 @@
                                 {% endif %}
                             </td>
                             {% endif %}
+                            <td class="sequence" data-label="Seq">{{ instance.sequence }}</td>
                             <td class="code" data-label="Code"><a href={{ url_for('.product_edit', id=instance.id) }}>{{ instance.code }}</a></td>
                             <td class="title" data-label="Title">{{ instance.title }}</td>
                             <td class="price" data-label="Price">{{ render_currency_amount(instance.network.currency, instance.price) }}</td>

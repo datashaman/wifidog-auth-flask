@@ -70,10 +70,10 @@ resource_filters = defaultdict(lambda: lambda query: query)
 resource_filters.update({
     'adjustment': lambda query: query.order_by(Adjustment.created_at.desc()),
     'cashup': lambda query: query.order_by(Cashup.created_at.desc()),
-    'category': lambda query: query.order_by(Category.title),
+    'category': lambda query: query.order_by(Category.sequence),
     'order': lambda query: query.filter(Order.status != 'archived')
                                 .order_by(Order.created_at.desc()),
-    'product': lambda query: query.order_by(Product.code),
+    'product': lambda query: query.order_by(Product.sequence),
     'transaction': lambda query: query.filter(Transaction.status != 'archived')
                                       .order_by(Transaction.created_at.desc()),
     'user': lambda query: query.order_by(User.email),

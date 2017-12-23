@@ -8,9 +8,9 @@
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
 
 {% block content %}
-    <div class="content">
+    <div class="category-index content">
         {% if pagination.items %}
-            <table width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+            <table id="categories" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
                 <thead>
                     <tr>
                         {% if show_network or show_gateway %}
@@ -18,6 +18,7 @@
                             Network &amp; Gateway
                         </th>
                         {% endif %}
+                        <th class="sequence">Seq</th>
                         <th>Code</th>
                         <th>Title</th>
                         <th class="actions">Actions</th>
@@ -26,7 +27,7 @@
 
                 <tbody>
                     {% for instance in pagination.items %}
-                        <tr data-id={{ instance.id }} class={{ 'pure-table-' + loop.cycle('odd', 'even') }}>
+                        <tr data-id={{ instance.id }} class="category">
                             {% if show_network or show_gateway %}
                             <td data-label="Network & Gateway">
                                 {% if show_network %}
@@ -38,6 +39,7 @@
                                 {% endif %}
                             </td>
                             {% endif %}
+                            <td class="sequence" data-label="Seq">{{ instance.sequence }}</td>
                             {% if instance.read_only %}
                             <td class="code" data-label="Code">{{ instance.code }}</td>
                             {% else %}
@@ -59,4 +61,28 @@
             </table>
         {% endif %}
     </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+Zepto(function($) {
+    $('#categories .sequence').hide();
+    var $el = $('#categories tbody');
+    var sortable = Sortable.create($el.get(0), {
+        animation: 150,
+        onUpdate: function (evt) {
+            var sequences = {};
+            $('#categories tbody tr').each(function (index) {
+                sequences[$(this).data('id')] = index * 10;
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/categories/sort',
+                contentType: 'application/json',
+                data: JSON.stringify({ sequences: sequences })
+            });
+        }
+    });
+});
+</script>
 {% endblock %}

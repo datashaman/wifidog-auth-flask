@@ -2,8 +2,8 @@ from __future__ import absolute_import
 
 import csv
 import datetime
-import os
 import simplejson as json
+import yaml
 
 from auth.constants import ROLES
 from auth.models import \
@@ -530,3 +530,46 @@ def create_vat_rate(id, title, percentage, country_id, quiet=True):
 
     if not quiet:
         print('Vat rate created')
+
+@manager.command
+def load_gateway_products(gateway_id, products_file):
+    gateway = Gateway.query.get_or_404(gateway_id)
+
+    with open(products_file, 'r') as f:
+        products = yaml.load(f)
+
+    category_sequence = 0
+
+    for category_code, category_defn in products['categories'].items():
+        category_sequence += 10
+
+        category = Category()
+        category.code = category_code
+        category.description = category_defn.get('description')
+        category.sequence = category_sequence
+        category.title = category_defn['title']
+
+        product_sequence = 0
+
+        for product_code, product_defn in category_defn['products'].items():
+            product_sequence += 10
+
+            product = Product()
+
+            for k, v in products['defaults'].items():
+                setattr(product, k, v)
+
+            product.code = product_code
+            product.description = product_defn.get('description')
+            product.gateway_id = gateway.id
+            product.network_id = gateway.network.id
+            product.price = product_defn['price']
+            product.sequence = product_sequence
+            product.title = product_defn['title']
+            product.unit = product_defn.get('unit')
+
+            category.products.append(product)
+
+        db.session.add(category)
+
+    db.session.commit()

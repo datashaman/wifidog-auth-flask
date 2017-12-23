@@ -461,6 +461,18 @@ def category_index():
     return resource_index('category')
 
 
+@bp.route('/categories/sort', methods=['POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def category_sort():
+    content = request.get_json()
+    for category_id, sequence in content['sequences'].items():
+        category = Category.query.get_or_404(category_id)
+        category.sequence = sequence
+        db.session.commit()
+    return 'OK'
+
+
 @bp.route('/categories/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
