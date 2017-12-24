@@ -73,7 +73,7 @@ resource_filters.update({
     'category': lambda query: query.order_by(Category.sequence),
     'order': lambda query: query.filter(Order.status != 'archived')
                                 .order_by(Order.created_at.desc()),
-    'product': lambda query: query.order_by(Product.sequence),
+    'product': lambda query: query.join(Category).order_by(Category.sequence, Product.sequence),
     'transaction': lambda query: query.filter(Transaction.status != 'archived')
                                       .order_by(Transaction.created_at.desc()),
     'user': lambda query: query.order_by(User.email),

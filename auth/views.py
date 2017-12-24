@@ -512,6 +512,18 @@ def product_index():
     return resource_index('product')
 
 
+@bp.route('/products/sort', methods=['POST'])
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def product_sort():
+    content = request.get_json()
+    for product_id, sequence in content['sequences'].items():
+        product = Product.query.get_or_404(product_id)
+        product.sequence = sequence
+        db.session.commit()
+    return 'OK'
+
+
 def get_category_properties(category):
     names = category.properties
     return names.split('\n') if names else []

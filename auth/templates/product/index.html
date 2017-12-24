@@ -10,7 +10,7 @@
 {% block content %}
     <div class="content">
         {% if pagination.items %}
-            <table width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+            <table id="products" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
                 <thead>
                     <tr>
                         {% if show_network or show_gateway %}
@@ -18,7 +18,8 @@
                             Network &amp; Gateway
                         </th>
                         {% endif %}
-                        <th>Seq</th>
+                        <th class="sequence">Seq</th>
+                        <th>Category</th>
                         <th>Code</th>
                         <th>Title</th>
                         <th>Price</th>
@@ -29,7 +30,7 @@
 
                 <tbody>
                     {% for instance in pagination.items %}
-                        <tr data-id={{ instance.id }} class={{ 'pure-table-' + loop.cycle('odd', 'even') }}>
+                    <tr data-id={{ instance.id }} class="product">
                             {% if show_network or show_gateway %}
                             <td data-label="Network & Gateway">
                                 {% if show_network %}
@@ -42,6 +43,7 @@
                             </td>
                             {% endif %}
                             <td class="sequence" data-label="Seq">{{ instance.sequence }}</td>
+                            <td class="category" data-label="Category"><a href={{ url_for('.category_edit', id=instance.category_id) }}>{{ instance.category }}</a></td>
                             <td class="code" data-label="Code"><a href={{ url_for('.product_edit', id=instance.id) }}>{{ instance.code }}</a></td>
                             <td class="title" data-label="Title">{{ instance.title }}</td>
                             <td class="price" data-label="Price">{{ render_currency_amount(instance.network.currency, instance.price) }}</td>
@@ -61,4 +63,28 @@
             </table>
         {% endif %}
     </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+Zepto(function($) {
+    $('#products .sequence').hide();
+    var $el = $('#products tbody');
+    var sortable = Sortable.create($el.get(0), {
+        animation: 150,
+        onUpdate: function (evt) {
+            var sequences = {};
+            $('#products tbody tr').each(function (index) {
+                sequences[$(this).data('id')] = index * 10;
+            });
+            $.ajax({
+                type: 'POST',
+                url: '/products/sort',
+                contentType: 'application/json',
+                data: JSON.stringify({ sequences: sequences })
+            });
+        }
+    });
+});
+</script>
 {% endblock %}
