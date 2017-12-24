@@ -10,6 +10,7 @@ Flask-Uploads
 https://github.com/lepture/flask-wtf/archive/master.zip#egg=Flask-WTF
 healthcheck
 pillow
+PyYAML
 requests
 simplejson
 six
