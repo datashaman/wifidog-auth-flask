@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="content">
-        <form method="post" action={{ url_for('.%s_delete' % resource, id=instance.id) }}>
+        <form method="post" action="{{ action_url }}">
             <p>Are you sure you want to <em>delete</em> <strong>{{ instance }}</strong>?</p>
 
             <button type="submit" class="pure-button pure-button-primary">Yes</button>

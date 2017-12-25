@@ -140,6 +140,7 @@ def resource_delete(resource, **kwargs):
         flash('Delete %s successful' % instance_label)
         return redirect(url_for('.%s_index' % resource))
     return render_template('shared/delete.html',
+                           action_url=url_for('.%s_delete' % resource, **kwargs),
                            instance=instance,
                            resource=resource)
 
