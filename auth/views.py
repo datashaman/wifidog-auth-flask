@@ -107,9 +107,9 @@ def resource_new(resource, form):
     return render_template('%s/new.html' % resource, form=form, resource=resource)
 
 
-def resource_edit(resource, id, form_class):
+def resource_edit(resource, form_class, **kwargs):
     """Handle a resource edit request"""
-    instance = resource_instance(resource, id)
+    instance = resource_instance(resource, **kwargs)
     form = form_class(obj=instance)
     if form.validate_on_submit():
         form.populate_obj(instance)
@@ -122,17 +122,17 @@ def resource_edit(resource, id, form_class):
                            resource=resource)
 
 
-def resource_show(resource, id):
+def resource_show(resource, **kwargs):
     """Handle a resource show request"""
-    instance = resource_instance(resource, id)
+    instance = resource_instance(resource, **kwargs)
     return render_template('%s/show.html' % resource,
                            instance=instance,
                            resource=resource)
 
 
-def resource_delete(resource, id):
+def resource_delete(resource, **kwargs):
     """Handle a resource delete request"""
-    instance = resource_instance(resource, id)
+    instance = resource_instance(resource, **kwargs)
     if request.method == 'POST':
         instance_label = str(instance)
         db.session.delete(instance)
@@ -144,9 +144,9 @@ def resource_delete(resource, id):
                            resource=resource)
 
 
-def resource_action(resource, id, action, param_name='id'):
+def resource_action(resource, action, **kwargs):
     """Handle a resource action request"""
-    instance = resource_instance(resource, id, param_name)
+    instance = resource_instance(resource, **kwargs)
     if request.method == 'POST':
         if action in constants.ACTIONS[resource]:
             getattr(instance, action)()
@@ -155,7 +155,8 @@ def resource_action(resource, id, action, param_name='id'):
             return redirect(url_for('.%s_index' % resource))
         else:
             abort(404)
-    action_url = url_for('.%s_action' % resource, **{'action': action, param_name: getattr(instance, param_name)})
+    kwargs['action'] = action
+    action_url = url_for('.%s_action' % resource, **kwargs)
     return render_template('shared/action.html',
                            action=action,
                            action_url=action_url,
@@ -260,14 +261,14 @@ def network_new():
 @login_required
 @roles_accepted('super-admin')
 def network_edit(id):
-    return resource_edit('network', id, NetworkForm)
+    return resource_edit('network', NetworkForm, id=id)
 
 
 @bp.route('/networks/<id>/delete', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin')
 def network_delete(id):
-    return resource_delete('network', id)
+    return resource_delete('network', id=id)
 
 
 @bp.route('/gateways')
@@ -342,7 +343,7 @@ def gateway_edit(id):
 @login_required
 @roles_accepted('super-admin', 'network-admin')
 def gateway_delete(id):
-    return resource_delete('gateway', id)
+    return resource_delete('gateway', id=id)
 
 
 @bp.route('/users')
@@ -385,7 +386,7 @@ def user_new():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def user_edit(id):
-    instance = resource_instance('user', id)
+    instance = resource_instance('user', id=id)
 
     if (current_user.has_role('network-admin')
             and instance.network != current_user.network):
@@ -423,7 +424,7 @@ def user_edit(id):
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def user_delete(id):
-    return resource_delete('user', id)
+    return resource_delete('user', id=id)
 
 
 @bp.route('/vouchers')
@@ -444,7 +445,7 @@ def voucher_index():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def voucher_action(id, action):
-    return resource_action('voucher', id, action)
+    return resource_action('voucher', action, id=id)
 
 
 @bp.route('/categories')
@@ -481,21 +482,21 @@ def category_new():
     return resource_new('category', form)
 
 
-@bp.route('/categories/<int:id>/delete', methods=['GET', 'POST'])
+@bp.route('/categories/<code>/delete', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def category_delete(id):
-    return resource_delete('category', id)
+def category_delete(code):
+    return resource_delete('category', code=code)
 
 
-@bp.route('/categories/<int:id>', methods=['GET', 'POST'])
+@bp.route('/categories/<code>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def category_edit(id):
-    category = resource_instance('category', id)
+def category_edit(code):
+    category = resource_instance('category', code=code)
     if category.read_only:
         return redirect(redirect_url())
-    return resource_edit('category', id, CategoryForm)
+    return resource_edit('category', CategoryForm, code=code)
 
 
 @bp.route('/products')
@@ -650,14 +651,14 @@ def product_new(network_id=None, gateway_id=None, category_id=None):
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def product_delete(id):
-    return resource_delete('product', id)
+    return resource_delete('product', id=id)
 
 
 @bp.route('/products/<int:id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def product_edit(id):
-    product = resource_instance('product', id)
+    product = resource_instance('product', id=id)
 
     class Form(ProductForm):
         pass
@@ -707,14 +708,14 @@ def country_new():
 @login_required
 @roles_accepted('super-admin')
 def country_delete(id):
-    return resource_delete('country', id)
+    return resource_delete('country', id=id)
 
 
 @bp.route('/countries/<id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin')
 def country_edit(id):
-    return resource_edit('country', id, CountryForm)
+    return resource_edit('country', CountryForm, id=id)
 
 
 @bp.route('/currencies')
@@ -743,14 +744,14 @@ def currency_new():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def currency_delete(id):
-    return resource_delete('currency', id)
+    return resource_delete('currency', id=id)
 
 
 @bp.route('/currencies/<id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def currency_edit(id):
-    return resource_edit('currency', id, CurrencyForm)
+    return resource_edit('currency', CurrencyForm, id=id)
 
 
 @bp.route('/orders')
@@ -866,7 +867,7 @@ def order_new():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def order_edit(hash):
-    order = resource_instance('order', hash, 'hash')
+    order = resource_instance('order', hash=hash)
 
     if order.status == 'new':
         form = OrderForm(obj=order)
@@ -918,7 +919,7 @@ def order_edit(hash):
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def order_delete(id):
-    return resource_delete('order', id)
+    return resource_delete('order', id=id)
 
 
 @bp.route('/order-items/<int:id>/<action>', methods=['GET'])
@@ -943,8 +944,8 @@ def order_item_action(id, action):
 
 @bp.route('/orders/<hash>/pay/<processor_id>', methods=['GET', 'POST'])
 def order_pay(hash, processor_id):
-    order = resource_instance('order', hash, 'hash')
-    processor = resource_instance('processor', processor_id)
+    order = resource_instance('order', hash=hash)
+    processor = resource_instance('processor', id=processor_id)
     return processor.pay_order(order)
 
 
@@ -952,7 +953,7 @@ def order_pay(hash, processor_id):
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def order_action(hash, action):
-    return resource_action('order', hash, action, 'hash')
+    return resource_action('order', action, hash=hash)
 
 
 @bp.route('/cashups')
@@ -1006,14 +1007,14 @@ def cashup_new():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def cashup_delete(id):
-    return resource_delete('cashup', id)
+    return resource_delete('cashup', id=id)
 
 
 @bp.route('/cashups/<id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def cashup_show(id):
-    return resource_show('cashup', id)
+    return resource_show('cashup', id=id)
 
 
 @bp.route('/transactions')
@@ -1042,7 +1043,7 @@ def transaction_show(hash):
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def transaction_action(hash, action):
-    return resource_action('transaction', slug, action, 'hash')
+    return resource_action('transaction', action, hash=hash)
 
 
 @bp.route('/adjustments')
@@ -1078,14 +1079,14 @@ def adjustment_new():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def adjustment_delete(id):
-    return resource_delete('adjustment', id)
+    return resource_delete('adjustment', id=id)
 
 
 @bp.route('/adjustments/<id>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def adjustment_edit(id):
-    return resource_edit('adjustment', id, AdjustmentForm)
+    return resource_edit('adjustment', AdjustmentForm, id=id)
 
 
 @bp.route('/new-voucher', methods=['GET', 'POST'])

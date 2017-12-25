@@ -43,13 +43,13 @@
                             {% if instance.read_only %}
                             <td class="code" data-label="Code">{{ instance.code }}</td>
                             {% else %}
-                            <td class="code" data-label="Code"><a href={{ url_for('.category_edit', id=instance.id) }}>{{ instance.code }}</a></td>
+                            <td class="code" data-label="Code"><a href={{ url_for('.category_edit', code=instance.code) }}>{{ instance.code }}</a></td>
                             {% endif %}
                             <td class="title" data-label="Title">{{ instance.title }}</td>
 
                             <td class="actions actions-instance">
                                 <div class="pure-button-group" role="group" aria-label="Actions Available">
-                                    <a href={{ url_for('.category_delete', id=instance.id) }} class="pure-button">
+                                    <a href={{ url_for('.category_delete', code=instance.code) }} class="pure-button">
                                         <span class="oi" data-glyph="x" title="Delete" aria-hidden="true"></span>
                                         Delete
                                     </a>

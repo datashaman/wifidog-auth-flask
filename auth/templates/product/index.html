@@ -43,7 +43,7 @@
                             </td>
                             {% endif %}
                             <td class="sequence" data-label="Seq">{{ instance.sequence }}</td>
-                            <td class="category" data-label="Category"><a href={{ url_for('.category_edit', id=instance.category_id) }}>{{ instance.category }}</a></td>
+                            <td class="category" data-label="Category"><a href={{ url_for('.category_edit', code=instance.category.code) }}>{{ instance.category }}</a></td>
                             <td class="code" data-label="Code"><a href={{ url_for('.product_edit', id=instance.id) }}>{{ instance.code }}</a></td>
                             <td class="title" data-label="Title">{{ instance.title }}</td>
                             <td class="price" data-label="Price">{{ render_currency_amount(instance.network.currency, instance.price) }}</td>

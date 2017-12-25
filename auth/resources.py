@@ -36,7 +36,10 @@ RESOURCE_MODELS = {
 
 
 def resource_query(resource):
-    """Generate a filtered query for a resource"""
+    """
+    Generate a filtered query for a resource.
+    Avoid using joins in this function, it causes issues.
+    """
     model = RESOURCE_MODELS[resource]
     query = model.query
 
@@ -48,7 +51,8 @@ def resource_query(resource):
 
     if current_user.has_role('network-admin'):
         if model == Voucher:
-            query = query.join(Voucher.gateway).join(Gateway.network).filter(Network.id == current_user.network_id)
+            gateway_ids = [g.id for g in current_user.network.gateways]
+            query = query.filter(Voucher.gateway_id.in_(gateway_ids))
 
     if current_user.has_role('gateway-admin'):
         if model == Gateway:
@@ -59,9 +63,8 @@ def resource_query(resource):
     return query
 
 
-def resource_instance(resource, param, param_name='id'):
-    model = RESOURCE_MODELS[resource]
-    query = resource_filters[resource](resource_query(resource)).filter(getattr(model, param_name) == param)
+def resource_instance(resource, **kwargs):
+    query = resource_filters[resource](resource_query(resource)).filter_by(**kwargs)
     return query.first_or_404()
 
 
