@@ -33,5 +33,20 @@
             {% endfor %}
         </ul>
     {% endif %}
+
+    {% if instance.adjustments.count() %}
+        <h3>
+            Adjustments
+        </h3>
+
+        <ul>
+            {% for adjustment in instance.adjustments %}
+            <li>
+                <a href="{{ url_for('.adjustment_show', hash=adjustment.hash) }}">{{ adjustment }}</a> - {{ render_currency_amount(adjustment.currency, adjustment.amount) }} cash {{ adjustment.direction }} for {{ adjustment.reason }}.
+                {% if adjustment.reference_number %} (Reference {{ adjustment.reference_number }}){% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </div>
 {% endblock %}

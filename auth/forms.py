@@ -57,6 +57,8 @@ AdjustmentForm = model_form(
     FlaskForm,
     exclude=[
         'created_at',
+        'currency',
+        'hash',
         'user',
     ],
     converter=model_converter

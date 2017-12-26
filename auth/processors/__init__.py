@@ -40,6 +40,7 @@ def update_transaction(id, response):
 
     if transaction is None:
         transaction = Transaction()
+        transaction.gateway = order.gateway
         transaction.tip_amount = processor_module.get_tip_amount(response)
         transaction.total_amount = processor_module.get_transaction_amount(response)
         transaction.currency_id = processor_module.get_transaction_currency(response)

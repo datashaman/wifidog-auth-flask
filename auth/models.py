@@ -598,6 +598,9 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     hash = db.Column(db.String(40), default=generate_uuid, nullable=False, unique=True)
 
+    gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', ondelete='cascade', onupdate='cascade'), nullable=False)
+    gateway = db.relationship(Gateway, backref=backref('transactions', lazy='dynamic'))
+
     status = db.Column(db.String(20), nullable=False, default='new')
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'))
@@ -653,11 +656,7 @@ class Transaction(db.Model):
 
     @property
     def network(self):
-        return self.order.network
-
-    @property
-    def gateway(self):
-        return self.order.gateway
+        return self.gateway.network
 
     def __str__(self):
         return 'Transaction #%08d' % self.id
@@ -699,7 +698,7 @@ class Adjustment(db.Model):
     __tablename__ = 'adjustments'
 
     id = db.Column(db.Integer, primary_key=True)
-    reason = db.Column(db.UnicodeText, nullable=False)
+    hash = db.Column(db.String(40), default=generate_uuid, nullable=False, unique=True)
 
     network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     network = db.relationship(Network, backref=backref('adjustments', lazy='dynamic'))
@@ -707,7 +706,20 @@ class Adjustment(db.Model):
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('adjustments', lazy='dynamic'))
 
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade', onupdate='cascade'))
+    user = db.relationship(User, backref=backref('adjustments', lazy='dynamic'))
+
+    currency_id = db.Column(db.String(3), db.ForeignKey('currencies.id', ondelete='cascade', onupdate='cascade'), nullable=False)
+    currency = db.relationship(Currency, backref=backref('adjustments', lazy='dynamic'))
+
     amount = db.Column(SqliteDecimal, nullable=False)
+    direction = db.Column(db.Enum('in', 'out', validate_strings=True), nullable=False, default='out')
+
+    cashup_id = db.Column(db.String(40), db.ForeignKey('cashups.id', ondelete='cascade', onupdate='cascade'))
+    cashup = db.relationship('Cashup', backref=backref('adjustments', lazy='dynamic'))
+
+    reason = db.Column(db.UnicodeText, nullable=False)
+    reference_number = db.Column(db.String(40))
 
     created_at = db.Column(db.DateTime, default=current_timestamp)
     updated_at = db.Column(db.DateTime, default=current_timestamp, onupdate=current_timestamp)
@@ -715,3 +727,6 @@ class Adjustment(db.Model):
     @property
     def available_actions(self):
         return available_actions(graphs['adjustment'], None, 'admin')
+
+    def __str__(self):
+        return 'Adjustment #%08d' % self.id

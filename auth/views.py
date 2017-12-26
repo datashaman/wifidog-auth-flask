@@ -31,6 +31,7 @@ from auth.forms import \
     UserForm
 
 from auth.models import \
+    Adjustment, \
     Cashup, \
     Category, \
     Gateway, \
@@ -975,8 +976,9 @@ def cashup_index():
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def cashup_new():
-    if Transaction.query.filter(Transaction.cashup == None).count() == 0:
-        flash('No new transactions since last cashup', 'warning')
+    if Transaction.query.filter_by(cashup=None).count() == 0 \
+            and Adjustment.query.filter_by(cashup=None).count() == 0:
+        flash('No new transactions or adjustments since last cashup', 'warning')
         return redirect(redirect_url())
 
     form = CashupForm(data={'user': current_user})
@@ -994,8 +996,11 @@ def cashup_new():
         db.session.add(cashup)
         db.session.commit()
 
-        for transaction in db.session.query(Transaction) \
-                             .filter(Transaction.created_at < cashup.created_at, Transaction.cashup == None):
+        for adjustment in cashup.gateway.adjustments \
+                .filter(Adjustment.created_at < cashup.created_at, Adjustment.cashup == None):
+            cashup.adjustments.append(adjustment)
+        for transaction in cashup.gateway.transactions \
+                .filter(Transaction.created_at < cashup.created_at, Transaction.cashup == None):
             cashup.transactions.append(transaction)
         db.session.commit()
 
@@ -1061,6 +1066,14 @@ def adjustment_index():
     return resource_index('adjustment')
 
 
+@bp.route('/adjustments/<hash>')
+@login_required
+@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
+def adjustment_show(hash):
+    adjustment = Adjustment.query.filter_by(hash=hash).first_or_404()
+    return render_template('adjustment/show.html', adjustment=adjustment)
+
+
 @bp.route('/adjustments/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
@@ -1073,7 +1086,17 @@ def adjustment_index():
 )
 def adjustment_new():
     form = AdjustmentForm()
-    return resource_new('adjustment', form)
+    if form.validate_on_submit():
+        network = form.network.data
+        adjustment = Adjustment()
+        adjustment.currency = network.currency
+        adjustment.user = current_user
+        form.populate_obj(adjustment)
+        db.session.add(adjustment)
+        db.session.commit()
+        flash('Create %s successful' % adjustment)
+        return redirect(url_for('.adjustment_index'))
+    return render_template('adjustment/new.html', form=form, resource='adjustment')
 
 
 @bp.route('/adjustments/<id>/delete', methods=['GET', 'POST'])
