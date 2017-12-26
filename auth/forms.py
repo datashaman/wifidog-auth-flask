@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from auth.graphs import graphs
-from auth.models import db, Adjustment, Cashup, Category, Country, Currency, Gateway, GatewayType, Network, Order, Product, Voucher, Role, SqliteDecimal
+from auth.models import db, Adjustment, Cashup, Category, Country, Currency, Gateway, GatewayType, Network, Order, Product, Role, SqliteDecimal, Transaction, Voucher
 from auth.resources import resource_query
 from auth.utils import args_get
 from flask import current_app
@@ -318,7 +318,22 @@ class SelectNetworkGatewayForm(FlaskForm):
     gateway = QuerySelectField('Gateway', allow_blank=True, default=lambda: current_user.gateway, query_factory=instances('gateway'))
 
 
-class OrderFilterForm(FlaskForm):
+class FilterForm(FlaskForm):
+    def filter_query(self, query):
+        filters = {}
+        if hasattr(self.meta, 'filters'):
+            filters = self.meta.filters
+
+        for k, v in self.data.items():
+            if v:
+                if k in filters:
+                    query = filters['k'](query, k, v)
+                else:
+                    query = query.filter_by(**{k: v})
+        return query
+
+
+class OrderFilterForm(FilterForm):
     network = QuerySelectField('Network', allow_blank=True, query_factory=instances('network'), blank_text='Select Network')
     gateway = QuerySelectField('Gateway', allow_blank=True, query_factory=instances('gateway'), blank_text='Select Gateway')
     user = QuerySelectField('User', allow_blank=True, query_factory=instances('user'), blank_text='Select User')
@@ -326,13 +341,29 @@ class OrderFilterForm(FlaskForm):
     created_from = f.TextField('Created From')
     created_to = f.TextField('Created To')
 
-    def filter_query(self, query):
-        for k, v in self.data.items():
-            if v:
-                if k == 'created_from':
-                    query = query.filter(Order.created_at >= v)
-                elif k == 'created_to':
-                    query = query.filter(Order.created_at < v)
-                else:
-                    query = query.filter_by(**{k: v})
-        return query
+    class Meta:
+        filters = {
+            'created_from': lambda q, k, v: q.filter(Order.created_at >= v),
+            'created_to': lambda q, k, v: q.filter(Order.created_at < v)
+        }
+
+
+class TransactionFilterForm(FilterForm):
+    network = QuerySelectField('Network', allow_blank=True, query_factory=instances('network'), blank_text='Select Network')
+    gateway = QuerySelectField('Gateway', allow_blank=True, query_factory=instances('gateway'), blank_text='Select Gateway')
+    user = QuerySelectField('User', allow_blank=True, query_factory=instances('user'), blank_text='Select User')
+    status = f.SelectField('Status', default='', choices=[('', 'Select Status')] + [(status, status) for status in graphs['order']['states'].keys()])
+    created_from = f.TextField('Created From')
+    created_to = f.TextField('Created To')
+
+    class Meta:
+        filters = {
+            'created_from': lambda q, k, v: q.filter(Transaction.created_at >= v),
+            'created_to': lambda q, k, v: q.filter(Transaction.created_at < v),
+        }
+
+
+class UserFilterForm(FilterForm):
+    network = QuerySelectField('Network', allow_blank=True, query_factory=instances('network'), blank_text='Select Network')
+    gateway = QuerySelectField('Gateway', allow_blank=True, query_factory=instances('gateway'), blank_text='Select Gateway')
+    email = f.TextField('Email')

@@ -9,6 +9,24 @@
 
 {% block content %}
     <div class="content">
+        <form class="form-filter pure-form">
+            <fieldset>
+                <form method="get">
+                    {% if show_network %}
+                        {{ form.network() }}
+                    {% endif %}
+
+                    {% if show_gateway %}
+                        {{ form.gateway() }}
+                    {% endif %}
+                    {{ form.email(placeholder='Email') }}
+
+                    <button type="submit" class="pure-button pure-button-primary">Filter</button>
+                    <a href="{{ url_for('.user_index') }}" class="pure-button">Clear</a>
+                </form>
+            </fieldset>
+        </form>
+
         {% if pagination.items %}
             <table width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
                 <thead>

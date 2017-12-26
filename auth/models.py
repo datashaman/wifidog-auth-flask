@@ -472,14 +472,11 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     hash = db.Column(db.String(40), unique=True, nullable=False, default=generate_order_hash)
 
-    network_id = db.Column(db.Unicode(20), db.ForeignKey('networks.id', ondelete='cascade', onupdate='cascade'), nullable=False)
-    network = db.relationship(Network, backref=backref('orders', lazy='dynamic'))
-
     gateway_id = db.Column(db.Unicode(20), db.ForeignKey('gateways.id', ondelete='cascade', onupdate='cascade'), nullable=False)
     gateway = db.relationship(Gateway, backref=backref('orders', lazy='dynamic'))
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='set null', onupdate='cascade'))
-    user = db.relationship(User, backref=backref('orders', lazy='dynamic'), foreign_keys=[user_id])
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='set null', onupdate='cascade'), nullable=False)
+    user = db.relationship(User, backref=backref('orders', lazy='dynamic'))
 
     status = db.Column(db.String(20), nullable=False, default='new')
 
@@ -519,6 +516,10 @@ class Order(db.Model):
     @property
     def owed_amount(self):
         return Decimal(max(self.total_amount - self.paid_amount, Decimal(0)))
+
+    @property
+    def network(self):
+        return self.gateway.network
 
     @property
     def class_hint(self):
@@ -649,6 +650,14 @@ class Transaction(db.Model):
             'successful': 'success',
         }
         return choices.get(self.status, 'default')
+
+    @property
+    def network(self):
+        return self.order.network
+
+    @property
+    def gateway(self):
+        return self.order.gateway
 
     def __str__(self):
         return 'Transaction #%08d' % self.id

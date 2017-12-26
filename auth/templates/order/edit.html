@@ -29,9 +29,9 @@
                 <tr class="order-item">
                     <td data-label="Product">{{ item.product.title }}</td>
                     <td data-label="Quantity" style="text-align: right">{{ item.quantity }}</td>
-                    <td data-label="Price" style="text-align: right">{{ render_currency_amount(order.network.currency, item.price) }}</td>
+                    <td data-label="Price" style="text-align: right">{{ render_currency_amount(order.currency, item.price) }}</td>
                     <td data-label="Unit" style="text-align: right">{{ item.unit or '-' }}</td>
-                    <td data-label="Total" style="text-align: right">{{ render_currency_amount(order.network.currency, item.total_amount) }}</td>
+                    <td data-label="Total" style="text-align: right">{{ render_currency_amount(order.currency, item.total_amount) }}</td>
                     <td class="actions actions-instance">
                         <div class="pure-button-group" role="group" aria-label="Actions Available">
                             {% for action, defn in item.available_actions.items() %}
@@ -54,7 +54,7 @@
                         <strong>VAT</strong>
                     </td>
                     <td style="text-align: right">
-                        {{ render_currency_amount(order.network.currency, order.vat_amount) }}
+                        {{ render_currency_amount(order.currency, order.vat_amount) }}
                     </td>
                     <td>
                     </td>
@@ -65,7 +65,7 @@
                         <strong>Total</strong>
                     </td>
                     <td style="text-align: right">
-                        {{ render_currency_amount(order.network.currency, order.total_amount) }}
+                        {{ render_currency_amount(order.currency, order.total_amount) }}
                     </td>
                     <td>
                     </td>

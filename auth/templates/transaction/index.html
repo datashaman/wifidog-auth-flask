@@ -7,6 +7,28 @@
 
 {% block content %}
     <div class="content">
+        <form class="form-filter pure-form">
+            <fieldset>
+                <form method="get">
+                    {% if show_network %}
+                        {{ form.network() }}
+                    {% endif %}
+
+                    {% if show_gateway %}
+                        {{ form.gateway() }}
+                    {% endif %}
+
+                    {{ form.user() }}
+                    {{ form.status() }}
+                    {{ form.created_from(placeholder='Created From') }}
+                    {{ form.created_to(placeholder='Created To') }}
+
+                    <button type="submit" class="pure-button pure-button-primary">Filter</button>
+                    <a href="{{ url_for('.transaction_index') }}" class="pure-button">Clear</a>
+                </form>
+            </fieldset>
+        </form>
+
         {% if pagination.items %}
             <table id="transactions" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
                 <thead>
@@ -38,11 +60,11 @@
                         {% if show_network or show_gateway %}
                         <td data-label="Network & Gateway">
                             {% if show_network %}
-                            {{ instance.order.network or '' }}
+                            {{ instance.network or '' }}
                             {% endif %}
                             {% if show_gateway %}
                                 {% if show_network %}<br />{% endif %}
-                                {{ instance.order.gateway or '' }}
+                                {{ instance.gateway or '' }}
                             {% endif %}
                         </td>
                         {% endif %}

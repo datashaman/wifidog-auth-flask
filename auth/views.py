@@ -26,6 +26,8 @@ from auth.forms import \
     ProductForm, \
     SelectCategoryForm, \
     SelectNetworkGatewayForm, \
+    TransactionFilterForm, \
+    UserFilterForm, \
     UserForm
 
 from auth.models import \
@@ -359,8 +361,7 @@ def gateway_delete(id):
     order=90
 )
 def user_index():
-    form = UserForm()
-    return resource_index('user', form=form)
+    return resource_index('user', UserFilterForm(formdata=request.args))
 
 
 @bp.route('/users/new', methods=['GET', 'POST'])
@@ -834,7 +835,6 @@ def order_new():
 
         order = Order()
         order.gateway = gateway
-        order.network = gateway.network
         order.currency = currency
         order.user = current_user
 
@@ -891,7 +891,6 @@ def order_edit(hash):
 
         if form.validate_on_submit():
             order.gateway = gateway
-            order.network = gateway.network
 
             order_item = OrderItem()
             form.populate_obj(order_item)
@@ -1030,7 +1029,7 @@ def cashup_show(id):
     order=45
 )
 def transaction_index():
-    return resource_index('transaction')
+    return resource_index('transaction', TransactionFilterForm(formdata=request.args))
 
 
 @bp.route('/transactions/<hash>')
