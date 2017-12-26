@@ -1,0 +1,40 @@
+{% extends 'layouts/default.html' %}
+
+{% set page_title = adjustment %}
+
+{% block content %}
+<div class="content">
+    <table class="table-properties">
+        <thead>
+            <tr><th /><th class="heading">Details</th></tr>
+        </thead>
+
+        <tbody>
+            <tr><th>Direction</th><td>{{ adjustment.direction }}</td></tr>
+            <tr><th>Amount</th><td>{{ render_currency_amount(adjustment.currency, adjustment.amount) }}</td></tr>
+            <tr><th>Reason</th><td>{{ adjustment.reason }}</td></tr>
+            <tr><th>Reference</th><td>{{ adjustment.reference_number }}</td></tr>
+            <tr>
+                <th>User</th>
+                <td>
+                    {% if adjustment.user %}
+                    <a href="{{ url_for('.user_edit', id=adjustment.user_id) }}">{{ adjustment.user }}</a>
+                    {% else %}
+                    {{ adjustment.user }}
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Cashup</th>
+                <td>
+                    {% if adjustment.cashup %}
+                    <a href="{{ url_for('.cashup_show', id=adjustment.cashup.id) }}">{{ adjustment.cashup }}</a>
+                    {% else %}
+                    {{ adjustment.cashup }}
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </div>
+</div>
+{% endblock %}
