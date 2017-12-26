@@ -22,6 +22,7 @@ from auth.forms import \
     NetworkForm, \
     NewVoucherForm, \
     OrderForm, \
+    OrderFilterForm, \
     ProductForm, \
     SelectCategoryForm, \
     SelectNetworkGatewayForm, \
@@ -88,7 +89,7 @@ def redirect_url():
 
 def resource_index(resource, form=None):
     """Handle a resource index request"""
-    pagination = resource_instances(resource).paginate()
+    pagination = resource_instances(resource, form).paginate()
     return render_template('%s/index.html' % resource,
                            form=form,
                            pagination=pagination,
@@ -766,7 +767,7 @@ def currency_edit(id):
     order=36
 )
 def order_index():
-    return resource_index('order')
+    return resource_index('order', OrderFilterForm(formdata=request.args))
 
 
 def _gateway_choices():

@@ -34,6 +34,22 @@ RESOURCE_MODELS = {
     'voucher': Voucher,
 }
 
+resource_filters = defaultdict(lambda: lambda query: query)
+
+resource_filters.update({
+    'adjustment': lambda query: query.order_by(Adjustment.created_at.desc()),
+    'cashup': lambda query: query.order_by(Cashup.created_at.desc()),
+    'category': lambda query: query.order_by(Category.sequence),
+    'order': lambda query: query.filter(Order.status != 'archived')
+                                .order_by(Order.created_at.desc()),
+    'product': lambda query: query.join(Category).order_by(Category.sequence, Product.sequence),
+    'transaction': lambda query: query.filter(Transaction.status != 'archived')
+                                      .order_by(Transaction.created_at.desc()),
+    'user': lambda query: query.order_by(User.email),
+    'voucher': lambda query: query.filter(Voucher.status != 'archived')
+                                  .order_by(Voucher.status, Voucher.created_at.desc()),
+})
+
 
 def resource_query(resource):
     """
@@ -63,27 +79,22 @@ def resource_query(resource):
     return query
 
 
-def resource_instance(resource, **kwargs):
-    query = resource_filters[resource](resource_query(resource)).filter_by(**kwargs)
-    return query.first_or_404()
+def clean_filters(filters):
+    clean = {}
+    for k, v in filters.items():
+        if v != '__None':
+            clean[k] = v
+    return clean
 
 
-resource_filters = defaultdict(lambda: lambda query: query)
+def resource_instances(resource, form=None):
+    query = resource_filters[resource](resource_query(resource))
 
-resource_filters.update({
-    'adjustment': lambda query: query.order_by(Adjustment.created_at.desc()),
-    'cashup': lambda query: query.order_by(Cashup.created_at.desc()),
-    'category': lambda query: query.order_by(Category.sequence),
-    'order': lambda query: query.filter(Order.status != 'archived')
-                                .order_by(Order.created_at.desc()),
-    'product': lambda query: query.join(Category).order_by(Category.sequence, Product.sequence),
-    'transaction': lambda query: query.filter(Transaction.status != 'archived')
-                                      .order_by(Transaction.created_at.desc()),
-    'user': lambda query: query.order_by(User.email),
-    'voucher': lambda query: query.filter(Voucher.status != 'archived')
-                                  .order_by(Voucher.status, Voucher.created_at.desc()),
-})
+    if form is None:
+        return query
+
+    return form.filter_query(query)
 
 
-def resource_instances(resource):
-    return resource_filters[resource](resource_query(resource))
+def resource_instance(resource, **filters):
+    return resource_instances(resource).filter_by(**filters).first_or_404()

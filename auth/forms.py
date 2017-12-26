@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
-from auth.models import db, Adjustment, Cashup, Category, Country, Currency, Gateway, GatewayType, Network, Product, Voucher, Role, SqliteDecimal
+from auth.graphs import graphs
+from auth.models import db, Adjustment, Cashup, Category, Country, Currency, Gateway, GatewayType, Network, Order, Product, Voucher, Role, SqliteDecimal
 from auth.resources import resource_query
 from auth.utils import args_get
 from flask import current_app
@@ -315,3 +316,23 @@ class SelectCategoryForm(FlaskForm):
 class SelectNetworkGatewayForm(FlaskForm):
     network = QuerySelectField('Network', default=lambda: current_user.network, query_factory=instances('network'))
     gateway = QuerySelectField('Gateway', allow_blank=True, default=lambda: current_user.gateway, query_factory=instances('gateway'))
+
+
+class OrderFilterForm(FlaskForm):
+    network = QuerySelectField('Network', allow_blank=True, query_factory=instances('network'), blank_text='Select Network')
+    gateway = QuerySelectField('Gateway', allow_blank=True, query_factory=instances('gateway'), blank_text='Select Gateway')
+    user = QuerySelectField('User', allow_blank=True, query_factory=instances('user'), blank_text='Select User')
+    status = f.SelectField('Status', default='', choices=[('', 'Select Status')] + [(status, status) for status in graphs['order']['states'].keys()])
+    created_from = f.TextField('Created From')
+    created_to = f.TextField('Created To')
+
+    def filter_query(self, query):
+        for k, v in self.data.items():
+            if v:
+                if k == 'created_from':
+                    query = query.filter(Order.created_at >= v)
+                elif k == 'created_to':
+                    query = query.filter(Order.created_at < v)
+                else:
+                    query = query.filter_by(**{k: v})
+        return query
