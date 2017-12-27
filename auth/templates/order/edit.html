@@ -4,13 +4,17 @@
 {% set page_title = 'Edit Order' %}
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
 
+{% block page_actions %}
+    {% include 'shared/actions.html' %}
+{% endblock %}
+
 {% block content %}
     <div class="order-edit content">
-        <form method="post" action="{{ url_for('.order_edit', hash=order.hash) }}" class="order-item pure-form pure-form-aligned">
+        <form method="post" action="{{ url_for('.order_edit', hash=instance.hash) }}" class="order-item pure-form pure-form-aligned">
             {% include 'order/_form.html' %}
         </form>
 
-        {% if order.items.count() %}
+        {% if instance.items.count() %}
         <hr class="divider" />
 
         <table id="order-items" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
@@ -25,13 +29,13 @@
                 </tr>
             </thead>
             <tbody>
-                {% for item in order.items %}
+                {% for item in instance.items %}
                 <tr class="order-item">
                     <td data-label="Product">{{ item.product.title }}</td>
                     <td data-label="Quantity" style="text-align: right">{{ item.quantity }}</td>
-                    <td data-label="Price" style="text-align: right">{{ render_currency_amount(order.currency, item.price) }}</td>
+                    <td data-label="Price" style="text-align: right">{{ render_currency_amount(instance.currency, item.price) }}</td>
                     <td data-label="Unit" style="text-align: right">{{ item.unit or '-' }}</td>
-                    <td data-label="Total" style="text-align: right">{{ render_currency_amount(order.currency, item.total_amount) }}</td>
+                    <td data-label="Total" style="text-align: right">{{ render_currency_amount(instance.currency, item.total_amount) }}</td>
                     <td class="actions actions-instance">
                         <div class="pure-button-group" role="group" aria-label="Actions Available">
                             {% for action, defn in item.available_actions.items() %}
@@ -54,7 +58,7 @@
                         <strong>VAT</strong>
                     </td>
                     <td style="text-align: right">
-                        {{ render_currency_amount(order.currency, order.vat_amount) }}
+                        {{ render_currency_amount(instance.currency, instance.vat_amount) }}
                     </td>
                     <td>
                     </td>
@@ -65,7 +69,7 @@
                         <strong>Total</strong>
                     </td>
                     <td style="text-align: right">
-                        {{ render_currency_amount(order.currency, order.total_amount) }}
+                        {{ render_currency_amount(instance.currency, instance.total_amount) }}
                     </td>
                     <td>
                     </td>

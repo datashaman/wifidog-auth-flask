@@ -909,9 +909,10 @@ def order_edit(hash):
 
         return render_template('order/edit.html',
                                form=form,
-                               order=order,
+                               instance=order,
                                price=price,
-                               prices=prices)
+                               prices=prices,
+                               resource='order')
 
     return render_template('order/show.html', order=order)
 

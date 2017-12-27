@@ -81,14 +81,16 @@
 
                     <div class="pure-g">
                         <div class="pure-u-1-2">
-                            {% if new_url %}
-                                <div class="actions-collection">
+                            <div class="actions-collection">
+                                {% if new_url %}
                                     <a href="{{ new_url }}" class="pure-button pure-button-primary">
                                         <span class="oi" data-glyph="file" title="{{ new_title }}" aria-hidden="true"></span>
                                         {{ new_title }}
                                     </a>
-                                </div>
-                            {% endif %}
+                                {% endif %}
+                                {% block page_actions %}
+                                {% endblock %}
+                            </div>
                         </div>
 
                         <div class="pure-u-1-2 pagination-container">
