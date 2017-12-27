@@ -40,7 +40,7 @@ def create_app(config=None):
         mailhost = app.config.get('ERROR_MAIL_SERVER',
                                   app.config.get('MAIL_SERVER',
                                                  'localhost')),
-        print('mailhost %s (%s)' % (mailhost, type(mailhost))
+        print('mailhost %s (%s)' % (mailhost, type(mailhost)))
         mail_handler = SMTPHandler(mailhost,
                                    app.config.get('MAIL_DEFAULT_SENDER',
                                                   'no-reply@localhost'),
