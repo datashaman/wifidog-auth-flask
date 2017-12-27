@@ -509,6 +509,7 @@ def migrate():
 
                 if entity.__tablename__ == 'transactions':
                     row['total_amount'] = row.get('amount', 0)
+                    row['gateway_id'] = Order.query.get_or_404(row['order_id']).gateway_id
 
                 if entity.__tablename__ == 'products':
                     row['category_id'] = Category.query.filter_by(code='vouchers').first_or_404().id
