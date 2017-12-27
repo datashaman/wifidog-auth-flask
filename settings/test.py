@@ -1,4 +1,4 @@
-MAIL_DEFAULT_SENDER = 'Test Auth <no-reply@test.example.com>'
+MAIL_DEFAULT_SENDER = ('Test Auth', 'no-reply@test.example.com')
 MAIL_PORT = 25
 MAIL_SERVER = 'localhost'
 SECRET_KEY = 'a-good-secret-is-hard-to-find'

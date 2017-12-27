@@ -5,7 +5,6 @@ BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 ADMINS = ['admin@example.com']
 DATABASE_CONNECTION_OPTIONS = {}
 SECURITY_CONFIRMABLE = True
-SECURITY_EMAIL_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'no-reply@localhost')
 SECURITY_PASSWORD_HASH = 'sha512_crypt'
 SECURITY_POST_LOGIN_VIEW = 'auth.voucher_index'
 SECURITY_POST_LOGOUT_VIEW = 'login'
