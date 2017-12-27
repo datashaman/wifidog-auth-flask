@@ -58,7 +58,7 @@ def bootstrap_reference(bind=None, users_csv=None):
     bootstrap_instance('ZA', 'South Africa', bind=bind, users_csv=users_csv)
     create_currency('ZA', 'ZAR', 'South African Rand', 'R')
     create_processor('snapscan', 'SnapScan', 'ZA', active=True)
-    create_processor('pay', 'Pay', 'ZA', active=True)
+    create_processor('payu', 'PayU', 'ZA', active=False)
     create_vat_rate('standard', 'Standard Rate', 14, 'ZA')
     create_vat_rate('zero', 'Zero Rate', 0, 'ZA')
 

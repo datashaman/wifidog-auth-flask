@@ -1075,7 +1075,7 @@ def adjustment_show(hash):
     return render_template('adjustment/show.html', adjustment=adjustment)
 
 
-@bp.route('/adjustments/new', methods=['GET', 'POST'])
+@bp.route('/new-adjustment', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
