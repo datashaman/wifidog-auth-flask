@@ -7,6 +7,7 @@ import yaml
 
 from auth.constants import ROLES
 from auth.models import \
+    Adjustment, \
     Cashup, \
     Category, \
     Change, \
@@ -452,6 +453,7 @@ def migrate():
         Voucher,
         Cashup,
         Transaction,
+        Adjustment,
     ]
 
     reference_engine = db.get_engine(current_app, 'reference')
