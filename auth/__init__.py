@@ -37,10 +37,12 @@ def create_app(config=None):
         app.config.update(**config)
 
     if not app.debug:
-        mail_handler = SMTPHandler(app.config.get('MAIL_SERVER', 'localhost'),
+        mail_handler = SMTPHandler(app.config.get('ERROR_MAIL_SERVER',
+                                                  app.config.get('MAIL_SERVER',
+                                                                 'localhost')),
                                    app.config['MAIL_DEFAULT_SENDER_EMAIL'],
                                    app.config['ADMINS'],
-                                   app.config.get('MAIL_ERROR_SUBJECT',
+                                   app.config.get('ERROR_MAIL_SUBJECT',
                                                   'Application Error'))
         mail_handler.setFormatter(logging.Formatter('''
     Message type:       %(levelname)s
