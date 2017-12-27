@@ -1061,7 +1061,7 @@ def transaction_action(hash, action):
     '.adjustments',
     'Adjustments',
     visible_when=has_admin_role(),
-    order=38
+    order=42
 )
 def adjustment_index():
     return resource_index('adjustment')
@@ -1083,7 +1083,7 @@ def adjustment_show(hash):
     '.new-adjustment',
     'New Adjustment',
     visible_when=has_admin_role(),
-    order=42
+    order=38
 )
 def adjustment_new():
     form = AdjustmentForm()

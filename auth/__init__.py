@@ -40,7 +40,7 @@ def create_app(config=None):
         mail_handler = SMTPHandler(app.config.get('ERROR_MAIL_SERVER',
                                                   app.config.get('MAIL_SERVER',
                                                                  'localhost')),
-                                   app.config['MAIL_DEFAULT_SENDER_EMAIL'],
+                                   app.config.get('MAIL_DEFAULT_SENDER', 'no-reply@localhost'),
                                    app.config['ADMINS'],
                                    app.config.get('ERROR_MAIL_SUBJECT',
                                                   'Application Error'))
