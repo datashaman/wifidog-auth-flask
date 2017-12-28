@@ -38,6 +38,8 @@
     {% endfor %}
     {% endif %}
 
+    {{ group(form.sequence) }}
+
     <div class="pure-controls">
         <button type="submit" class="pure-button pure-button-primary">Ok</button>
         <button type="button" class="pure-button" onclick="history.back()">Cancel</button>

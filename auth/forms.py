@@ -59,6 +59,7 @@ AdjustmentForm = model_form(
         'created_at',
         'currency',
         'hash',
+        'updated_at',
         'user',
     ],
     converter=model_converter
@@ -70,6 +71,7 @@ CashupForm = model_form(
     db.session,
     FlaskForm,
     exclude=[
+        'adjustments',
         'created_at',
         'transactions',
         'user',
@@ -112,6 +114,7 @@ CountryForm = model_form(
         'created_at',
         'gateways',
         'updated_at',
+        'vat_rates',
     ],
     exclude_pk=False,
     field_args={
@@ -127,10 +130,12 @@ CurrencyForm = model_form(
     db.session,
     FlaskForm,
     exclude=[
+        'adjustments',
         'created_at',
         'networks',
         'orders',
         'products',
+        'transactions',
         'updated_at',
     ],
     exclude_pk=False,
@@ -156,10 +161,18 @@ GatewayForm = model_form(
     db.session,
     FlaskForm,
     exclude=[
+        'adjustments',
         'auths',
         'cashups',
         'created_at',
         'categories',
+        'last_ping_ip',
+        'last_ping_at',
+        'last_ping_user_agent',
+        'last_ping_sys_uptime',
+        'last_ping_wifidog_uptime',
+        'last_ping_sys_memfree',
+        'last_ping_sys_load',
         'orders',
         'products',
         'transactions',
@@ -198,17 +211,18 @@ GatewayForm = model_form(
     converter=GatewayConverter()
 )
 
-
 NetworkForm = model_form(
     Network,
     db.session,
     FlaskForm,
     exclude=[
+        'adjustments',
         'categories',
         'created_at',
         'gateways',
         'orders',
         'products',
+        'transactions',
         'updated_at',
         'users',
     ],
