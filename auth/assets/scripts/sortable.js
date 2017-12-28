@@ -8,19 +8,19 @@ Zepto(function($) {
         $table.find('.sequence').hide();
         $tbody.find('tr').prepend('<td class="sortable-handle"><span class="oi" data-glyph="elevator" title="Sort" aria-hidden="true"></span></td>');
         $tbody.each(function () {
-            var url = $(this).data('url');
+            var $this = $(this);
 
             Sortable.create(this, {
                 animation: 150,
                 handle: '.sortable-handle',
                 onUpdate: function (evt) {
                     var sequences = {};
-                    $tbody.find('tr').each(function (index) {
+                    $this.find('tr').each(function (index) {
                         sequences[$(this).data('id')] = index * 10;
                     });
                     $.ajax({
                         type: 'POST',
-                        url: url,
+                        url: $this.data('url'),
                         contentType: 'application/json',
                         data: JSON.stringify({ sequences: sequences })
                     });
