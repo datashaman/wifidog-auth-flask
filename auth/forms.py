@@ -162,6 +162,7 @@ GatewayForm = model_form(
         'categories',
         'orders',
         'products',
+        'transactions',
         'updated_at',
         'users',
         'vouchers',
