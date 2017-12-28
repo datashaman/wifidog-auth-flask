@@ -11,6 +11,6 @@ class TestThing(TestCase):
             c = Country.query.first()
             mapper = object_mapper(c)
             pk = mapper.primary_key_from_instance(c)
-            self.assertEqual(pk, [c.id])
+            self.assertEqual(pk, (c.id,))
             ik = mapper.identity_key_from_primary_key(pk)
             self.assertEqual((type(c), (c.id,)), ik)
