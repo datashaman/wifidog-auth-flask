@@ -35,12 +35,24 @@
                 <ul class="pure-menu-list">
                     {%- for item in current_menu.children recursive -%}
                     {%- if item.visible -%}
-                    <li class="pure-menu-item{% if item.active %} pure-menu-selected{% endif %}{% if item.children %} pure-menu-has-children pure-menu-allow-hover{% endif %}">
-                        <a href="{{ item.url }}" class="pure-menu-link">{{ item.text }}</a>
+                    <li class="pure-menu-item{% if item.active %} pure-menu-selected{% endif %}">
                         {%- if item.children -%}
-                        <ul class="pure-menu-children">
+                        <a href="#" class="pure-menu-link" aria-haspopup="true">{{ item.text }}</a>
+                        <ul class="pure-menu-submenu" role="menu">
                             {{ loop(item.children) }}
                         </ul>
+                        {% else %}
+                        <a href="{{ item.url }}" class="pure-menu-link">
+                            {{ item.text }}
+                        </a>
+                        {% if item.new_url %}
+                        {% set new_url = item.new_url() %}
+                        {% if new_url %}
+                        <div class="new"><a href="{{ new_url }}">
+                            <span class="oi" data-glyph="plus" title="New" aria-hidden="true"></span>
+                        </a></div>
+                        {% endif %}
+                        {% endif %}
                         {%- endif -%}
                     </li>
                     {%- endif -%}

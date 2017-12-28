@@ -245,7 +245,7 @@ def my_account():
 @roles_accepted('super-admin')
 @register_menu(
     bp,
-    '.networks',
+    'networks',
     'Networks',
     visible_when=has_role('super-admin'),
     order=85
@@ -281,7 +281,7 @@ def network_delete(id):
 @roles_accepted('super-admin', 'network-admin')
 @register_menu(
     bp,
-    '.gateways',
+    'gateways',
     'Gateways',
     visible_when=has_role('super-admin', 'network-admin'),
     order=87
@@ -356,7 +356,7 @@ def gateway_delete(id):
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
     bp,
-    '.users',
+    'users',
     'Users',
     visible_when=has_admin_role(),
     order=90
@@ -439,7 +439,8 @@ def user_delete(id):
     '.vouchers',
     'Vouchers',
     visible_when=has_admin_role(),
-    order=20
+    order=20,
+    new_url=lambda: url_for('.voucher_new')
 )
 def voucher_index():
     return resource_index('voucher')
@@ -457,7 +458,7 @@ def voucher_action(id, action):
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
     bp,
-    '.categories',
+    'categories',
     'Categories',
     visible_when=has_admin_role(),
     order=70
@@ -508,7 +509,7 @@ def category_edit(code):
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
     bp,
-    '.products',
+    'products',
     'Products',
     visible_when=has_admin_role(),
     order=80
@@ -691,7 +692,7 @@ def product_edit(id):
 @roles_accepted('super-admin')
 @register_menu(
     bp,
-    '.countries',
+    'countries',
     'Countries',
     visible_when=has_role('super-admin'),
     order=82
@@ -727,7 +728,7 @@ def country_edit(id):
 @roles_accepted('super-admin')
 @register_menu(
     bp,
-    '.currencies',
+    'currencies',
     'Currencies',
     visible_when=has_role('super-admin'),
     order=84
@@ -763,10 +764,11 @@ def currency_edit(id):
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
     bp,
-    '.orders',
+    'orders',
     'Orders',
     visible_when=has_admin_role(),
-    order=36
+    order=36,
+    new_url=lambda: url_for('.order_new')
 )
 def order_index():
     return resource_index('order', OrderFilterForm(formdata=request.args))
@@ -800,16 +802,9 @@ def _gateway_choices():
     return choices
 
 
-@bp.route('/new-order', methods=['GET', 'POST'])
+@bp.route('/orders/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(
-    bp,
-    '.new-order',
-    'New Order',
-    visible_when=has_admin_role(),
-    order=30
-)
 def order_new():
     form = OrderForm()
 
@@ -964,10 +959,11 @@ def order_action(hash, action):
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
     bp,
-    '.cashups',
+    'cashups',
     'Cashups',
     visible_when=has_admin_role(),
-    order=60
+    order=60,
+    new_url=lambda: url_for('.cashup_new')
 )
 def cashup_index():
     return resource_index('cashup')
@@ -1029,7 +1025,7 @@ def cashup_show(id):
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
     bp,
-    '.transactions',
+    'transactions',
     'Transactions',
     visible_when=has_admin_role(),
     order=45
@@ -1058,10 +1054,11 @@ def transaction_action(hash, action):
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
     bp,
-    '.adjustments',
+    'adjustments',
     'Adjustments',
     visible_when=has_admin_role(),
-    order=42
+    order=42,
+    new_url=lambda: url_for('.adjustment_new')
 )
 def adjustment_index():
     return resource_index('adjustment')
@@ -1075,16 +1072,9 @@ def adjustment_show(hash):
     return render_template('adjustment/show.html', adjustment=adjustment)
 
 
-@bp.route('/new-adjustment', methods=['GET', 'POST'])
+@bp.route('/adjustments/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(
-    bp,
-    '.new-adjustment',
-    'New Adjustment',
-    visible_when=has_admin_role(),
-    order=38
-)
 def adjustment_new():
     form = AdjustmentForm()
     if form.validate_on_submit():
@@ -1114,16 +1104,9 @@ def adjustment_edit(id):
     return resource_edit('adjustment', AdjustmentForm, id=id)
 
 
-@bp.route('/new-voucher', methods=['GET', 'POST'])
+@bp.route('/vouchers/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(
-    bp,
-    '.new-voucher',
-    'New Voucher',
-    visible_when=has_admin_role(),
-    order=10
-)
 def voucher_new():
     form = NewVoucherForm()
     choices = []

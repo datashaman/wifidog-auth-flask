@@ -236,6 +236,20 @@ th, td {
         color: #fff;
         margin: 0;
     }
+
+    .pure-menu-submenu {
+        list-style-type: none;
+        padding-left: 0;
+
+        a {
+            color: #333;
+            background-color: #fff;
+        }
+
+        .pure-menu-selected a {
+            color: #333;
+        }
+    }
 }
 
 /*
@@ -526,4 +540,17 @@ legend {
 .sortable-chosen {
     color: #333;
     background-color: #eee;
+}
+
+.pure-menu-item {
+    position: relative;
+    .new {
+        position: absolute;
+        top: 30%;
+        right: 0;
+
+        a {
+            padding: .6em !important;
+        }
+    }
 }
