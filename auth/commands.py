@@ -550,10 +550,10 @@ def load_gateway_products(gateway_id, products_file):
         category_sequence += 10
 
         category = Category()
-        category.network_id = gateway.network_id
-        category.gateway_id = gateway_id
         category.code = category_code
         category.description = category_defn.get('description')
+        category.gateway_id = gateway_id
+        category.network_id = gateway.network_id
         category.sequence = category_sequence
         category.title = category_defn['title']
 
