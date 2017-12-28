@@ -10,7 +10,13 @@
 {% block content %}
     <div class="content">
         {% if pagination.items %}
-            <table id="products" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+            <table
+                id="products"
+                width="100%"
+                cellspacing="0"
+                class="pure-table pure-table-horizontal"
+                data-sortable
+            >
                 <thead>
                     <tr>
                         {% if show_network or show_gateway %}
@@ -28,7 +34,7 @@
                     </tr>
                 </thead>
 
-                <tbody>
+                <tbody data-url="{{ url_for('.product_sort') }}">
                     {% for instance in pagination.items %}
                     <tr data-id={{ instance.id }} class="product">
                             {% if show_network or show_gateway %}
@@ -63,28 +69,4 @@
             </table>
         {% endif %}
     </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-Zepto(function($) {
-    $('#products .sequence').hide();
-    var $el = $('#products tbody');
-    var sortable = Sortable.create($el.get(0), {
-        animation: 150,
-        onUpdate: function (evt) {
-            var sequences = {};
-            $('#products tbody tr').each(function (index) {
-                sequences[$(this).data('id')] = index * 10;
-            });
-            $.ajax({
-                type: 'POST',
-                url: '/products/sort',
-                contentType: 'application/json',
-                data: JSON.stringify({ sequences: sequences })
-            });
-        }
-    });
-});
-</script>
 {% endblock %}

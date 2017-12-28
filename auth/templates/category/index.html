@@ -10,7 +10,13 @@
 {% block content %}
     <div class="category-index content">
         {% if pagination.items %}
-            <table id="categories" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+            <table
+                id="categories"
+                width="100%"
+                cellspacing="0"
+                class="pure-table pure-table-horizontal"
+                data-sortable
+            >
                 <thead>
                     <tr>
                         {% if show_network or show_gateway %}
@@ -25,7 +31,7 @@
                     </tr>
                 </thead>
 
-                <tbody>
+                <tbody data-url="{{ url_for('.category_sort') }}">
                     {% for instance in pagination.items %}
                         <tr data-id={{ instance.id }} class="category">
                             {% if show_network or show_gateway %}
@@ -65,24 +71,5 @@
 
 {% block scripts %}
 <script>
-Zepto(function($) {
-    $('#categories .sequence').hide();
-    var $el = $('#categories tbody');
-    var sortable = Sortable.create($el.get(0), {
-        animation: 150,
-        onUpdate: function (evt) {
-            var sequences = {};
-            $('#categories tbody tr').each(function (index) {
-                sequences[$(this).data('id')] = index * 10;
-            });
-            $.ajax({
-                type: 'POST',
-                url: '/categories/sort',
-                contentType: 'application/json',
-                data: JSON.stringify({ sequences: sequences })
-            });
-        }
-    });
-});
 </script>
 {% endblock %}

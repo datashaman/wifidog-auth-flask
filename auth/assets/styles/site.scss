@@ -512,3 +512,18 @@ table-warning,
 legend {
     font-size: x-large;
 }
+
+.sortable-handle {
+    max-width: 1em;
+    cursor: move;
+    cursor: -webkit-grabbing;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+}
+
+.sortable-chosen {
+    color: #333;
+    background-color: #eee;
+}
