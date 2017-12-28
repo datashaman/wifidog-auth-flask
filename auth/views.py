@@ -440,7 +440,7 @@ def user_delete(id):
     'Vouchers',
     visible_when=has_admin_role(),
     order=20,
-    new_url=lambda: url_for('.voucher_new')
+    new_url=lambda: url_for('auth.voucher_new')
 )
 def voucher_index():
     return resource_index('voucher')
@@ -768,7 +768,7 @@ def currency_edit(id):
     'Orders',
     visible_when=has_admin_role(),
     order=36,
-    new_url=lambda: url_for('.order_new')
+    new_url=lambda: url_for('auth.order_new')
 )
 def order_index():
     return resource_index('order', OrderFilterForm(formdata=request.args))
