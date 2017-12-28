@@ -14,5 +14,6 @@ PyYAML
 requests
 simplejson
 six
+SQLAlchemy==1.1.15
 https://github.com/armooo/suds_requests/archive/master.zip#egg=suds_requests
 wheel
