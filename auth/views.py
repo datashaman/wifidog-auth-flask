@@ -1282,16 +1282,14 @@ def wifidog_portal():
 
 @bp.route('/favicon.ico')
 def favicon():
-    directory = os.path.join(current_app.root_path, 'static')
-    return send_from_directory(directory,
-                               'favicon.ico',
-                               mimetype='image/vnd.microsoft.icon')
+    return current_app.send_static_file('favicon.ico')
 
 
 @bp.route('/uploads/<path:path>')
 def uploads(path):
     directory = os.path.join(current_app.instance_path, 'uploads')
-    return send_from_directory(directory, path)
+    cache_timeout = current_app.get_send_file_max_age(path)
+    return send_from_directory(directory, path, cache_timeout=cache_timeout)
 
 
 @bp.route('/auth-token')
