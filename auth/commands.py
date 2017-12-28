@@ -538,6 +538,9 @@ def create_vat_rate(id, title, percentage, country_id, quiet=True):
 def load_gateway_products(gateway_id, products_file):
     gateway = Gateway.query.get_or_404(gateway_id)
 
+    gateway.products.delete()
+    gateway.categories.delete()
+
     with open(products_file, 'r') as f:
         products = yaml.load(f)
 
@@ -547,6 +550,8 @@ def load_gateway_products(gateway_id, products_file):
         category_sequence += 10
 
         category = Category()
+        category.network_id = gateway.network_id
+        category.gateway_id = gateway_id
         category.code = category_code
         category.description = category_defn.get('description')
         category.sequence = category_sequence
