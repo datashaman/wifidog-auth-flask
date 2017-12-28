@@ -1289,7 +1289,7 @@ def favicon():
 def uploads(path):
     directory = os.path.join(current_app.instance_path, 'uploads')
     cache_timeout = current_app.get_send_file_max_age(path)
-    return send_from_directory(directory, path, cache_timeout=cache_timeout)
+    return send_from_directory(directory, path, cache_timeout=cache_timeout, conditional=True)
 
 
 @bp.route('/auth-token')
