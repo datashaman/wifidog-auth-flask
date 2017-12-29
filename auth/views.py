@@ -1058,7 +1058,7 @@ def transaction_action(hash, action):
     'Adjustments',
     visible_when=has_admin_role(),
     order=42,
-    new_url=lambda: url_for('.adjustment_new')
+    new_url=lambda: url_for('auth.adjustment_new')
 )
 def adjustment_index():
     return resource_index('adjustment')
