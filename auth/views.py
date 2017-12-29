@@ -963,7 +963,7 @@ def order_action(hash, action):
     'Cashups',
     visible_when=has_admin_role(),
     order=60,
-    new_url=lambda: url_for('.cashup_new')
+    new_url=lambda: url_for('auth.cashup_new')
 )
 def cashup_index():
     return resource_index('cashup')
