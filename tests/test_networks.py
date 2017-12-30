@@ -1,89 +1,118 @@
+from flask import url_for
 from tests import TestCase
 
 
 class TestNetworks(TestCase):
     def test_networks_index_as_anonymous(self):
-        self.assertLogin('/networks')
+        with self.app.test_request_context():
+            self.assertLogin(url_for('network.index'))
 
     def test_networks_index_as_gateway(self):
-        self.login('main-gateway1@example.com', 'admin123')
-        self.assertRedirect('/networks')
+        with self.app.test_request_context():
+            self.login('main-gateway1@example.com', 'admin123')
+            self.assertRedirect(url_for('network.index'))
 
     def test_networks_index_as_network(self):
-        self.login('main-network@example.com', 'admin123')
-        self.assertRedirect('/networks')
+        with self.app.test_request_context():
+            self.login('main-network@example.com', 'admin123')
+            self.assertRedirect(url_for('network.index'))
 
     def test_networks_index_as_super(self):
-        self.login('super-admin@example.com', 'admin123')
+        with self.app.test_request_context():
+            self.login('super-admin@example.com', 'admin123')
 
-        pq = self.assertOk('/networks')
-        networks = pq('table#networks > tbody > tr')
+            pq = self.assertOk(url_for('network.index'))
+            networks = pq('table#networks > tbody > tr')
 
-        self.assertEqual(2, len(networks))
+            self.assertEqual(2, len(networks))
 
-        self.assertEqual('main-network', networks[0].get('data-id'))
+            self.assertEqual('main-network', networks[0].get('data-id'))
 
     def test_networks_new_as_anonymous(self):
-        self.assertLogin('/networks/new')
+        with self.app.test_request_context():
+            self.assertLogin(url_for('network.new'))
 
     def test_networks_new_as_gateway(self):
-        self.login('main-gateway1@example.com', 'admin123')
-        self.assertForbidden('/networks/new')
+        with self.app.test_request_context():
+            self.login('main-gateway1@example.com', 'admin123')
+            self.assertForbidden(url_for('network.new'))
 
     def test_networks_new_as_network(self):
-        self.login('main-network@example.com', 'admin123')
-        self.assertForbidden('/networks/new')
+        with self.app.test_request_context():
+            self.login('main-network@example.com', 'admin123')
+            self.assertForbidden(url_for('network.new'))
 
     def test_networks_new_as_super(self):
-        self.login('super-admin@example.com', 'admin123')
+        with self.app.test_request_context():
+            self.login('super-admin@example.com', 'admin123')
 
-        response = self.client.get('/networks/new')
-        self.assertEqual(200, response.status_code)
+            response = self.client.get(url_for('network.new'))
+            self.assertEqual(200, response.status_code)
 
     def test_networks_store_as_anonymous(self):
-        self.assertLoginPost('/networks/new', data={'id': 'network', 'title': 'Network'})
+        with self.app.test_request_context():
+            self.assertLoginPost(url_for('network.new'),
+                                 data={'id': 'network', 'title': 'Network'})
 
     def test_networks_store_as_gateway(self):
-        self.login('main-gateway1@example.com', 'admin123')
-        self.assertForbiddenPost('/networks/new', data={'id': 'network', 'title': 'Network'})
+        with self.app.test_request_context():
+            self.login('main-gateway1@example.com', 'admin123')
+            self.assertForbiddenPost(url_for('network.new'),
+                                     data={'id': 'network',
+                                           'title': 'Network'})
 
     def test_networks_store_as_network(self):
-        self.login('main-network@example.com', 'admin123')
-        self.assertForbiddenPost('/networks/new', data={'id': 'network', 'title': 'Network'})
+        with self.app.test_request_context():
+            self.login('main-network@example.com', 'admin123')
+            self.assertForbiddenPost(url_for('network.new'),
+                                     data={'id': 'network',
+                                           'title': 'Network'})
 
     def test_networks_store_as_super(self):
-        self.login('super-admin@example.com', 'admin123')
-        response = self.client.post('/networks/new', data={'id': 'network', 'title': 'Network'}, follow_redirects=True)
-        self.assertEqual(200, response.status_code)
+        with self.app.test_request_context():
+            self.login('super-admin@example.com', 'admin123')
+            response = self.client.post(url_for('network.new'),
+                                        data={'id': 'network',
+                                              'title': 'Network'},
+                                        follow_redirects=True)
+            self.assertEqual(200, response.status_code)
 
     def test_networks_edit_as_anonymous(self):
-        self.assertLogin('/networks/main-network')
+        with self.app.test_request_context():
+            self.assertLogin(url_for('network.edit', id='main-network'))
 
     def test_networks_edit_as_gateway(self):
-        self.login('main-gateway1@example.com', 'admin123')
-        self.assertForbidden('/networks/main-network')
+        with self.app.test_request_context():
+            self.login('main-gateway1@example.com', 'admin123')
+            self.assertForbidden(url_for('network.edit', id='main-network'))
 
     def test_networks_edit_as_network(self):
-        self.login('main-network@example.com', 'admin123')
-        self.assertForbidden('/networks/main-network')
+        with self.app.test_request_context():
+            self.login('main-network@example.com', 'admin123')
+            self.assertForbidden(url_for('network.edit', id='main-network'))
 
     def test_networks_edit_as_super(self):
-        self.login('super-admin@example.com', 'admin123')
-        response = self.client.get('/networks/main-network')
-        self.assertEqual(200, response.status_code)
+        with self.app.test_request_context():
+            self.login('super-admin@example.com', 'admin123')
+            response = self.client.get(url_for('network.edit', id='main-network'))
+            self.assertEqual(200, response.status_code)
 
     def test_networks_update_as_anonymous(self):
-        self.assertLoginPost('/networks/main-network', {'id': 'network', 'title': 'Network'})
+        with self.app.test_request_context():
+            self.assertLoginPost(url_for('network.edit', id='main-network'), {'id': 'network', 'title': 'Network'})
 
     def test_networks_update_as_gateway(self):
-        self.login('main-gateway1@example.com', 'admin123')
-        self.assertForbiddenPost('/networks/main-network')
+        with self.app.test_request_context():
+            self.login('main-gateway1@example.com', 'admin123')
+            self.assertForbiddenPost(url_for('network.edit', id='main-network'))
 
     def test_networks_update_as_network(self):
-        self.login('main-network@example.com', 'admin123')
-        self.assertForbiddenPost('/networks/main-network')
+        with self.app.test_request_context():
+            self.login('main-network@example.com', 'admin123')
+            self.assertForbiddenPost(url_for('network.edit', id='main-network'))
 
     def test_networks_update_as_super(self):
-        self.login('super-admin@example.com', 'admin123')
-        response = self.client.post('/networks/main-network', data={'id': 'network', 'title': 'Network'}, follow_redirects=True)
-        self.assertEqual(200, response.status_code)
+        with self.app.test_request_context():
+            self.login('super-admin@example.com', 'admin123')
+            response = self.client.post(url_for('network.edit', id='main-network'), data={'id': 'network', 'title': 'Network'}, follow_redirects=True)
+            self.assertEqual(200, response.status_code)

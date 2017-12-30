@@ -79,6 +79,13 @@ def has_admin_role():
     return has_role('super-admin', 'network-admin', 'gateway-admin')
 
 
+def resource_url_for(resource, verb, **kwargs):
+    if resource in ['gateway', 'network', 'order']:
+        return url_for('%s.%s' % (resource, verb), **kwargs)
+    else:
+        return url_for('.%s_%s' % (resource, verb), **kwargs)
+
+
 def resource_index(resource, form=None):
     """Handle a resource index request"""
     pagination = resource_instances(resource, form).paginate()
@@ -96,8 +103,10 @@ def resource_new(resource, form):
         db.session.add(instance)
         db.session.commit()
         flash('Create %s successful' % instance)
-        return redirect(url_for('.%s_index' % resource))
-    return render_template('%s/new.html' % resource, form=form, resource=resource)
+        return redirect(resource_url_for(resource, 'index'))
+    return render_template('%s/new.html' % resource,
+                           form=form,
+                           resource=resource)
 
 
 def resource_edit(resource, form_class, **kwargs):
@@ -108,7 +117,7 @@ def resource_edit(resource, form_class, **kwargs):
         form.populate_obj(instance)
         db.session.commit()
         flash('Update %s successful' % instance)
-        return redirect(url_for('.%s_index' % resource))
+        return redirect(resource_url_for(resource, 'index'))
     return render_template('%s/edit.html' % resource,
                            form=form,
                            instance=instance,
@@ -131,11 +140,8 @@ def resource_delete(resource, **kwargs):
         db.session.delete(instance)
         db.session.commit()
         flash('Delete %s successful' % instance_label)
-        return redirect(url_for('.%s_index' % resource))
-    if resource in ['gateway', 'network', 'order']:
-        action_url = url_for('%s.delete' % resource, **kwargs)
-    else:
-        action_url = url_for('.%s_delete' % resource, **kwargs)
+        return redirect(resource_url_for(resource, 'index'))
+    action_url = resource_url_for(resource, 'delete')
     return render_template('shared/delete.html',
                            action_url=action_url,
                            instance=instance,
@@ -154,20 +160,20 @@ def resource_action(resource, action, **kwargs):
         else:
             abort(404)
     kwargs['action'] = action
-    if resource in ['gateway', 'network', 'order']:
-        action_url = url_for('%s.action' % resource, **kwargs)
-    else:
-        action_url = url_for('.%s_action' % resource, **kwargs)
     return render_template('shared/action.html',
                            action=action,
-                           action_url=action_url,
+                           action_url=resource_url_for(resource,
+                                                       'action',
+                                                       **kwargs),
                            instance=instance,
                            resource=resource)
 
 
 def set_locale_choices(form):
-    form.locale.choices = [(id, title) for id, title in constants.LOCALES.items()]
-    form.timezone.choices = [(timezone, timezone) for timezone in common_timezones]
+    form.locale.choices = [(id, title)
+                           for id, title in constants.LOCALES.items()]
+    form.timezone.choices = [(timezone, timezone)
+                             for timezone in common_timezones]
 
 
 @bp.route('/user', methods=['GET', 'POST'])
