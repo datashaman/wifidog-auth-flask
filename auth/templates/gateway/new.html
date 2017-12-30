@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="content">
-        <form method="post" enctype="multipart/form-data" action={{ url_for('.gateway_new') }} class="pure-form pure-form-aligned">
+        <form method="post" enctype="multipart/form-data" action={{ url_for('.new') }} class="pure-form pure-form-aligned">
             {% include 'gateway/_form.html' %}
         </form>
     </div>

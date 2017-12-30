@@ -16,10 +16,8 @@ from auth.forms import \
     CategoryForm, \
     CountryForm, \
     CurrencyForm, \
-    GatewayForm, \
     LoginVoucherForm, \
     MyUserForm, \
-    NetworkForm, \
     NewVoucherForm, \
     ProductForm, \
     SelectCategoryForm, \
@@ -134,8 +132,12 @@ def resource_delete(resource, **kwargs):
         db.session.commit()
         flash('Delete %s successful' % instance_label)
         return redirect(url_for('.%s_index' % resource))
+    if resource in ['gateway', 'network', 'order']:
+        action_url = url_for('%s.delete' % resource, **kwargs)
+    else:
+        action_url = url_for('.%s_delete' % resource, **kwargs)
     return render_template('shared/delete.html',
-                           action_url=url_for('.%s_delete' % resource, **kwargs),
+                           action_url=action_url,
                            instance=instance,
                            resource=resource)
 
@@ -152,7 +154,7 @@ def resource_action(resource, action, **kwargs):
         else:
             abort(404)
     kwargs['action'] = action
-    if resource in ['order']:
+    if resource in ['gateway', 'network', 'order']:
         action_url = url_for('%s.action' % resource, **kwargs)
     else:
         action_url = url_for('.%s_action' % resource, **kwargs)
@@ -166,47 +168,6 @@ def resource_action(resource, action, **kwargs):
 def set_locale_choices(form):
     form.locale.choices = [(id, title) for id, title in constants.LOCALES.items()]
     form.timezone.choices = [(timezone, timezone) for timezone in common_timezones]
-
-
-@bp.route('/network', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('network-admin')
-@register_menu(
-    bp,
-    '.network',
-    'My Network',
-    visible_when=has_role('network-admin'),
-    order=110
-)
-def my_network():
-    form = NetworkForm(obj=current_user.network)
-    if form.validate_on_submit():
-        form.populate_obj(current_user.network)
-        db.session.commit()
-        flash('Update successful')
-        return redirect('/')
-    return render_template('network/current.html',
-                           form=form,
-                           instance=current_user.network)
-
-
-@bp.route('/gateway', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('gateway-admin')
-@register_menu(
-    bp,
-    '.gateway',
-    'My Gateway',
-    visible_when=has_role('gateway-admin'),
-    order=120
-)
-def my_gateway():
-    gateway = current_user.gateway
-    return _gateway_edit(
-        gateway,
-        'My Gateway',
-        url_for('.my_gateway')
-    )
 
 
 @bp.route('/user', methods=['GET', 'POST'])
@@ -232,117 +193,6 @@ def my_account():
     return render_template('user/current.html',
                            form=form,
                            instance=current_user)
-
-
-@bp.route('/networks')
-@login_required
-@roles_accepted('super-admin')
-@register_menu(
-    bp,
-    'networks',
-    'Networks',
-    visible_when=has_role('super-admin'),
-    order=85
-)
-def network_index():
-    return resource_index('network')
-
-
-@bp.route('/networks/new', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin')
-def network_new():
-    form = NetworkForm()
-    return resource_new('network', form)
-
-
-@bp.route('/networks/<id>', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin')
-def network_edit(id):
-    return resource_edit('network', NetworkForm, id=id)
-
-
-@bp.route('/networks/<id>/delete', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin')
-def network_delete(id):
-    return resource_delete('network', id=id)
-
-
-@bp.route('/gateways')
-@login_required
-@roles_accepted('super-admin', 'network-admin')
-@register_menu(
-    bp,
-    'gateways',
-    'Gateways',
-    visible_when=has_role('super-admin', 'network-admin'),
-    order=87
-)
-def gateway_index():
-    return resource_index('gateway')
-
-
-def handle_logo(form):
-    if request.files['logo']:
-        filename = form.logo.data = logos.save(request.files['logo'], name='%s.' % form.id.data)
-        im = Image.open(logos.path(filename))
-        im.thumbnail((300, 300), Image.ANTIALIAS)
-        im.save(logos.path(filename))
-    else:
-        del form.logo
-
-
-@bp.route('/gateways/new', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin')
-def gateway_new():
-    form = GatewayForm()
-    if form.validate_on_submit():
-        handle_logo(form)
-        gateway = Gateway()
-        form.populate_obj(gateway)
-        db.session.add(gateway)
-        db.session.commit()
-        flash('Create %s successful' % gateway)
-        return redirect(url_for('.gateway_index'))
-    return render_template('gateway/new.html', form=form)
-
-
-def _gateway_edit(gateway, page_title, action_url):
-    form = GatewayForm(obj=gateway)
-    if form.validate_on_submit():
-        handle_logo(form)
-        form.populate_obj(gateway)
-        db.session.commit()
-        flash('Update %s successful' % gateway)
-        return redirect(url_for('.home'))
-    return render_template('gateway/edit.html',
-                           action_url=action_url,
-                           form=form,
-                           instance=gateway,
-                           logos=logos,
-                           page_title=page_title)
-
-
-@bp.route('/gateways/<id>', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin')
-def gateway_edit(id):
-    gateway = Gateway.query.filter_by(id=id).first_or_404()
-    return _gateway_edit(
-        gateway,
-        'Edit Gateway',
-        url_for('.gateway_edit', id=id)
-    )
-
-
-@bp.route('/gateways/<id>/delete', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin')
-def gateway_delete(id):
-    return resource_delete('gateway', id=id)
 
 
 @bp.route('/users')

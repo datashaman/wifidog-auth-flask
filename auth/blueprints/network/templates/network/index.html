@@ -2,7 +2,7 @@
 
 {% set page_title = 'Networks' %}
 {% set new_title = 'New Network' %}
-{% set new_url = url_for('.network_new') %}
+{% set new_url = url_for('.new') %}
 
 {% block content %}
     <div class="content">
@@ -22,14 +22,14 @@
                 <tbody>
                     {% for instance in pagination.items %}
                     <tr data-id={{ instance.id }} class="network {{ 'pure-table-' + loop.cycle('odd', 'even') }}">
-                        <td data-label="ID"><a href="{{ url_for('.network_edit', id=instance.id) }}">{{ instance.id }}</a></td>
+                        <td data-label="ID"><a href="{{ url_for('.edit', id=instance.id) }}">{{ instance.id }}</a></td>
                         <td data-label="Title">{{ instance.title | default('-') }}</td>
                         <td data-label="Description">{{ instance.description | default('-') }}</td>
                         <td data-label="Created At">{{ instance.created_at | datetimeformat('short') }}</td>
 
                         <td class="actions actions-instance">
                             <div class="pure-button-group" role="group" aria-label="Actions Available">
-                                <a href="{{ url_for('.network_delete', id=instance.id) }}" class="pure-button">
+                                <a href="{{ url_for('.delete', id=instance.id) }}" class="pure-button">
                                     <span class="oi" data-glyph="x" title="Delete" aria-hidden="true"></span>
                                     Delete
                                 </a>

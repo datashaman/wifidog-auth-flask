@@ -8,7 +8,10 @@ import logging
 import os
 
 from auth import constants
-from auth.blueprints import order
+from auth.blueprints import \
+        gateway, \
+        network, \
+        order
 from auth.models import db, Processor, users
 from auth.processors import init_processors
 from auth.services import login_manager, logos, mail, menu, security
@@ -70,6 +73,8 @@ def create_app(config=None):
     configure_uploads(app, (logos,))
 
     app.register_blueprint(bp)
+    app.register_blueprint(gateway, url_prefix='/gateways')
+    app.register_blueprint(network, url_prefix='/networks')
     app.register_blueprint(order, url_prefix='/orders')
 
     babel = Babel(app)
