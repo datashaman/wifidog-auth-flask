@@ -5,15 +5,15 @@
 
 {% block content %}
     <div class="order-cash content">
-        <form method="post" action="{{ url_for('.order_pay', hash=order.hash, processor_id='cash') }}" class="pure-form pure-form-aligned">
+        <form method="post" action="{{ url_for('order.pay', hash=order.hash, processor_id='cash') }}" class="pure-form pure-form-aligned">
             {{ form.csrf_token }}
 
             <fieldset>
                 <div class="pure-controls">
                     <ul>
-                        <li>Total: {{ render_currency_amount(order.currency, order.total_amount) }}</li>
-                        <li>Paid: {{ render_currency_amount(order.currency, order.paid_amount) }}</li>
-                        <li>Owed: {{ render_currency_amount(order.currency, order.owed_amount) }}</li>
+                        <li>Total: {{ order.currency.render_amount(order.total_amount) }}</li>
+                        <li>Paid: {{ order.currency.render_amount(order.paid_amount) }}</li>
+                        <li>Owed: {{ order.currency.render_amount(order.owed_amount) }}</li>
                     </ul>
                 </div>
 

@@ -8,10 +8,10 @@ import logging
 import os
 
 from auth import constants
+from auth.blueprints import order
 from auth.models import db, Processor, users
 from auth.processors import init_processors
 from auth.services import login_manager, logos, mail, menu, security
-from auth.utils import render_currency_amount
 from auth.views import bp
 from flask import Flask, render_template, request
 from flask_babelex import Babel
@@ -68,7 +68,9 @@ def create_app(config=None):
     menu.init_app(app)
     security.init_app(app, users)
     configure_uploads(app, (logos,))
+
     app.register_blueprint(bp)
+    app.register_blueprint(order, url_prefix='/orders')
 
     babel = Babel(app)
 
@@ -102,8 +104,7 @@ def create_app(config=None):
                     f=fields,
                     international_processors=lambda: Processor.query
                                                               .filter_by(international=True, active=True)
-                                                              .all(),
-                    render_currency_amount=render_currency_amount)
+                                                              .all())
 
     @app.errorhandler(403)
     def error_handler_403(error):

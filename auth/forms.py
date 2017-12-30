@@ -330,14 +330,10 @@ class SelectNetworkGatewayForm(FlaskForm):
 
 class FilterForm(FlaskForm):
     def filter_query(self, query):
-        filters = {}
-        if hasattr(self.meta, 'filters'):
-            filters = self.meta.filters
-
         for k, v in self.data.items():
             if v:
-                if k in filters:
-                    query = filters['k'](query, k, v)
+                if hasattr(self, 'filter_%s' % k):
+                    query = getattr(self, 'filter_%s' % k)(query, k, v)
                 else:
                     query = query.filter_by(**{k: v})
         return query
@@ -351,11 +347,11 @@ class TransactionFilterForm(FilterForm):
     created_from = f.TextField('Created From')
     created_to = f.TextField('Created To')
 
-    class Meta:
-        filters = {
-            'created_from': lambda q, k, v: q.filter(Transaction.created_at >= v),
-            'created_to': lambda q, k, v: q.filter(Transaction.created_at < v),
-        }
+    def filter_created_from(self, q, k, v):
+        return q.filter(Transaction.created_at >= v)
+
+    def filter_created_to(self, q, k, v):
+        return q.filter(Transaction.created_at < v)
 
 
 class UserFilterForm(FilterForm):

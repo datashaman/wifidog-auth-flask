@@ -1,5 +1,6 @@
 from babel.dates import format_datetime
-from flask import current_user, render_template
+from flask import render_template
+from flask_security import current_user
 
 
 class Grid(object):

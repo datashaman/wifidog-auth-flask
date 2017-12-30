@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="content">
-        <form method="post" action={{ url_for('.order_new') }} class="order-item pure-form pure-form-aligned">
+        <form method="post" action={{ url_for('.new') }} class="order-item pure-form pure-form-aligned">
             {% include 'order/_form.html' %}
         </form>
     </div>

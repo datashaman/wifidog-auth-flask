@@ -28,11 +28,11 @@
     </div>
 
     <div>
-        <strong>VAT Amount</strong> {{ render_currency_amount(order.currency, order.vat_amount) }}
+        <strong>VAT Amount</strong> {{ order.currency.render_amount(order.vat_amount) }}
     </div>
 
     <div>
-        <strong>Total Amount</strong> {{ render_currency_amount(order.currency, order.total_amount) }}
+        <strong>Total Amount</strong> {{ order.currency.render_amount(order.total_amount) }}
     </div>
 
     <h3>
@@ -67,7 +67,7 @@
         <ul>
             {% for transaction in order.transactions %}
             <li>
-                <a href="{{ url_for('.transaction_show', hash=transaction.hash) }}">{{ transaction }}</a> - {{ transaction.type[0].upper() + transaction.type[1:] }} {{ transaction.status }} for {{ render_currency_amount(transaction.currency, transaction.total_amount) }} via {{ transaction.processor }}.
+                <a href="{{ url_for('auth.transaction_show', hash=transaction.hash) }}">{{ transaction }}</a> - {{ transaction.type[0].upper() + transaction.type[1:] }} {{ transaction.status }} for {{ transaction.currency.render_amount(transaction.total_amount) }} via {{ transaction.processor }}.
             </li>
             {% endfor %}
         </ul>

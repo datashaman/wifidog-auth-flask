@@ -3,7 +3,7 @@
 
 {% set page_title = 'Orders' %}
 {% set new_title = 'New Order' %}
-{% set new_url = url_for('.order_new') %}
+{% set new_url = url_for('.new') %}
 
 {% set show_network = current_user.has_role('super-admin') %}
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
@@ -23,11 +23,11 @@
 
                     {{ form.user() }}
                     {{ form.status() }}
-                    {{ form.created_from(placeholder='Created From') }}
-                    {{ form.created_to(placeholder='Created To') }}
+                    {{ form.created_from() }}
+                    {{ form.created_to() }}
 
                     <button type="submit" class="pure-button pure-button-primary">Filter</button>
-                    <a href="{{ url_for('.order_index') }}" class="pure-button">Clear</a>
+                    <a href="{{ url_for('.index') }}" class="pure-button">Clear</a>
                 </form>
             </fieldset>
         </form>
@@ -55,7 +55,7 @@
                     {% for instance in pagination.items %}
                     <tr data-id={{ instance.id }} class="order table-{{ instance.class_hint }}">
                         <td data-label="ID">
-                            <a href="{{ url_for('.order_edit', hash=instance.hash) }}">{{ instance }}</a><br/>
+                            <a href="{{ url_for('.edit', hash=instance.hash) }}">{{ instance }}</a><br/>
                             {{ instance.hash }}
                         </td>
                         {% if show_network or show_gateway %}
@@ -71,7 +71,7 @@
                         {% endif %}
                         <td data-label="User">{{ instance.user | default('-') }}</td>
                         <td data-label="Status">{{ instance.status }}</td>
-                        <td data-label="Total">{{ render_currency_amount(instance.network.currency, instance.total_amount) }}</td>
+                        <td data-label="Total">{{ instance.network.currency.render_amount(instance.total_amount) }}</td>
                         <td data-label="Created At">{{ instance.created_at | datetimeformat }}</td>
 
                         <td class="actions actions-instance">
@@ -82,7 +82,7 @@
                 </tbody>
             </table>
 
-            {{ render_pagination(pagination, '.order_index') }}
+            {{ render_pagination(pagination, '.index') }}
         {% endif %}
     </div>
 {% endblock %}

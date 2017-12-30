@@ -11,7 +11,7 @@
 
         <tbody>
             <tr><th>Direction</th><td>{{ adjustment.direction }}</td></tr>
-            <tr><th>Amount</th><td>{{ render_currency_amount(adjustment.currency, adjustment.amount) }}</td></tr>
+            <tr><th>Amount</th><td>{{ adjustment.currency.render_amount(adjustment.amount) }}</td></tr>
             <tr><th>Reason</th><td>{{ adjustment.reason }}</td></tr>
             <tr><th>Reference</th><td>{{ adjustment.reference_number }}</td></tr>
             <tr>

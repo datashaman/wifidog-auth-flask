@@ -11,9 +11,9 @@
 
         <tbody>
             {% if transaction.tip_amount %}
-            <tr><th>Tip</th><td>{{ render_currency_amount(transaction.currency, transaction.tip_amount) }}</td></tr>
+            <tr><th>Tip</th><td>{{ transaction.currency.render_amount(transaction.tip_amount) }}</td></tr>
             {% endif %}
-            <tr><th>Total</th><td>{{ render_currency_amount(transaction.currency, transaction.total_amount) }}</td></tr>
+            <tr><th>Total</th><td>{{ transaction.currency.render_amount(transaction.total_amount) }}</td></tr>
             <tr><th>Description</th><td>{{ transaction.description }}</td></tr>
         </tbody>
 
@@ -32,7 +32,7 @@
                     {% endif %}
                 </td>
             </tr>
-            <tr><th>Order</th><td><a href="{{ url_for('.order_edit', hash=transaction.order.hash) }}">{{ transaction.order }}</a></td></tr>
+            <tr><th>Order</th><td><a href="{{ url_for('order.edit', hash=transaction.order.hash) }}">{{ transaction.order }}</a></td></tr>
             <tr><th>Processor</th><td>{{ transaction.processor }}</td></tr>
             <tr><th>Reference</th><td>{{ transaction.processor_reference }}</td></tr>
             <tr><th>Status</th><td>{{ transaction.status }}</td></tr>

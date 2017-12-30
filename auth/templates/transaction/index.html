@@ -75,7 +75,7 @@
                         {% endif %}
                         <td data-label="Order">
                             {% if instance.order.hash %}
-                                <a href="{{ url_for('.order_edit', hash=instance.order.hash) }}">{{ instance.order }}</a></td>
+                                <a href="{{ url_for('order.edit', hash=instance.order.hash) }}">{{ instance.order }}</a></td>
                             {% else %}
                                 None
                             {% endif %}
@@ -83,9 +83,9 @@
                         <td data-label="Processor">{{ instance.processor }}</td>
                         <td data-label="Status">{{ instance.status }}</td>
                         <td data-label="Tip / Total">
-                            {{ render_currency_amount(instance.currency, instance.tip_amount) if instance.tip_amount else None }}
+                            {{ instance.currency.render_amount(instance.tip_amount) if instance.tip_amount else None }}
                             /
-                            {{ render_currency_amount(instance.currency, instance.total_amount) }}
+                            {{ instance.currency.render_amount(instance.total_amount) }}
                         </td>
                         <td data-label="Created At">{{ instance.created_at | datetimeformat('short') }}</td>
                     </tr>

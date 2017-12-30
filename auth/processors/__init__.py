@@ -2,8 +2,7 @@ import sys
 
 from auth.models import Order, Processor, Transaction, Voucher
 from auth.services import db
-from auth.utils import render_currency_amount
-from flask import current_app, flash
+from flask import flash
 from flask_security import current_user
 
 
@@ -26,7 +25,9 @@ def flash_transaction(transaction):
     if order.owed_amount == 0:
         flash('Paid %s' % order)
     else:
-        flash('Still owed %s on %s' % ( render_currency_amount(order.currency, order.owed_amount), order), 'warning')
+        flash('Still owed %s on %s' %
+              (order.currency.render_amount(order.owed_amount), order),
+              'warning')
 
 
 def update_transaction(id, response):

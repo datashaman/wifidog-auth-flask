@@ -7,7 +7,7 @@ import sqlalchemy.types as types
 
 from auth.graphs import graphs
 from auth.services import db
-from auth.utils import render_currency_amount, generate_code, generate_order_hash, generate_uuid
+from auth.utils import generate_code, generate_order_hash, generate_uuid
 from decimal import Decimal
 from flask import current_app
 from flask_security import UserMixin, RoleMixin, current_user, SQLAlchemyUserDatastore
@@ -461,8 +461,7 @@ class Product(db.Model):
 
     def __str__(self):
         return '%s %s%s' % (self.title,
-                            render_currency_amount(self.network.currency,
-                                                   self.price),
+                            self.network.currency.render_amount(self.price),
                             ' %s' % self.unit if self.unit else '')
 
     def __getattr__(self, name):

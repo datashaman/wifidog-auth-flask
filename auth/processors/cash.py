@@ -40,7 +40,7 @@ def pay_order(order):
         }
         transaction = update_transaction('cash', response)
         flash_transaction(transaction)
-        return redirect(url_for('.order_index'))
+        return redirect(url_for('order.index'))
     return render_template('order/cash.html', form=form, order=order)
 
 

@@ -12,14 +12,19 @@
                 <ul class="pure-menu-children">
                     {% for processor in international_processors() + instance.gateway.country.processors if processor.active %}
                     <li class="pure-menu-item">
-                        <a href="{{ url_for('.order_pay', hash=instance.hash, processor_id=processor.id) }}" class="pure-menu-link">{{ processor.title }}</a>
+                        <a href="{{ url_for('order.pay', hash=instance.hash, processor_id=processor.id) }}" class="pure-menu-link">{{ processor.title }}</a>
                     </li>
                     {% endfor %}
                 </ul>
             </li>
         {% else %}
+            {% if resource in ['order'] %}
+            {% set endpoint = '%s.action' % resource %}
+            {% else %}
+            {% set endpoint = '.%s_action' % resource %}
+            {% endif %}
             <li class="pure-menu-item">
-                <a href="{{ url_for('.%s_action' % resource, hash=instance.hash, action=action) }}" class="pure-menu-link" title="{{ action }}">
+                <a href="{{ url_for(endpoint, hash=instance.hash, action=action) }}" class="pure-menu-link" title="{{ action }}">
                     {% if defn.icon %}
                     <span class="oi" data-glyph={{ defn.icon }} aria-hidden="true"></span>
                     {% endif %}

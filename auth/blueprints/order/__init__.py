@@ -32,7 +32,7 @@ from wtforms import fields as f, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 
-order = Blueprint('order', __name__)
+order = Blueprint('order', __name__, template_folder='templates')
 
 
 def status_choices():
@@ -57,10 +57,10 @@ class OrderFilterForm(FilterForm):
     created_from = f.TextField('Created From')
     created_to = f.TextField('Created To')
 
-    def created_from(self, q, k, v):
+    def filter_created_from(self, q, k, v):
         return q.filter(Order.created_at >= v)
 
-    def created_to(self, q, k, v):
+    def filter_created_to(self, q, k, v):
         return q.filter(Order.created_at < v)
 
 
@@ -84,13 +84,13 @@ class OrderGrid(Grid):
 
     def id(self, order):
         return '<a href="%s">%s</a><br/> %s' % \
-                (url_for('.order_edit', hash=order.hash), order, order.hash)
+                (url_for('.edit', hash=order.hash), order, order.hash)
 
     def total(self, order):
         return order.network.currency.render_amount(order.total_amount)
 
 
-@order.route('/orders')
+@order.route('/')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 @register_menu(
@@ -99,9 +99,9 @@ class OrderGrid(Grid):
     'Orders',
     visible_when=has_admin_role,
     order=36,
-    new_url=lambda: url_for('auth.order_new')
+    new_url=lambda: url_for('order.new')
 )
-def order_index():
+def index():
     return resource_index('order', OrderFilterForm(formdata=request.args))
 
 
@@ -133,10 +133,10 @@ def _gateway_choices():
     return choices
 
 
-@order.route('/orders/new', methods=['GET', 'POST'])
+@order.route('/new', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def order_new():
+def new():
     form = OrderForm()
 
     show_gateway = current_user.has_role('super-admin') or \
@@ -175,7 +175,7 @@ def order_new():
         db.session.commit()
 
         flash('Create %s successful' % order)
-        return redirect(url_for('.order_edit', hash=order.hash))
+        return redirect(url_for('.edit', hash=order.hash))
 
     # TODO This should be a union of global products,
     # then network then gateway
@@ -193,10 +193,10 @@ def order_new():
                            prices=prices)
 
 
-@order.route('/orders/<hash>', methods=['GET', 'POST'])
+@order.route('/<hash>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def order_edit(hash):
+def edit(hash):
     order = resource_instance('order', hash=hash)
 
     if order.status == 'new':
@@ -230,7 +230,7 @@ def order_edit(hash):
             db.session.commit()
 
             flash('Create %s successful' % order)
-            return redirect(url_for('.order_edit', hash=order.hash))
+            return redirect(url_for('.edit', hash=order.hash))
 
         prices = dict((p.id, p.price) for p in Product.query.all())
         price = '%.2f' % (list(prices.values())[0])
@@ -245,17 +245,17 @@ def order_edit(hash):
     return render_template('order/show.html', order=order)
 
 
-@order.route('/orders/<id>/delete', methods=['GET', 'POST'])
+@order.route('/<hash>/delete', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def order_delete(id):
-    return resource_delete('order', id=id)
+def delete(hash):
+    return resource_delete('order', hash=hash)
 
 
-@order.route('/order-items/<int:id>/<action>', methods=['GET'])
+@order.route('/items/<int:id>/<action>', methods=['GET'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def order_item_action(id, action):
+def item_action(id, action):
     order_item = OrderItem.query.filter_by(id=id).first_or_404()
     order_item_label = str(order_item)
     order = order_item.order
@@ -270,18 +270,18 @@ def order_item_action(id, action):
 
     flash('%s %s successful' %
           (action[0].upper() + action[1:], order_item_label))
-    return redirect(url_for('.order_edit', hash=order.hash))
+    return redirect(url_for('.edit', hash=order.hash))
 
 
-@order.route('/orders/<hash>/pay/<processor_id>', methods=['GET', 'POST'])
-def order_pay(hash, processor_id):
+@order.route('/<hash>/pay/<processor_id>', methods=['GET', 'POST'])
+def pay(hash, processor_id):
     order = resource_instance('order', hash=hash)
     processor = resource_instance('processor', id=processor_id)
     return processor.pay_order(order)
 
 
-@order.route('/orders/<hash>/<action>', methods=['GET', 'POST'])
+@order.route('/<hash>/<action>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def order_action(hash, action):
+def action(hash, action):
     return resource_action('order', action, hash=hash)

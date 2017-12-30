@@ -21,8 +21,6 @@ from auth.forms import \
     MyUserForm, \
     NetworkForm, \
     NewVoucherForm, \
-    OrderForm, \
-    OrderFilterForm, \
     ProductForm, \
     SelectCategoryForm, \
     SelectNetworkGatewayForm, \
@@ -154,7 +152,10 @@ def resource_action(resource, action, **kwargs):
         else:
             abort(404)
     kwargs['action'] = action
-    action_url = url_for('.%s_action' % resource, **kwargs)
+    if resource in ['order']:
+        action_url = url_for('%s.action' % resource, **kwargs)
+    else:
+        action_url = url_for('.%s_action' % resource, **kwargs)
     return render_template('shared/action.html',
                            action=action,
                            action_url=action_url,
