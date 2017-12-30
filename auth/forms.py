@@ -238,13 +238,6 @@ NetworkForm = model_form(
 )
 
 
-class OrderForm(FlaskForm):
-    gateway = f.SelectField('Gateway', default=lambda: current_user.gateway)
-    product = QuerySelectField('Product', query_factory=instances('product'))
-    quantity = f.IntegerField('Quantity', default=1)
-    price = f.DecimalField('Price', [validators.Required()])
-
-
 ProductForm = model_form(
     Product,
     db.session,
@@ -348,21 +341,6 @@ class FilterForm(FlaskForm):
                 else:
                     query = query.filter_by(**{k: v})
         return query
-
-
-class OrderFilterForm(FilterForm):
-    network = QuerySelectField('Network', allow_blank=True, query_factory=instances('network'), blank_text='Select Network')
-    gateway = QuerySelectField('Gateway', allow_blank=True, query_factory=instances('gateway'), blank_text='Select Gateway')
-    user = QuerySelectField('User', allow_blank=True, query_factory=instances('user'), blank_text='Select User')
-    status = f.SelectField('Status', default='', choices=[('', 'Select Status')] + [(status, status) for status in graphs['order']['states'].keys()])
-    created_from = f.TextField('Created From')
-    created_to = f.TextField('Created To')
-
-    class Meta:
-        filters = {
-            'created_from': lambda q, k, v: q.filter(Order.created_at >= v),
-            'created_to': lambda q, k, v: q.filter(Order.created_at < v)
-        }
 
 
 class TransactionFilterForm(FilterForm):

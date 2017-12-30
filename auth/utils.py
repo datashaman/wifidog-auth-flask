@@ -1,22 +1,26 @@
 from __future__ import absolute_import
 
 import base64
-import random
 import re
 import string
 import uuid
 
-from flask import request
+from flask import request, session, url_for
 from flask_security import current_user
 from random import choice
 
 
-def is_logged_out():
-    return not current_user.is_authenticated
+def args_get(which):
+    def func():
+        value = request.args.get(which)
+        if value == '':
+            value = None
+        return value
+    return func
 
 
-def is_logged_in():
-    return current_user.is_authenticated
+def has_admin_role():
+    return has_role('super-admin', 'network-admin', 'gateway-admin')
 
 
 def has_role(*roles):
@@ -29,22 +33,19 @@ def has_role(*roles):
     return func
 
 
-def args_get(which):
-    def func():
-        value = request.args.get(which)
-        if value == '':
-            value = None
-        return value
-    return func
+def is_logged_in():
+    return current_user.is_authenticated
 
 
-def render_currency_amount(currency, amount):
-    if amount is None:
-        return 'None'
+def is_logged_out():
+    return not current_user.is_authenticated
 
-    return '%s%.2f%s' % (currency.prefix if currency.prefix else '',
-                       amount,
-                       currency.suffix if currency.suffix else '')
+
+def redirect_url():
+    return request.args.get('next') or \
+        session.get('next_url') or \
+        request.referrer or \
+        url_for('.home')
 
 
 chars = string.ascii_lowercase + string.digits

@@ -142,6 +142,14 @@ class Currency(db.Model):
     prefix = db.Column(db.String(10))
     suffix = db.Column(db.String(10))
 
+    def render_amount(self, amount):
+        if amount is None:
+            return 'None'
+
+        return '%s%.2f%s' % (self.prefix if self.prefix else '',
+                             amount,
+                             self.suffix if self.suffix else '')
+
     def __str__(self):
         return self.title
 
