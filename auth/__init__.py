@@ -41,9 +41,14 @@ from wtforms import fields
 
 def create_app(config=None):
     """ Create app """
-    instance_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'instance')
+    instance_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'instance')
 
-    app = Flask(__name__, instance_path=instance_path, instance_relative_config=True)
+    app = Flask(__name__,
+                instance_path=instance_path,
+                instance_relative_config=True)
+
     env = os.environ.get('FLASK_ENV')
     if not env:
         raise Exception('FLASK_ENV is not set')
@@ -123,7 +128,8 @@ def create_app(config=None):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1"
         if 'Cache-Control' not in response.headers:
-            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Cache-Control"] = \
+                    "no-cache, no-store, must-revalidate"
         response.headers["Pragma"] = "no-cache"
         return response
 
@@ -133,8 +139,8 @@ def create_app(config=None):
         return dict(constants=constants,
                     f=fields,
                     international_processors=lambda: Processor.query
-                                                              .filter_by(international=True, active=True)
-                                                              .all())
+                    .filter_by(international=True, active=True)
+                    .all())
 
     @app.errorhandler(403)
     def error_handler_403(error):
