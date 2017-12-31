@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
-from auth.graphs import graphs
-from auth.models import db, Adjustment, Cashup, Country, Currency, Transaction
+from auth.models import db, Adjustment
 from auth.resources import resource_query
 from flask_wtf import FlaskForm
 from wtforms import fields as f, validators
@@ -45,41 +44,6 @@ AdjustmentForm = model_form(
 )
 
 
-CashupForm = model_form(
-    Cashup,
-    db.session,
-    FlaskForm,
-    exclude=[
-        'adjustments',
-        'created_at',
-        'transactions',
-        'user',
-    ]
-)
-
-
-CurrencyForm = model_form(
-    Currency,
-    db.session,
-    FlaskForm,
-    exclude=[
-        'adjustments',
-        'created_at',
-        'networks',
-        'orders',
-        'products',
-        'transactions',
-        'updated_at',
-    ],
-    exclude_pk=False,
-    field_args={
-        'id': {
-            'label': 'ID',
-        },
-    }
-)
-
-
 class BroadcastForm(FlaskForm):
     message = f.StringField('Message', [validators.InputRequired()])
 
@@ -97,18 +61,3 @@ class FilterForm(FlaskForm):
                 else:
                     query = query.filter_by(**{k: v})
         return query
-
-
-class TransactionFilterForm(FilterForm):
-    network = QuerySelectField('Network', allow_blank=True, query_factory=instances('network'), blank_text='Select Network')
-    gateway = QuerySelectField('Gateway', allow_blank=True, query_factory=instances('gateway'), blank_text='Select Gateway')
-    user = QuerySelectField('User', allow_blank=True, query_factory=instances('user'), blank_text='Select User')
-    status = f.SelectField('Status', default='', choices=[('', 'Select Status')] + [(status, status) for status in graphs['order']['states'].keys()])
-    created_from = f.StringField('Created From')
-    created_to = f.StringField('Created To')
-
-    def filter_created_from(self, q, k, v):
-        return q.filter(Transaction.created_at >= v)
-
-    def filter_created_to(self, q, k, v):
-        return q.filter(Transaction.created_at < v)

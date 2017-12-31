@@ -2,7 +2,7 @@
 
 {% set page_title = 'Cashups' %}
 {% set new_title = 'New Cashup' %}
-{% set new_url = url_for('.cashup_new') %}
+{% set new_url = url_for('.new') %}
 
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
 
@@ -27,7 +27,7 @@
                 <tbody>
                     {% for instance in pagination.items %}
                     <tr data-id={{ instance.id }} class="cashup {{ 'pure-table-' + loop.cycle('odd', 'even') }}">
-                        <td data-label="ID"><a href="{{ url_for('.cashup_show', id=instance.id) }}">{{ instance }}</a></td>
+                        <td data-label="ID"><a href="{{ url_for('.show', id=instance.id) }}">{{ instance }}</a></td>
                         {% if show_gateway %}
                         <td data-label="Gateway">
                             {{ instance.gateway }}

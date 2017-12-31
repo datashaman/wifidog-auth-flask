@@ -67,7 +67,7 @@
         <ul>
             {% for transaction in order.transactions %}
             <li>
-                <a href="{{ url_for('auth.transaction_show', hash=transaction.hash) }}">{{ transaction }}</a> - {{ transaction.type[0].upper() + transaction.type[1:] }} {{ transaction.status }} for {{ transaction.currency.render_amount(transaction.total_amount) }} via {{ transaction.processor }}.
+                <a href="{{ url_for('transaction.show', hash=transaction.hash) }}">{{ transaction }}</a> - {{ transaction.type[0].upper() + transaction.type[1:] }} {{ transaction.status }} for {{ transaction.currency.render_amount(transaction.total_amount) }} via {{ transaction.processor }}.
             </li>
             {% endfor %}
         </ul>

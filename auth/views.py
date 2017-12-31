@@ -8,18 +8,9 @@ from __future__ import division
 import os
 
 from auth import constants
+from auth.forms import AdjustmentForm
 
-from auth.forms import \
-    AdjustmentForm, \
-    CashupForm, \
-    CurrencyForm, \
-    TransactionFilterForm
-
-from auth.models import \
-    Adjustment, \
-    Cashup, \
-    Transaction, \
-    db
+from auth.models import Adjustment, db
 
 from auth.resources import \
         resource_instance, \
@@ -28,7 +19,7 @@ from auth.resources import \
 from auth.services import \
         environment_dump, \
         healthcheck as healthcheck_service
-from auth.utils import has_role, redirect_url
+from auth.utils import has_role
 
 from flask import \
     Blueprint, \
@@ -59,6 +50,7 @@ def resource_url_for(resource, verb, **kwargs):
     if resource in [
         'category',
         'country',
+        'currency',
         'gateway',
         'network',
         'order',
@@ -152,142 +144,6 @@ def resource_action(resource, action, **kwargs):
                                                        **kwargs),
                            instance=instance,
                            resource=resource)
-
-
-@bp.route('/currencies')
-@login_required
-@roles_accepted('super-admin')
-@register_menu(
-    bp,
-    'currencies',
-    'Currencies',
-    visible_when=has_role('super-admin'),
-    order=84
-)
-def currency_index():
-    return resource_index('currency')
-
-
-@bp.route('/currencies/new', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def currency_new():
-    form = CurrencyForm()
-    return resource_new('currency', form)
-
-
-@bp.route('/currencies/<id>/delete', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def currency_delete(id):
-    return resource_delete('currency', id=id)
-
-
-@bp.route('/currencies/<id>', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def currency_edit(id):
-    return resource_edit('currency', CurrencyForm, id=id)
-
-
-@bp.route('/cashups')
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(
-    bp,
-    'cashups',
-    'Cashups',
-    visible_when=has_admin_role(),
-    order=60,
-    new_url=lambda: url_for('auth.cashup_new')
-)
-def cashup_index():
-    return resource_index('cashup')
-
-
-@bp.route('/cashups/new', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def cashup_new():
-    if Transaction.query.filter_by(cashup=None).count() == 0 \
-            and Adjustment.query.filter_by(cashup=None).count() == 0:
-        flash('No new transactions or adjustments since last cashup',
-              'warning')
-        return redirect(redirect_url())
-
-    form = CashupForm(data={'user': current_user})
-
-    gateway_admin = current_user.has_role('gateway-admin')
-
-    if gateway_admin:
-        del form.gateway
-
-    if form.validate_on_submit():
-        cashup = Cashup()
-        cashup.gateway = current_user.gateway \
-            if gateway_admin else form.gateway.data
-        cashup.user = current_user
-        form.populate_obj(cashup)
-        db.session.add(cashup)
-        db.session.commit()
-
-        for adjustment in cashup.gateway.adjustments \
-                .filter(Adjustment.created_at < cashup.created_at,
-                        Adjustment.cashup is None):
-            cashup.adjustments.append(adjustment)
-        for transaction in cashup.gateway.transactions \
-                .filter(Transaction.created_at < cashup.created_at,
-                        Transaction.cashup is None):
-            cashup.transactions.append(transaction)
-        db.session.commit()
-
-        flash('Create %s successful' % cashup)
-        return redirect(url_for('.cashup_index'))
-    return render_template('cashup/new.html', form=form)
-
-
-@bp.route('/cashups/<id>/delete', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def cashup_delete(id):
-    return resource_delete('cashup', id=id)
-
-
-@bp.route('/cashups/<id>', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def cashup_show(id):
-    return resource_show('cashup', id=id)
-
-
-@bp.route('/transactions')
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(
-    bp,
-    'transactions',
-    'Transactions',
-    visible_when=has_admin_role(),
-    order=45
-)
-def transaction_index():
-    return resource_index('transaction',
-                          TransactionFilterForm(formdata=request.args))
-
-
-@bp.route('/transactions/<hash>')
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def transaction_show(hash):
-    transaction = Transaction.query.filter_by(hash=hash).first_or_404()
-    return render_template('transaction/show.html', transaction=transaction)
-
-
-@bp.route('/transactions/<hash>/<action>', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def transaction_action(hash, action):
-    return resource_action('transaction', action, hash=hash)
 
 
 @bp.route('/adjustments')

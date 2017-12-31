@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="content">
-        <form method="post" action={{ url_for('.currency_new') }} class="pure-form pure-form-aligned">
+        <form method="post" action={{ url_for('.new') }} class="pure-form pure-form-aligned">
             {{ form.csrf_token }}
             {% include 'currency/_form.html' %}
         </form>

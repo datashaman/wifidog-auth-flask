@@ -9,12 +9,15 @@ import os
 
 from auth import constants
 from auth.blueprints import \
+    cashup, \
     category, \
     country, \
+    currency, \
     gateway, \
     network, \
     order, \
     product, \
+    transaction, \
     user, \
     voucher, \
     wifidog
@@ -84,12 +87,15 @@ def create_app(config=None):
     configure_uploads(app, (logos,))
 
     app.register_blueprint(bp)
+    app.register_blueprint(cashup, url_prefix='/cashups')
     app.register_blueprint(category, url_prefix='/categories')
     app.register_blueprint(country, url_prefix='/countries')
+    app.register_blueprint(currency, url_prefix='/currencies')
     app.register_blueprint(gateway, url_prefix='/gateways')
     app.register_blueprint(network, url_prefix='/networks')
     app.register_blueprint(order, url_prefix='/orders')
     app.register_blueprint(product, url_prefix='/products')
+    app.register_blueprint(transaction, url_prefix='/transactions')
     app.register_blueprint(user, url_prefix='/users')
     app.register_blueprint(voucher, url_prefix='/vouchers')
     app.register_blueprint(wifidog, url_prefix='/wifidog')

@@ -18,7 +18,7 @@
                 <th>User</th>
                 <td>
                     {% if adjustment.user %}
-                    <a href="{{ url_for('.user_edit', id=adjustment.user_id) }}">{{ adjustment.user }}</a>
+                    <a href="{{ url_for('user.edit', id=adjustment.user_id) }}">{{ adjustment.user }}</a>
                     {% else %}
                     {{ adjustment.user }}
                     {% endif %}
@@ -28,7 +28,7 @@
                 <th>Cashup</th>
                 <td>
                     {% if adjustment.cashup %}
-                    <a href="{{ url_for('.cashup_show', id=adjustment.cashup.id) }}">{{ adjustment.cashup }}</a>
+                    <a href="{{ url_for('cashup.show', id=adjustment.cashup_id) }}">{{ adjustment.cashup }}</a>
                     {% else %}
                     {{ adjustment.cashup }}
                     {% endif %}

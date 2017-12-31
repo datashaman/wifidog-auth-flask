@@ -40,7 +40,7 @@
                 <th>Cashup</th>
                 <td>
                     {% if transaction.cashup %}
-                    <a href="{{ url_for('.cashup_show', id=transaction.cashup.id) }}">{{ transaction.cashup }}</a>
+                    <a href="{{ url_for('.show', id=transaction.cashup.id) }}">{{ transaction.cashup }}</a>
                     {% else %}
                     {{ transaction.cashup }}
                     {% endif %}

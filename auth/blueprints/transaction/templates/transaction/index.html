@@ -24,7 +24,7 @@
                     {{ form.created_to(placeholder='Created To') }}
 
                     <button type="submit" class="pure-button pure-button-primary">Filter</button>
-                    <a href="{{ url_for('.transaction_index') }}" class="pure-button">Clear</a>
+                    <a href="{{ url_for('.index') }}" class="pure-button">Clear</a>
                 </form>
             </fieldset>
         </form>
@@ -54,7 +54,7 @@
                     {% for instance in pagination.items %}
                     <tr data-id={{ instance.id }} class="transaction table-{{ instance.class_hint }}">
                         <td data-label="ID">
-                            <a href="{{ url_for('.transaction_show', hash=instance.hash) }}">{{ instance }}</a><br/>
+                            <a href="{{ url_for('.show', hash=instance.hash) }}">{{ instance }}</a><br/>
                             {{ instance.hash }}
                         </td>
                         {% if show_network or show_gateway %}
@@ -69,7 +69,7 @@
                         </td>
                         {% endif %}
                         {% if instance.user %}
-                        <td data-label="User"><a href="{{ url_for('.user_edit', id=instance.user_id) }}">{{ instance.user }}</a></td>
+                        <td data-label="User"><a href="{{ url_for('user.edit', id=instance.user_id) }}">{{ instance.user }}</a></td>
                         {% else %}
                         <td data-label="User">{{ instance.user }}</td>
                         {% endif %}
