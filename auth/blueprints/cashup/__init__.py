@@ -77,11 +77,11 @@ def new():
 
         for adjustment in cashup.gateway.adjustments \
                 .filter(Adjustment.created_at < cashup.created_at,
-                        Adjustment.cashup is None):
+                        Adjustment.cashup == None):
             cashup.adjustments.append(adjustment)
         for transaction in cashup.gateway.transactions \
                 .filter(Transaction.created_at < cashup.created_at,
-                        Transaction.cashup is None):
+                        Transaction.cashup == None):
             cashup.transactions.append(transaction)
         db.session.commit()
 
