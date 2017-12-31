@@ -1,16 +1,12 @@
 from auth import constants
 from auth.forms import FilterForm, instances
-from auth.models import \
-    Role, \
-    User
+from auth.models import Role, User
 from auth.resources import \
     resource_delete, \
     resource_index, \
     resource_instance
 from auth.services import db
-from auth.utils import \
-    has_admin_role, \
-    is_logged_in
+from auth.utils import has_admin_role, is_logged_in
 from flask import \
     abort, \
     Blueprint, \
@@ -21,10 +17,7 @@ from flask import \
     request, \
     url_for
 from flask_menu import register_menu
-from flask_security import \
-    current_user, \
-    login_required, \
-    roles_accepted
+from flask_security import current_user, login_required, roles_accepted
 from flask_wtf import FlaskForm
 from pytz import common_timezones
 from wtforms import fields as f, validators

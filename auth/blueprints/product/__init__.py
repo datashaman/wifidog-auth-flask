@@ -1,4 +1,4 @@
-from auth.forms import instances, model_converter, model_form
+from auth.forms import instances, model_converter
 from auth.models import \
     Gateway, \
     Network, \
@@ -25,6 +25,7 @@ from flask_security import \
 from flask_wtf import FlaskForm
 from wtforms import fields as f, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.ext.sqlalchemy.orm import model_form
 
 
 product = Blueprint('product', __name__, template_folder='templates')

@@ -1,4 +1,4 @@
-from auth.forms import model_form, model_converter
+from auth.forms import model_converter
 from auth.models import Adjustment
 from auth.resources import \
     resource_delete, \
@@ -13,6 +13,7 @@ from flask_security import \
     login_required, \
     roles_accepted
 from flask_wtf import FlaskForm
+from wtforms.ext.sqlalchemy.orm import model_form
 
 
 adjustment = Blueprint('adjustment', __name__, template_folder='templates')

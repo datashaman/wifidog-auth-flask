@@ -1,4 +1,3 @@
-from auth.forms import model_form
 from auth.models import Country
 from auth.resources import \
     resource_delete, \
@@ -13,6 +12,7 @@ from flask_security import \
     login_required, \
     roles_accepted
 from flask_wtf import FlaskForm
+from wtforms.ext.sqlalchemy.orm import model_form
 
 
 country = Blueprint('country', __name__, template_folder='templates')

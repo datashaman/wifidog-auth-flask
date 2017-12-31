@@ -1,8 +1,6 @@
 import datetime
 
-from auth.models import \
-    Gateway, \
-    Voucher
+from auth.models import Gateway, Voucher
 from auth.services import db, logos
 from auth.utils import args_get, generate_uuid, redirect_url
 from auth.vouchers import process_auth
