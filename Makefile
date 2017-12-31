@@ -92,6 +92,7 @@ production-install:
 
 clean:
 	find . -name '*.pyc' -delete
+	find . -name '__pycache__' -delete
 	rm -rf auth/static/{fonts,scripts,styles}/* build/
 
 graphs:

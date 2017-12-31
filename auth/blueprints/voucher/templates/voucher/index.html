@@ -2,7 +2,7 @@
 
 {% set page_title = 'Vouchers' %}
 {% set new_title = 'New Voucher' %}
-{% set new_url = '/new-voucher' %}
+{% set new_url = url_for('.new') %}
 
 {% set show_network = current_user.has_role('super-admin') %}
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
