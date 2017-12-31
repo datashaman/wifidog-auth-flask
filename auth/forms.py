@@ -1,9 +1,8 @@
 from __future__ import absolute_import
 
 from auth.graphs import graphs
-from auth.models import db, Adjustment, Cashup, Category, Country, Currency, Gateway, GatewayType, Network, Order, Product, Role, SqliteDecimal, Transaction, Voucher
+from auth.models import db, Adjustment, Cashup, Country, Currency, Product, Transaction
 from auth.resources import resource_query
-from auth.utils import args_get
 from flask_security import current_user
 from flask_wtf import FlaskForm
 from wtforms import fields as f, validators
@@ -57,33 +56,6 @@ CashupForm = model_form(
         'transactions',
         'user',
     ]
-)
-
-
-CategoryForm = model_form(
-    Category,
-    db.session,
-    FlaskForm,
-    exclude=[
-        'children',
-        'created_at',
-        'products',
-        'read_only',
-        'status',
-        'sub_categories',
-        'updated_at',
-    ],
-    field_args={
-        'gateway': {
-            'default': lambda: current_user.gateway,
-            'query_factory': instances('gateway'),
-        },
-        'network': {
-            'default': lambda: current_user.network,
-            'query_factory': instances('network'),
-        }
-    },
-    converter=model_converter
 )
 
 

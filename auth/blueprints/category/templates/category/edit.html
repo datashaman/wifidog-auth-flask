@@ -1,10 +1,10 @@
 {% extends 'layouts/default.html' %}
 
-{% set page_title = 'New Category' %}
+{% set page_title = 'Edit Category' %}
 
 {% block content %}
     <div class="content">
-        <form method="post" action={{ url_for('.category_new') }} class="pure-form pure-form-aligned">
+        <form method="post" action={{ url_for('.edit', code=instance.code) }} class="pure-form pure-form-aligned">
             {{ form.csrf_token }}
             {% include 'category/_form.html' %}
         </form>

@@ -12,7 +12,6 @@ from auth import constants
 from auth.forms import \
     AdjustmentForm, \
     CashupForm, \
-    CategoryForm, \
     CountryForm, \
     CurrencyForm, \
     ProductForm, \
@@ -66,7 +65,14 @@ def has_admin_role():
 
 
 def resource_url_for(resource, verb, **kwargs):
-    if resource in ['gateway', 'network', 'order', 'user', 'voucher']:
+    if resource in [
+        'category',
+        'gateway',
+        'network',
+        'order',
+        'user',
+        'voucher',
+    ]:
         return url_for('%s.%s' % (resource, verb), **kwargs)
     else:
         return url_for('.%s_%s' % (resource, verb), **kwargs)
@@ -153,57 +159,6 @@ def resource_action(resource, action, **kwargs):
                                                        **kwargs),
                            instance=instance,
                            resource=resource)
-
-
-@bp.route('/categories')
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(
-    bp,
-    'categories',
-    'Categories',
-    visible_when=has_admin_role(),
-    order=70
-)
-def category_index():
-    return resource_index('category')
-
-
-@bp.route('/categories/sort', methods=['POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def category_sort():
-    content = request.get_json()
-    for category_id, sequence in content['sequences'].items():
-        category = Category.query.get_or_404(category_id)
-        category.sequence = sequence
-        db.session.commit()
-    return 'OK'
-
-
-@bp.route('/categories/new', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def category_new():
-    form = CategoryForm()
-    return resource_new('category', form)
-
-
-@bp.route('/categories/<code>/delete', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def category_delete(code):
-    return resource_delete('category', code=code)
-
-
-@bp.route('/categories/<code>', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def category_edit(code):
-    category = resource_instance('category', code=code)
-    if category.read_only:
-        return redirect(redirect_url())
-    return resource_edit('category', CategoryForm, code=code)
 
 
 @bp.route('/products')
