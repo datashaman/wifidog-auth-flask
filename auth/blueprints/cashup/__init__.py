@@ -1,6 +1,5 @@
 from auth.forms import model_form
 from auth.models import \
-    db, \
     Adjustment, \
     Cashup, \
     Transaction
@@ -8,6 +7,7 @@ from auth.resources import \
     resource_delete, \
     resource_index, \
     resource_show
+from auth.services import db
 from auth.utils import has_admin_role, redirect_url
 from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_menu import register_menu

@@ -1,12 +1,11 @@
 from auth.forms import model_form
-from auth.models import \
-    db, \
-    Country
+from auth.models import Country
 from auth.resources import \
     resource_delete, \
     resource_edit, \
     resource_index, \
     resource_new
+from auth.services import db
 from auth.utils import has_role
 from flask import Blueprint
 from flask_menu import register_menu

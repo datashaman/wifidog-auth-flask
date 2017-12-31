@@ -1,11 +1,12 @@
 from __future__ import absolute_import
 
-from auth.models import db, Adjustment
 from auth.resources import resource_query
 from flask_wtf import FlaskForm
 from wtforms import fields as f, validators
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.ext.sqlalchemy.orm import converts, model_form, ModelConverter as BaseModelConverter
+from wtforms.ext.sqlalchemy.orm import \
+    converts, \
+    ModelConverter as BaseModelConverter
 
 
 def instances(resource):
@@ -28,9 +29,6 @@ class ModelConverter(BaseModelConverter):
 
 
 model_converter = ModelConverter()
-
-class BroadcastForm(FlaskForm):
-    message = f.StringField('Message', [validators.InputRequired()])
 
 
 class SelectCategoryForm(FlaskForm):

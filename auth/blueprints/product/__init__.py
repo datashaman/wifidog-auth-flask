@@ -1,6 +1,5 @@
 from auth.forms import instances, model_converter, model_form
 from auth.models import \
-    db, \
     Gateway, \
     Network, \
     Product
@@ -8,6 +7,7 @@ from auth.resources import \
     resource_delete, \
     resource_index, \
     resource_instance
+from auth.services import db
 from auth.utils import has_admin_role
 from flask import \
     abort, \

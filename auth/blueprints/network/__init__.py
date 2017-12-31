@@ -1,9 +1,10 @@
-from auth.models import db, Network
+from auth.models import Network
 from auth.resources import \
     resource_delete, \
     resource_edit, \
     resource_index, \
     resource_new
+from auth.services import db
 from auth.utils import has_role
 from flask import Blueprint, flash, redirect, render_template
 from flask_menu import register_menu

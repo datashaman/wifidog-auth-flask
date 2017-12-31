@@ -22,9 +22,10 @@ from auth.blueprints import \
     user, \
     voucher, \
     wifidog
-from auth.models import db, Processor, users
+from auth.models import Processor, users
 from auth.processors import init_processors
 from auth.services import \
+    db, \
     login_manager, \
     logos, \
     mail, \

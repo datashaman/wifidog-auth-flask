@@ -2,7 +2,6 @@ from auth.forms import FilterForm, instances
 from auth.graphs import graphs
 from auth.grids import Grid
 from auth.models import \
-    db, \
     Gateway, \
     Network, \
     Order, \
@@ -13,6 +12,7 @@ from auth.resources import \
     resource_delete, \
     resource_index, \
     resource_instance
+from auth.services import db
 from auth.utils import has_admin_role, redirect_url
 from flask import \
     abort, \

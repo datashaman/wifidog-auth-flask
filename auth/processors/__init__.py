@@ -70,7 +70,6 @@ def update_transaction(id, response):
 
     db.session.commit()
 
-
     return transaction
 
 from auth.processors import cash, payu, snapscan

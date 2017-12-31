@@ -1,11 +1,12 @@
 from auth.forms import instances, model_converter
-from auth.models import db, Category
+from auth.models import Category
 from auth.resources import \
     resource_delete, \
     resource_edit, \
     resource_index, \
     resource_instance, \
     resource_new
+from auth.services import db
 from auth.utils import has_admin_role, redirect_url
 from flask import \
     Blueprint, \

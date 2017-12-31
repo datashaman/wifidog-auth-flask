@@ -1,13 +1,13 @@
 from auth import constants
 from auth.forms import FilterForm, instances
 from auth.models import \
-    db, \
     Role, \
     User
 from auth.resources import \
     resource_delete, \
     resource_index, \
     resource_instance
+from auth.services import db
 from auth.utils import \
     has_admin_role, \
     is_logged_in

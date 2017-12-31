@@ -1,9 +1,10 @@
 from auth.forms import model_form, model_converter
-from auth.models import db, Adjustment
+from auth.models import Adjustment
 from auth.resources import \
     resource_delete, \
     resource_edit, \
     resource_index
+from auth.services import db
 from auth.utils import has_admin_role
 from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_menu import register_menu

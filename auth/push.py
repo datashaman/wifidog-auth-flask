@@ -1,7 +1,17 @@
 from auth.utils import has_role
-from flask import Blueprint
+from datetime import time
+from flask import \
+    Blueprint, \
+    flash, \
+    redirect, \
+    render_template, \
+    request, \
+    Response, \
+    url_for
+from flask_wtf import FlaskForm
 from flask_menu import register_menu
 from redis import StrictRedis, ConnectionError
+from wtforms import fields as f, validators
 
 from gevent import monkey
 monkey.patch_all()
@@ -9,8 +19,13 @@ monkey.patch_all()
 bp = Blueprint('push', __name__)
 redis = StrictRedis(host='127.0.0.1', port=6379, db=13)
 
+
+class BroadcastForm(FlaskForm):
+    message = f.StringField('Message', [validators.InputRequired()])
+
+
 def event_stream():
-    channels = [ 'notifications' ]
+    channels = ['notifications']
 
     pubsub = redis.pubsub()
     pubsub.subscribe(channels)
@@ -32,18 +47,20 @@ def event_stream():
                     pubsub.subscribe(channels)
                     break
 
-@bp.route('/broadcast', methods=[ 'GET', 'POST' ])
+
+@bp.route('/broadcast', methods=['GET', 'POST'])
 @register_menu(bp, '.broadcast', 'Broadcast', visible_when=has_role('super-admin'), order=5)
 def broadcast():
-    form = BroadcastForm(flask.request.form)
+    form = BroadcastForm(request.form)
 
     if form.validate_on_submit():
         redis.publish('notifications', form.message.data)
-        flask.flash('Message published')
-        return flask.redirect(flask.url_for('.broadcast'))
+        flash('Message published')
+        return redirect(url_for('.broadcast'))
 
-    return flask.render_template('broadcast.html', form=form)
+    return render_template('broadcast.html', form=form)
+
 
 @bp.route('/push')
 def push():
-    return flask.Response(event_stream(), mimetype='text/event-stream')
+    return Response(event_stream(), mimetype='text/event-stream')

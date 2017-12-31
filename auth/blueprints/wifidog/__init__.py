@@ -1,10 +1,9 @@
 import datetime
 
 from auth.models import \
-    db, \
     Gateway, \
     Voucher
-from auth.services import logos
+from auth.services import db, logos
 from auth.utils import args_get, generate_uuid, redirect_url
 from auth.vouchers import process_auth
 from flask import \
