@@ -13,6 +13,7 @@ from auth.blueprints import \
     gateway, \
     network, \
     order, \
+    product, \
     user, \
     voucher, \
     wifidog
@@ -86,6 +87,7 @@ def create_app(config=None):
     app.register_blueprint(gateway, url_prefix='/gateways')
     app.register_blueprint(network, url_prefix='/networks')
     app.register_blueprint(order, url_prefix='/orders')
+    app.register_blueprint(product, url_prefix='/products')
     app.register_blueprint(user, url_prefix='/users')
     app.register_blueprint(voucher, url_prefix='/vouchers')
     app.register_blueprint(wifidog, url_prefix='/wifidog')

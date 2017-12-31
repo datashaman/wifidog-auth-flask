@@ -2,7 +2,7 @@
 
 {% set page_title = 'Products' %}
 {% set new_title = 'New Product' %}
-{% set new_url = url_for('.product_new') %}
+{% set new_url = url_for('.new') %}
 
 {% set show_network = current_user.has_role('super-admin') %}
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
@@ -34,7 +34,7 @@
                     </tr>
                 </thead>
 
-                <tbody data-url="{{ url_for('.product_sort') }}">
+                <tbody data-url="{{ url_for('.sort') }}">
                     {% for instance in pagination.items %}
                     <tr data-id={{ instance.id }} class="product">
                             {% if show_network or show_gateway %}
@@ -50,14 +50,14 @@
                             {% endif %}
                             <td class="sequence" data-label="Seq">{{ instance.sequence }}</td>
                             <td class="category" data-label="Category"><a href={{ url_for('.category_edit', code=instance.category.code) }}>{{ instance.category }}</a></td>
-                            <td class="code" data-label="Code"><a href={{ url_for('.product_edit', id=instance.id) }}>{{ instance.code }}</a></td>
+                            <td class="code" data-label="Code"><a href={{ url_for('.edit', id=instance.id) }}>{{ instance.code }}</a></td>
                             <td class="title" data-label="Title">{{ instance.title }}</td>
                             <td class="price" data-label="Price">{{ instance.network.currency.render_amount(instance.price) }}</td>
                             <td class="unit" data-label="Unit">{{ instance.unit }}</td>
 
                             <td class="actions actions-instance">
                                 <div class="pure-button-group" role="group" aria-label="Actions Available">
-                                    <a href={{ url_for('.product_delete', id=instance.id) }} class="pure-button">
+                                    <a href={{ url_for('.delete', id=instance.id) }} class="pure-button">
                                         <span class="oi" data-glyph="x" title="Delete" aria-hidden="true"></span>
                                         Delete
                                     </a>
