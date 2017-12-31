@@ -4,11 +4,11 @@ from auth.models import \
     Adjustment, \
     Cashup, \
     Transaction
-from auth.utils import has_admin_role, redirect_url
-from auth.views import \
+from auth.resources import \
     resource_delete, \
     resource_index, \
     resource_show
+from auth.utils import has_admin_role, redirect_url
 from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_menu import register_menu
 from flask_security import \

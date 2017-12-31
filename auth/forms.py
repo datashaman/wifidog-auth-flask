@@ -29,21 +29,6 @@ class ModelConverter(BaseModelConverter):
 
 model_converter = ModelConverter()
 
-AdjustmentForm = model_form(
-    Adjustment,
-    db.session,
-    FlaskForm,
-    exclude=[
-        'created_at',
-        'currency',
-        'hash',
-        'updated_at',
-        'user',
-    ],
-    converter=model_converter
-)
-
-
 class BroadcastForm(FlaskForm):
     message = f.StringField('Message', [validators.InputRequired()])
 

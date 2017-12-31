@@ -1,3 +1,4 @@
+from auth.blueprints.adjustment import adjustment
 from auth.blueprints.cashup import cashup
 from auth.blueprints.category import category
 from auth.blueprints.country import country

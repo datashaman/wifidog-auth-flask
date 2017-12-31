@@ -4,13 +4,13 @@ from auth.models import \
     db, \
     Role, \
     User
-from auth.utils import \
-    has_admin_role, \
-    is_logged_in
-from auth.views import \
+from auth.resources import \
     resource_delete, \
     resource_index, \
     resource_instance
+from auth.utils import \
+    has_admin_role, \
+    is_logged_in
 from flask import \
     abort, \
     Blueprint, \

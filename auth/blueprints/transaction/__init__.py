@@ -1,8 +1,8 @@
 from auth.forms import FilterForm, instances
 from auth.graphs import graphs
 from auth.models import Transaction
+from auth.resources import resource_action, resource_index
 from auth.utils import has_admin_role
-from auth.views import resource_action, resource_index
 from flask import Blueprint, render_template, request
 from flask_menu import register_menu
 from flask_security import \

@@ -5,10 +5,10 @@ from auth.models import \
     db, \
     Network, \
     Voucher
-from auth.utils import has_admin_role, redirect_url
-from auth.views import \
+from auth.resources import \
     resource_action, \
     resource_index
+from auth.utils import has_admin_role, redirect_url
 from flask import \
     Blueprint, \
     flash, \

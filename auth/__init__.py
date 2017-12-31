@@ -9,6 +9,7 @@ import os
 
 from auth import constants
 from auth.blueprints import \
+    adjustment, \
     cashup, \
     category, \
     country, \
@@ -87,6 +88,7 @@ def create_app(config=None):
     configure_uploads(app, (logos,))
 
     app.register_blueprint(bp)
+    app.register_blueprint(adjustment, url_prefix='/adjustments')
     app.register_blueprint(cashup, url_prefix='/cashups')
     app.register_blueprint(category, url_prefix='/categories')
     app.register_blueprint(country, url_prefix='/countries')

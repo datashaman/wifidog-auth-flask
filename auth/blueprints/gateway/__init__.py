@@ -1,10 +1,10 @@
 from auth.forms import converts, instances, ModelConverter
 from auth.models import db, Gateway, GatewayType
-from auth.services import logos
-from auth.utils import has_role
-from auth.views import \
+from auth.resources import \
     resource_delete, \
     resource_index
+from auth.services import logos
+from auth.utils import has_role
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_menu import register_menu
 from flask_security import \

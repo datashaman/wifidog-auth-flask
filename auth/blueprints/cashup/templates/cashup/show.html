@@ -42,7 +42,7 @@
         <ul>
             {% for adjustment in instance.adjustments %}
             <li>
-                <a href="{{ url_for('.adjustment_show', hash=adjustment.hash) }}">{{ adjustment }}</a> - {{ adjustment.currency.render_amount(adjustment.amount) }} cash {{ adjustment.direction }} for {{ adjustment.reason }}.
+                <a href="{{ url_for('adjustment.show', hash=adjustment.hash) }}">{{ adjustment }}</a> - {{ adjustment.currency.render_amount(adjustment.amount) }} cash {{ adjustment.direction }} for {{ adjustment.reason }}.
                 {% if adjustment.reference_number %} (Reference {{ adjustment.reference_number }}){% endif %}
             </li>
             {% endfor %}

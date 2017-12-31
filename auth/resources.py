@@ -1,11 +1,13 @@
 from __future__ import absolute_import
 
+from auth import constants
 from auth.models import \
     Adjustment, \
     Cashup, \
     Category, \
     Country, \
     Currency, \
+    db, \
     Gateway, \
     Network, \
     Order, \
@@ -15,6 +17,7 @@ from auth.models import \
     User, \
     Voucher
 from collections import defaultdict
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask_security import current_user
 
 
@@ -42,12 +45,15 @@ resource_filters.update({
     'category': lambda query: query.order_by(Category.sequence),
     'order': lambda query: query.filter(Order.status != 'archived')
                                 .order_by(Order.created_at.desc()),
-    'product': lambda query: query.join(Category).order_by(Category.sequence, Product.sequence),
+    'product': lambda query: query.join(Category)
+                                  .order_by(Category.sequence,
+                                            Product.sequence),
     'transaction': lambda query: query.filter(Transaction.status != 'archived')
                                       .order_by(Transaction.created_at.desc()),
     'user': lambda query: query.order_by(User.email),
     'voucher': lambda query: query.filter(Voucher.status != 'archived')
-                                  .order_by(Voucher.status, Voucher.created_at.desc()),
+                                  .order_by(Voucher.status,
+                                            Voucher.created_at.desc()),
 })
 
 
@@ -59,7 +65,8 @@ def resource_query(resource):
     model = RESOURCE_MODELS[resource]
     query = model.query
 
-    if current_user.has_role('network-admin') or current_user.has_role('gateway-admin'):
+    if current_user.has_role('network-admin') or \
+            current_user.has_role('gateway-admin'):
         if model == Network:
             query = query.filter_by(id=current_user.network_id)
         elif model in [Gateway, User]:
@@ -98,3 +105,90 @@ def resource_instances(resource, form=None):
 
 def resource_instance(resource, **filters):
     return resource_instances(resource).filter_by(**filters).first_or_404()
+
+
+def resource_url_for(resource, verb, **kwargs):
+    return url_for('%s.%s' % (resource, verb), **kwargs)
+
+
+def resource_index(resource, form=None):
+    """Handle a resource index request"""
+    pagination = resource_instances(resource, form).paginate()
+    return render_template('%s/index.html' % resource,
+                           form=form,
+                           pagination=pagination,
+                           resource=resource)
+
+
+def resource_new(resource, form):
+    """Handle a new resource request"""
+    if form.validate_on_submit():
+        instance = RESOURCE_MODELS[resource]()
+        form.populate_obj(instance)
+        db.session.add(instance)
+        db.session.commit()
+        flash('Create %s successful' % instance)
+        return redirect(resource_url_for(resource, 'index'))
+    return render_template('%s/new.html' % resource,
+                           form=form,
+                           resource=resource)
+
+
+def resource_edit(resource, form_class, **kwargs):
+    """Handle a resource edit request"""
+    instance = resource_instance(resource, **kwargs)
+    form = form_class(obj=instance)
+    if form.validate_on_submit():
+        form.populate_obj(instance)
+        db.session.commit()
+        flash('Update %s successful' % instance)
+        return redirect(resource_url_for(resource, 'index'))
+    return render_template('%s/edit.html' % resource,
+                           form=form,
+                           instance=instance,
+                           resource=resource)
+
+
+def resource_show(resource, **kwargs):
+    """Handle a resource show request"""
+    instance = resource_instance(resource, **kwargs)
+    return render_template('%s/show.html' % resource,
+                           instance=instance,
+                           resource=resource)
+
+
+def resource_delete(resource, **kwargs):
+    """Handle a resource delete request"""
+    instance = resource_instance(resource, **kwargs)
+    if request.method == 'POST':
+        instance_label = str(instance)
+        db.session.delete(instance)
+        db.session.commit()
+        flash('Delete %s successful' % instance_label)
+        return redirect(resource_url_for(resource, 'index'))
+    action_url = resource_url_for(resource, 'delete', **kwargs)
+    return render_template('shared/delete.html',
+                           action_url=action_url,
+                           instance=instance,
+                           resource=resource)
+
+
+def resource_action(resource, action, **kwargs):
+    """Handle a resource action request"""
+    instance = resource_instance(resource, **kwargs)
+    if request.method == 'POST':
+        if action in constants.ACTIONS[resource]:
+            getattr(instance, action)()
+            db.session.commit()
+            flash('%s %s successful' % (instance, action))
+            return redirect(resource_url_for(resource, 'index'))
+        else:
+            abort(404)
+    kwargs['action'] = action
+    return render_template('shared/action.html',
+                           action=action,
+                           action_url=resource_url_for(resource,
+                                                       'action',
+                                                       **kwargs),
+                           instance=instance,
+                           resource=resource)

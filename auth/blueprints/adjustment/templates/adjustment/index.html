@@ -2,7 +2,7 @@
 
 {% set page_title = 'Adjustments' %}
 {% set new_title = 'New Adjustment' %}
-{% set new_url = url_for('.adjustment_new') %}
+{% set new_url = url_for('.new') %}
 
 {% set show_network = current_user.has_role('super-admin') %}
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
@@ -30,7 +30,7 @@
                 <tbody>
                     {% for instance in pagination.items %}
                         <tr data-id={{ instance.id }} class={{ 'pure-table-' + loop.cycle('odd', 'even') }}>
-                            <td class="id" data-label="ID"><a href={{ url_for('.adjustment_edit', id=instance.id) }}>{{ instance.id }}</a></td>
+                            <td class="id" data-label="ID"><a href={{ url_for('.edit', id=instance.id) }}>{{ instance.id }}</a></td>
                             {% if show_network or show_gateway %}
                             <td data-label="Network & Gateway">
                                 {% if show_network %}

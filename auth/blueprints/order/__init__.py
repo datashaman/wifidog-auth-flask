@@ -8,12 +8,12 @@ from auth.models import \
     Order, \
     OrderItem, \
     Product
-from auth.utils import has_admin_role, redirect_url
-from auth.views import \
+from auth.resources import \
     resource_action, \
     resource_delete, \
     resource_index, \
     resource_instance
+from auth.utils import has_admin_role, redirect_url
 from flask import \
     abort, \
     Blueprint, \

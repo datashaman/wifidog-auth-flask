@@ -1,12 +1,12 @@
 from auth.forms import instances, model_converter
 from auth.models import db, Category
-from auth.utils import has_admin_role, redirect_url
-from auth.views import \
+from auth.resources import \
     resource_delete, \
     resource_edit, \
     resource_index, \
     resource_instance, \
     resource_new
+from auth.utils import has_admin_role, redirect_url
 from flask import \
     Blueprint, \
     redirect, \

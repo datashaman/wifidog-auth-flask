@@ -4,11 +4,11 @@ from auth.models import \
     Gateway, \
     Network, \
     Product
-from auth.utils import has_admin_role
-from auth.views import \
+from auth.resources import \
     resource_delete, \
     resource_index, \
     resource_instance
+from auth.utils import has_admin_role
 from flask import \
     abort, \
     Blueprint, \
