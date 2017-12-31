@@ -10,6 +10,7 @@ from auth.models import \
 from auth.resources import \
     resource_action, \
     resource_delete, \
+    resource_grid, \
     resource_index, \
     resource_instance
 from auth.services import db
@@ -72,22 +73,42 @@ class OrderForm(FlaskForm):
 
 
 class OrderGrid(Grid):
-    columns = [
-        'id',
-        'network_gateway',
-        'user'
-        'status',
-        'total',
-        'created_at',
-        'actions',
-    ]
+    page_title = 'Orders'
+    new_title = 'New Order'
 
-    def id(self, order):
+    columns = {
+        'id': {
+            'title': 'ID',
+        },
+        'network_gateway': {
+            'title': 'Network / Gateway',
+        },
+        'user': {
+            'title': 'User',
+        },
+        'status': {
+            'title': 'Status',
+        },
+        'total': {
+            'title': 'Total',
+        },
+        'created_at': {
+            'title': 'Created At',
+        },
+        'actions': {
+            'title': 'Actions',
+        },
+    }
+
+    def render_id(self, order):
         return '<a href="%s">%s</a><br/> %s' % \
                 (url_for('.edit', hash=order.hash), order, order.hash)
 
-    def total(self, order):
+    def render_total(self, order):
         return order.network.currency.render_amount(order.total_amount)
+
+    def show_network_gateway(self, order):
+        return current_user.has_role('super-admin') or current_user.has_role('network-admin')
 
 
 @order.route('/')
@@ -102,7 +123,7 @@ class OrderGrid(Grid):
     new_url=lambda: url_for('order.new')
 )
 def index():
-    return resource_index('order', OrderFilterForm(formdata=request.args))
+    return resource_grid('order', OrderGrid(), OrderFilterForm(formdata=request.args))
 
 
 def _gateway_choices():

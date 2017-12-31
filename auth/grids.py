@@ -13,7 +13,7 @@ class Grid(object):
         return current_user.has_role('super-admin') or \
                 current_user.has_role('network-admin')
 
-    def network_gateway(self, instance):
+    def render_network_gateway(self, instance):
         lines = []
         if self.show_network:
             lines.append(str(instance.network))
@@ -23,8 +23,8 @@ class Grid(object):
             lines.append(str(instance.gateway))
         return '\n'.join(lines)
 
-    def created_at(self, order):
+    def render_created_at(self, order):
         return format_datetime(order.created_at)
 
-    def actions(self, instance):
+    def render_actions(self, instance):
         return render_template('shared/actions.html', instance=instance)

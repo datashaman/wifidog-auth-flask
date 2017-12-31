@@ -1,0 +1,64 @@
+{% extends 'layouts/default.html' %}
+{% from 'helpers/render.html' import render_pagination %}
+
+{% set page_title = grid.page_title %}
+{% set new_title = grid.new_title %}
+{% set new_url = url_for('.new') %}
+
+{% set show_network = current_user.has_role('super-admin') %}
+{% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
+
+{% block content %}
+    <div class="content">
+        {% if filter_form %}
+        <form class="form-filter pure-form">
+            <fieldset>
+                <form method="get">
+                    {% for field in filter_form %}
+                    {{ field }}
+                    {% endfor %}
+
+                    <button type="submit" class="pure-button pure-button-primary">Filter</button>
+                    <a href="{{ url_for('.index') }}" class="pure-button">Clear</a>
+                </form>
+            </fieldset>
+        </form>
+        {% endif %}
+
+        {% if pagination.items %}
+        <table id="{{ grid.id }}" width="100%" cellspacing="0" class="pure-table pure-table-horizontal">
+                <thead>
+                    <tr>
+                        {% for id, column in grid.columns.items() %}
+                        {% set show = grid['show_%s' % id] %}
+                        {% if not show or show and show(instance) %}
+                        <th class="{{ id }}">{{ column.get('title', id) }}</th>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for instance in pagination.items %}
+                    <tr data-id={{ instance.id }} class="order table-{{ instance.class_hint }}">
+                        {% for id, column in grid.columns.items() %}
+                        {% set show = grid['show_%s' % id] %}
+                        {% if not show or show and show(instance) %}
+                        <td class="{{ id }}">
+                            {% if grid['render_%s' % id] %}
+                            {{ grid['render_%s' % id](instance) | safe }}
+                            {% else %}
+                            {{ instance[id] }}
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {{ render_pagination(pagination, '.index') }}
+        {% endif %}
+    </div>
+{% endblock %}

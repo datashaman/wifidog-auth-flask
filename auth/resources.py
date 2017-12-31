@@ -111,6 +111,16 @@ def resource_url_for(resource, verb, **kwargs):
     return url_for('%s.%s' % (resource, verb), **kwargs)
 
 
+def resource_grid(resource, grid=None, filter_form=None):
+    """Handle a resource grid request"""
+    pagination = resource_instances(resource, filter_form).paginate()
+    return render_template('shared/grid.html',
+                           filter_form=filter_form,
+                           grid=grid,
+                           pagination=pagination,
+                           resource=resource)
+
+
 def resource_index(resource, form=None):
     """Handle a resource index request"""
     pagination = resource_instances(resource, form).paginate()

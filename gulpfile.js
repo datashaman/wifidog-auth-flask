@@ -84,6 +84,7 @@ gulp.task('serve', [ 'build' ], function() {
 
     gulp.watch(vendorStyles.concat(siteStyles), [ 'styles' ]);
     gulp.watch(ieScripts.concat(siteScripts), [ 'scripts' ]);
+    gulp.watch('auth/blueprints/**/*.html', reload);
     gulp.watch('auth/templates/**/*.html', reload);
 });
 
