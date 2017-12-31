@@ -57,7 +57,7 @@ CategoryForm = model_form(
     category,
     'categories',
     'Categories',
-    visible_when=has_admin_role(),
+    visible_when=has_admin_role,
     order=70
 )
 def index():

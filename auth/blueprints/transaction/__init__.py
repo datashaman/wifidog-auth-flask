@@ -37,7 +37,7 @@ class TransactionFilterForm(FilterForm):
     transaction,
     'transactions',
     'Transactions',
-    visible_when=has_admin_role(),
+    visible_when=has_admin_role,
     order=45
 )
 def index():

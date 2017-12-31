@@ -57,7 +57,7 @@ class SelectNetworkGatewayForm(FlaskForm):
     product,
     'products',
     'Products',
-    visible_when=has_admin_role(),
+    visible_when=has_admin_role,
     order=80
 )
 def index():

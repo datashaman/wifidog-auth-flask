@@ -41,7 +41,7 @@ CashupForm = model_form(
     cashup,
     'cashups',
     'Cashups',
-    visible_when=has_admin_role(),
+    visible_when=has_admin_role,
     order=60,
     new_url=lambda: url_for('cashup.new')
 )

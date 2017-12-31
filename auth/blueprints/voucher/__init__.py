@@ -51,7 +51,7 @@ class NewVoucherForm(FlaskForm):
     voucher,
     '.vouchers',
     'Vouchers',
-    visible_when=has_admin_role(),
+    visible_when=has_admin_role,
     order=20,
     new_url=lambda: url_for('voucher.new')
 )

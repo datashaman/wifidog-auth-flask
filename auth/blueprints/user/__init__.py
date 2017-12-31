@@ -133,7 +133,7 @@ def mine():
     user,
     'users',
     'Users',
-    visible_when=has_admin_role(),
+    visible_when=has_admin_role,
     order=90
 )
 def index():

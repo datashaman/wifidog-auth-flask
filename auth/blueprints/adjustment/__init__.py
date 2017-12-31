@@ -39,7 +39,7 @@ AdjustmentForm = model_form(
     adjustment,
     'adjustments',
     'Adjustments',
-    visible_when=has_admin_role(),
+    visible_when=has_admin_role,
     order=42,
     new_url=lambda: url_for('adjustment.new')
 )

@@ -28,10 +28,6 @@ from flask_security import \
 bp = Blueprint('auth', __name__)
 
 
-def has_admin_role():
-    return has_role('super-admin', 'network-admin', 'gateway-admin')
-
-
 @bp.route('/favicon.ico')
 def favicon():
     return current_app.send_static_file('favicon.ico')
