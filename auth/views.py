@@ -62,6 +62,7 @@ def resource_url_for(resource, verb, **kwargs):
         'gateway',
         'network',
         'order',
+        'product',
         'user',
         'voucher',
     ]:
