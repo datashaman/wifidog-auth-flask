@@ -12,7 +12,6 @@ from auth import constants
 from auth.forms import \
     AdjustmentForm, \
     CashupForm, \
-    CountryForm, \
     CurrencyForm, \
     TransactionFilterForm
 
@@ -59,6 +58,7 @@ def has_admin_role():
 def resource_url_for(resource, verb, **kwargs):
     if resource in [
         'category',
+        'country',
         'gateway',
         'network',
         'order',
@@ -154,42 +154,6 @@ def resource_action(resource, action, **kwargs):
                            resource=resource)
 
 
-@bp.route('/countries')
-@login_required
-@roles_accepted('super-admin')
-@register_menu(
-    bp,
-    'countries',
-    'Countries',
-    visible_when=has_role('super-admin'),
-    order=82
-)
-def country_index():
-    return resource_index('country')
-
-
-@bp.route('/countries/new', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin')
-def country_new():
-    form = CountryForm()
-    return resource_new('country', form)
-
-
-@bp.route('/countries/<id>/delete', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin')
-def country_delete(id):
-    return resource_delete('country', id=id)
-
-
-@bp.route('/countries/<id>', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin')
-def country_edit(id):
-    return resource_edit('country', CountryForm, id=id)
-
-
 @bp.route('/currencies')
 @login_required
 @roles_accepted('super-admin')
@@ -247,7 +211,8 @@ def cashup_index():
 def cashup_new():
     if Transaction.query.filter_by(cashup=None).count() == 0 \
             and Adjustment.query.filter_by(cashup=None).count() == 0:
-        flash('No new transactions or adjustments since last cashup', 'warning')
+        flash('No new transactions or adjustments since last cashup',
+              'warning')
         return redirect(redirect_url())
 
     form = CashupForm(data={'user': current_user})
@@ -259,17 +224,20 @@ def cashup_new():
 
     if form.validate_on_submit():
         cashup = Cashup()
-        cashup.gateway = current_user.gateway if gateway_admin else form.gateway.data
+        cashup.gateway = current_user.gateway \
+            if gateway_admin else form.gateway.data
         cashup.user = current_user
         form.populate_obj(cashup)
         db.session.add(cashup)
         db.session.commit()
 
         for adjustment in cashup.gateway.adjustments \
-                .filter(Adjustment.created_at < cashup.created_at, Adjustment.cashup == None):
+                .filter(Adjustment.created_at < cashup.created_at,
+                        Adjustment.cashup is None):
             cashup.adjustments.append(adjustment)
         for transaction in cashup.gateway.transactions \
-                .filter(Transaction.created_at < cashup.created_at, Transaction.cashup == None):
+                .filter(Transaction.created_at < cashup.created_at,
+                        Transaction.cashup is None):
             cashup.transactions.append(transaction)
         db.session.commit()
 
@@ -303,7 +271,8 @@ def cashup_show(id):
     order=45
 )
 def transaction_index():
-    return resource_index('transaction', TransactionFilterForm(formdata=request.args))
+    return resource_index('transaction',
+                          TransactionFilterForm(formdata=request.args))
 
 
 @bp.route('/transactions/<hash>')
@@ -359,7 +328,9 @@ def adjustment_new():
         db.session.commit()
         flash('Create %s successful' % adjustment)
         return redirect(url_for('.adjustment_index'))
-    return render_template('adjustment/new.html', form=form, resource='adjustment')
+    return render_template('adjustment/new.html',
+                           form=form,
+                           resource='adjustment')
 
 
 @bp.route('/adjustments/<id>/delete', methods=['GET', 'POST'])
@@ -385,7 +356,10 @@ def favicon():
 def uploads(path):
     directory = os.path.join(current_app.instance_path, 'uploads')
     cache_timeout = current_app.get_send_file_max_age(path)
-    return send_from_directory(directory, path, cache_timeout=cache_timeout, conditional=True)
+    return send_from_directory(directory,
+                               path,
+                               cache_timeout=cache_timeout,
+                               conditional=True)
 
 
 @bp.route('/auth-token')

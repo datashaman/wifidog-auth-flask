@@ -2,7 +2,7 @@
 
 {% set page_title = 'Countries' %}
 {% set new_title = 'New Country' %}
-{% set new_url = url_for('.country_new') %}
+{% set new_url = url_for('.new') %}
 
 {% block content %}
     <div class="content">
@@ -20,13 +20,13 @@
                 <tbody>
                     {% for instance in pagination.items %}
                         <tr data-id={{ instance.id }} class={{ 'pure-table-' + loop.cycle('odd', 'even') }}>
-                            <td class="id" data-label="ID"><a href={{ url_for('.country_edit', id=instance.id) }}>{{ instance.id }}</a></td>
+                            <td class="id" data-label="ID"><a href={{ url_for('.edit', id=instance.id) }}>{{ instance.id }}</a></td>
                             <td class="title" data-label="Title">{{ instance.title }}</td>
                             <td class="currencies" data-label="Currencies">{{ instance.currencies | join(', ') }}</td>
 
                             <td class="actions actions-instance">
                                 <div class="pure-button-group" role="group" aria-label="Actions Available">
-                                    <a href={{ url_for('.country_delete', id=instance.id) }} class="pure-button">
+                                    <a href={{ url_for('.delete', id=instance.id) }} class="pure-button">
                                         <span class="oi" data-glyph="x" title="Delete" aria-hidden="true"></span>
                                         Delete
                                     </a>

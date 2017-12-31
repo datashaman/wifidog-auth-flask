@@ -1,10 +1,10 @@
 {% extends 'layouts/default.html' %}
 
-{% set page_title = 'New Country' %}
+{% set page_title = 'Edit Country' %}
 
 {% block content %}
     <div class="content">
-        <form method="post" action={{ url_for('.country_new') }} class="pure-form pure-form-aligned">
+        <form method="post" action={{ url_for('.edit', id=instance.id) }} class="pure-form pure-form-aligned">
             {{ form.csrf_token }}
             {% include 'country/_form.html' %}
         </form>

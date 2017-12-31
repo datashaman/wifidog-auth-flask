@@ -58,25 +58,6 @@ CashupForm = model_form(
 )
 
 
-CountryForm = model_form(
-    Country,
-    db.session,
-    FlaskForm,
-    exclude=[
-        'created_at',
-        'gateways',
-        'updated_at',
-        'vat_rates',
-    ],
-    exclude_pk=False,
-    field_args={
-        'id': {
-            'label': 'ID',
-        },
-    }
-)
-
-
 CurrencyForm = model_form(
     Currency,
     db.session,
