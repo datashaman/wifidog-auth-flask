@@ -6,12 +6,12 @@ from unittest import skip
 class TestMine(TestCase):
     def test_my_account_as_anonymous(self):
         with self.app.test_request_context():
-            self.assertLogin('/user')
+            self.assertLogin(url_for('user.mine'))
 
     def test_my_account_as_gateway(self):
         with self.app.test_request_context():
             self.login('main-gateway1@example.com', 'admin123')
-            pq = self.assertOk('/user')
+            pq = self.assertOk(url_for('user.mine'))
             response = self.client.post(pq('form').attr('action'), data={'email': 'main-gateway1@example.com', 'first_name': 'Another Main', 'locale': 'en', 'timezone': 'UTC'}, follow_redirects=True)
             assert 'Update successful' in str(response.get_data())
 
@@ -36,7 +36,7 @@ class TestMine(TestCase):
     def test_my_account_as_network(self):
         with self.app.test_request_context():
             self.login('main-network@example.com', 'admin123')
-            pq = self.assertOk('/user')
+            pq = self.assertOk(url_for('user.mine'))
             response = self.client.post(pq('form').attr('action'), data={'email': 'main-network@example.com', 'first_name': 'Another Main', 'locale': 'en', 'timezone': 'UTC'}, follow_redirects=True)
             assert 'Update successful' in str(response.get_data())
 
