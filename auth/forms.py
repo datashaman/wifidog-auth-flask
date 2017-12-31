@@ -4,22 +4,11 @@ from auth.graphs import graphs
 from auth.models import db, Adjustment, Cashup, Category, Country, Currency, Gateway, GatewayType, Network, Order, Product, Role, SqliteDecimal, Transaction, Voucher
 from auth.resources import resource_query
 from auth.utils import args_get
-from flask import current_app
 from flask_security import current_user
 from flask_wtf import FlaskForm
 from wtforms import fields as f, validators
-from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.ext.sqlalchemy.orm import converts, model_form, ModelConverter as BaseModelConverter
-
-
-def default_megabytes():
-    if current_user.gateway is not None:
-        return current_user.gateway.default_megabytes
-
-
-def default_minutes():
-    if current_user.gateway is not None:
-        return current_user.gateway.default_minutes
 
 
 def instances(resource):
@@ -152,12 +141,6 @@ ProductForm = model_form(
     ],
     converter=model_converter
 )
-
-
-class NewVoucherForm(FlaskForm):
-    gateway_id = f.SelectField('Gateway')
-    minutes = f.IntegerField('Minutes', [validators.InputRequired(), validators.NumberRange(min=0)], default=default_minutes)
-    megabytes = f.IntegerField('Megabytes', [validators.Optional(), validators.NumberRange(min=0)], default=default_megabytes)
 
 
 class BroadcastForm(FlaskForm):

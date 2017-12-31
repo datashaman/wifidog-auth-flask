@@ -17,7 +17,6 @@ from auth.forms import \
     CountryForm, \
     CurrencyForm, \
     LoginVoucherForm, \
-    NewVoucherForm, \
     ProductForm, \
     SelectCategoryForm, \
     SelectNetworkGatewayForm, \
@@ -31,16 +30,18 @@ from auth.models import \
     Network, \
     Product, \
     Transaction, \
-    User, \
     Voucher, \
     db
 
-from auth.resources import resource_instance, resource_instances, RESOURCE_MODELS
+from auth.resources import \
+        resource_instance, \
+        resource_instances, \
+        RESOURCE_MODELS
 from auth.services import \
         environment_dump, \
         healthcheck as healthcheck_service, \
         logos
-from auth.utils import generate_uuid, has_role, is_logged_in
+from auth.utils import generate_uuid, has_role
 from auth.vouchers import process_auth
 
 from flask import \
@@ -60,7 +61,6 @@ from flask_security import \
     current_user, \
     login_required, \
     roles_accepted
-from pytz import common_timezones
 from sqlalchemy import func
 from wtforms import fields as f, validators
 
@@ -73,7 +73,7 @@ def has_admin_role():
 
 
 def resource_url_for(resource, verb, **kwargs):
-    if resource in ['gateway', 'network', 'order', 'user']:
+    if resource in ['gateway', 'network', 'order', 'user', 'voucher']:
         return url_for('%s.%s' % (resource, verb), **kwargs)
     else:
         return url_for('.%s_%s' % (resource, verb), **kwargs)
@@ -149,7 +149,7 @@ def resource_action(resource, action, **kwargs):
             getattr(instance, action)()
             db.session.commit()
             flash('%s %s successful' % (instance, action))
-            return redirect(url_for('.%s_index' % resource))
+            return redirect(resource_url_for(resource, 'index'))
         else:
             abort(404)
     kwargs['action'] = action
@@ -160,28 +160,6 @@ def resource_action(resource, action, **kwargs):
                                                        **kwargs),
                            instance=instance,
                            resource=resource)
-
-
-@bp.route('/vouchers')
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(
-    bp,
-    '.vouchers',
-    'Vouchers',
-    visible_when=has_admin_role(),
-    order=20,
-    new_url=lambda: url_for('auth.voucher_new')
-)
-def voucher_index():
-    return resource_index('voucher')
-
-
-@bp.route('/vouchers/<int:id>/<action>', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def voucher_action(id, action):
-    return resource_action('voucher', action, id=id)
 
 
 @bp.route('/categories')
@@ -638,67 +616,6 @@ def adjustment_delete(id):
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def adjustment_edit(id):
     return resource_edit('adjustment', AdjustmentForm, id=id)
-
-
-@bp.route('/vouchers/new', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def voucher_new():
-    form = NewVoucherForm()
-    choices = []
-    defaults = {}
-
-    if current_user.has_role('gateway-admin'):
-        choices = [
-            [
-                current_user.gateway_id,
-                '%s - %s' % (current_user.gateway.network.title,
-                             current_user.gateway.title)
-            ]
-        ]
-        defaults[current_user.gateway_id] = {
-            'minutes': current_user.gateway.default_minutes,
-            'megabytes': current_user.gateway.default_megabytes,
-        }
-    else:
-        if current_user.has_role('network-admin'):
-            networks = [current_user.network]
-        else:
-            networks = Network.query.all()
-
-        for network in networks:
-            for gateway in network.gateways:
-                choices.append([
-                    gateway.id,
-                    '%s - %s' % (network.title,
-                                 gateway.title)
-                ])
-                defaults[gateway.id] = {
-                    'minutes': gateway.default_minutes,
-                    'megabytes': gateway.default_megabytes,
-                }
-
-    if choices == []:
-        flash('Define a network and gateway first.')
-        return redirect(redirect_url())
-
-    form.gateway_id.choices = choices
-
-    item = defaults[choices[0][0]]
-
-    if request.method == 'GET':
-        form.minutes.data = item['minutes']
-        form.megabytes.data = item['megabytes']
-
-    if form.validate_on_submit():
-        voucher = Voucher()
-        form.populate_obj(voucher)
-        db.session.add(voucher)
-        db.session.commit()
-
-        return redirect(url_for('.voucher_new', code=voucher.code))
-
-    return render_template('voucher/new.html', form=form, defaults=defaults)
 
 
 @bp.route('/wifidog/login/', methods=['GET', 'POST'])

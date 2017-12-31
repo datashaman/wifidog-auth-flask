@@ -62,7 +62,7 @@
                             <td class="actions actions-instance">
                                 <div class="pure-button-group" role="group" aria-label="Actions Available">
                                     {% for action, defn in instance.available_actions.items() %}
-                                    <a href="{{ url_for('.voucher_action', id=instance.id, action=action) }}" class="pure-button" title="{{ action }}">
+                                    <a href="{{ url_for('.action', id=instance.id, action=action) }}" class="pure-button" title="{{ action }}">
                                         {% if defn.icon %}
                                         <span class="oi" data-glyph={{ defn.icon }} aria-hidden="true"></span>
                                         {% endif %}

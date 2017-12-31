@@ -12,7 +12,8 @@ from auth.blueprints import \
         gateway, \
         network, \
         order, \
-        user
+        user, \
+        voucher
 from auth.models import db, Processor, users
 from auth.processors import init_processors
 from auth.services import login_manager, logos, mail, menu, security
@@ -78,6 +79,7 @@ def create_app(config=None):
     app.register_blueprint(network, url_prefix='/networks')
     app.register_blueprint(order, url_prefix='/orders')
     app.register_blueprint(user, url_prefix='/users')
+    app.register_blueprint(voucher, url_prefix='/vouchers')
 
     babel = Babel(app)
 
