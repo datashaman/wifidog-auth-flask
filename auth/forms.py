@@ -28,14 +28,6 @@ def instances(resource):
     return func
 
 
-def roles():
-    if current_user.has_role('super-admin'):
-        return db.session.query(Role).all()
-    if current_user.has_role('network-admin'):
-        return db.session.query(Role).filter(Role.name == 'gateway-admin').all()
-    return []
-
-
 class ModelConverter(BaseModelConverter):
     @converts('String', 'Unicode')
     def conv_String(self, field_args, **extra):
@@ -162,40 +154,6 @@ ProductForm = model_form(
 )
 
 
-class UserForm(FlaskForm):
-    network = QuerySelectField('Network', allow_blank=True, default=lambda: current_user.network, query_factory=instances('network'))
-    gateway = QuerySelectField('Gateway', allow_blank=True, default=lambda: current_user.gateway, query_factory=instances('gateway'))
-    email = f.StringField('Email')
-    password = f.PasswordField(
-        'Password',
-        [
-            validators.Optional(),
-            validators.Length(min=2),
-            validators.EqualTo('confirm', message='Passwords must match'),
-        ]
-    )
-    confirm = f.PasswordField('Repeat Password')
-    locale = f.SelectField('Locale', default=lambda: current_app.config['BABEL_DEFAULT_LOCALE'])
-    timezone = f.SelectField('Timezone', default=lambda: current_app.config['BABEL_DEFAULT_TIMEZONE'])
-    active = f.BooleanField('Active', default=True)
-    roles = QuerySelectMultipleField('Roles', query_factory=roles)
-
-
-class MyUserForm(FlaskForm):
-    email = f.StringField('Email')
-    password = f.PasswordField(
-        'Password',
-        [
-            validators.Optional(),
-            validators.Length(min=2),
-            validators.EqualTo('confirm', message='Passwords must match'),
-        ]
-    )
-    confirm = f.PasswordField('Repeat Password')
-    locale = f.SelectField('Locale', default=lambda: current_app.config['BABEL_DEFAULT_LOCALE'])
-    timezone = f.SelectField('Timezone', default=lambda: current_app.config['BABEL_DEFAULT_TIMEZONE'])
-
-
 class NewVoucherForm(FlaskForm):
     gateway_id = f.SelectField('Gateway')
     minutes = f.IntegerField('Minutes', [validators.InputRequired(), validators.NumberRange(min=0)], default=default_minutes)
@@ -261,9 +219,3 @@ class TransactionFilterForm(FilterForm):
 
     def filter_created_to(self, q, k, v):
         return q.filter(Transaction.created_at < v)
-
-
-class UserFilterForm(FilterForm):
-    network = QuerySelectField('Network', allow_blank=True, query_factory=instances('network'), blank_text='Select Network')
-    gateway = QuerySelectField('Gateway', allow_blank=True, query_factory=instances('gateway'), blank_text='Select Gateway')
-    email = f.TextField('Email')

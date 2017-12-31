@@ -1,0 +1,12 @@
+{% extends 'layouts/default.html' %}
+
+{% set page_title = 'Edit User' %}
+
+{% block content %}
+    <div class="content">
+        <form method="post" action={{ url_for('.edit', id=instance.id) }} class="pure-form pure-form-aligned">
+            {{ form.csrf_token }}
+            {% include 'user/_form.html' %}
+        </form>
+    </div>
+{% endblock %}

@@ -17,14 +17,11 @@ from auth.forms import \
     CountryForm, \
     CurrencyForm, \
     LoginVoucherForm, \
-    MyUserForm, \
     NewVoucherForm, \
     ProductForm, \
     SelectCategoryForm, \
     SelectNetworkGatewayForm, \
-    TransactionFilterForm, \
-    UserFilterForm, \
-    UserForm
+    TransactionFilterForm
 
 from auth.models import \
     Adjustment, \
@@ -32,8 +29,6 @@ from auth.models import \
     Category, \
     Gateway, \
     Network, \
-    Order, \
-    OrderItem, \
     Product, \
     Transaction, \
     User, \
@@ -48,7 +43,6 @@ from auth.services import \
 from auth.utils import generate_uuid, has_role, is_logged_in
 from auth.vouchers import process_auth
 
-from decimal import Decimal, getcontext
 from flask import \
     Blueprint, \
     abort, \
@@ -66,7 +60,6 @@ from flask_security import \
     current_user, \
     login_required, \
     roles_accepted
-from PIL import Image
 from pytz import common_timezones
 from sqlalchemy import func
 from wtforms import fields as f, validators
@@ -80,7 +73,7 @@ def has_admin_role():
 
 
 def resource_url_for(resource, verb, **kwargs):
-    if resource in ['gateway', 'network', 'order']:
+    if resource in ['gateway', 'network', 'order', 'user']:
         return url_for('%s.%s' % (resource, verb), **kwargs)
     else:
         return url_for('.%s_%s' % (resource, verb), **kwargs)
@@ -141,7 +134,7 @@ def resource_delete(resource, **kwargs):
         db.session.commit()
         flash('Delete %s successful' % instance_label)
         return redirect(resource_url_for(resource, 'index'))
-    action_url = resource_url_for(resource, 'delete')
+    action_url = resource_url_for(resource, 'delete', **kwargs)
     return render_template('shared/delete.html',
                            action_url=action_url,
                            instance=instance,
@@ -167,118 +160,6 @@ def resource_action(resource, action, **kwargs):
                                                        **kwargs),
                            instance=instance,
                            resource=resource)
-
-
-def set_locale_choices(form):
-    form.locale.choices = [(id, title)
-                           for id, title in constants.LOCALES.items()]
-    form.timezone.choices = [(timezone, timezone)
-                             for timezone in common_timezones]
-
-
-@bp.route('/user', methods=['GET', 'POST'])
-@login_required
-@register_menu(
-    bp,
-    '.account',
-    'My Account',
-    visible_when=is_logged_in,
-    order=130
-)
-def my_account():
-    form = MyUserForm(obj=current_user)
-    set_locale_choices(form)
-
-    if form.validate_on_submit():
-        if form.password.data == '':
-            del form.password
-        form.populate_obj(current_user)
-        db.session.commit()
-        flash('Update successful')
-        return redirect('/')
-    return render_template('user/current.html',
-                           form=form,
-                           instance=current_user)
-
-
-@bp.route('/users')
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-@register_menu(
-    bp,
-    'users',
-    'Users',
-    visible_when=has_admin_role(),
-    order=90
-)
-def user_index():
-    return resource_index('user', UserFilterForm(formdata=request.args))
-
-
-@bp.route('/users/new', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def user_new():
-    form = UserForm()
-    set_locale_choices(form)
-
-    if current_user.has_role('gateway-admin'):
-        del form.roles
-
-    if form.validate_on_submit():
-        user = User()
-        form.populate_obj(user)
-        db.session.add(user)
-        db.session.commit()
-        flash('Create %s successful' % user)
-        return redirect(url_for('.user_index'))
-
-    return render_template('user/new.html', form=form)
-
-
-@bp.route('/users/<int:id>', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def user_edit(id):
-    instance = resource_instance('user', id=id)
-
-    if (current_user.has_role('network-admin')
-            and instance.network != current_user.network):
-        abort(403)
-
-    if (current_user.has_role('gateway-admin')
-            and (instance.network != current_user.network
-                 or instance.gateway != current_user.gateway)):
-        abort(403)
-
-    form = UserForm(obj=instance)
-    set_locale_choices(form)
-
-    if current_user.has_role('network-admin'):
-        del form.gateway
-
-    if current_user == instance:
-        del form.active
-        del form.roles
-
-    if form.validate_on_submit():
-        if form.password.data == '':
-            del form.password
-
-        form.populate_obj(instance)
-        db.session.commit()
-
-        flash('Update %s successful' % instance)
-        return redirect(url_for('.user_index'))
-
-    return render_template('user/edit.html', form=form, instance=instance)
-
-
-@bp.route('/users/<int:id>/delete', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def user_delete(id):
-    return resource_delete('user', id=id)
 
 
 @bp.route('/vouchers')

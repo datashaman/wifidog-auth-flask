@@ -2,7 +2,7 @@
 
 {% set page_title = 'Users' %}
 {% set new_title = 'New User' %}
-{% set new_url = url_for('.user_new') %}
+{% set new_url = url_for('.new') %}
 
 {% set show_network = current_user.has_role('super-admin') %}
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
@@ -22,7 +22,7 @@
                     {{ form.email(placeholder='Email') }}
 
                     <button type="submit" class="pure-button pure-button-primary">Filter</button>
-                    <a href="{{ url_for('.user_index') }}" class="pure-button">Clear</a>
+                    <a href="{{ url_for('.index') }}" class="pure-button">Clear</a>
                 </form>
             </fieldset>
         </form>
@@ -58,7 +58,7 @@
                             </td>
                             {% endif %}
                             <td data-label="Email">
-                                <a href="{{ url_for('.user_edit', id=instance.id) }}">
+                                <a href="{{ url_for('.edit', id=instance.id) }}">
                                     {{ instance.email | default('-') }}
                                 </a>
                             </td>
@@ -68,7 +68,7 @@
                             <td class="actions actions-instance">
                                 <div class="pure-button-group" role="group" aria-label="Actions Available">
                                     <a
-                                        href="{{ url_for('.user_delete', id=instance.id) }}" class="pure-button"
+                                        href="{{ url_for('.delete', id=instance.id) }}" class="pure-button"
                                         title="{{ 'Cowardly refuse to delete current user' if current_user.id == instance.id }}"
                                         {% if current_user.id == instance.id %}disabled="disabled"{% endif %}
                                     >
