@@ -98,7 +98,7 @@ class MyUserForm(FlaskForm, LocaleMixin):
 class UserFilterForm(FilterForm):
     network = QuerySelectField('Network', allow_blank=True, query_factory=instances('network'), blank_text='Select Network')
     gateway = QuerySelectField('Gateway', allow_blank=True, query_factory=instances('gateway'), blank_text='Select Gateway')
-    email = f.TextField('Email')
+    email = f.StringField('Email')
 
 
 @user.route('/mine', methods=['GET', 'POST'])

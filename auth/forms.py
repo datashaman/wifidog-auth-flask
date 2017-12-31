@@ -147,28 +147,6 @@ class BroadcastForm(FlaskForm):
     message = f.StringField('Message', [validators.InputRequired()])
 
 
-class LoginVoucherForm(FlaskForm):
-    voucher_code = f.StringField('Voucher Code', [validators.InputRequired()], default=args_get('voucher'), description='The voucher code you were given at the counter')
-    name = f.StringField('Your Name', description='So we know what to call you')
-
-    gw_address = f.HiddenField('Gateway Address', default=args_get('gw_address'))
-    gw_port = f.HiddenField('Gateway Port', default=args_get('gw_port'))
-    gw_id = f.HiddenField('Gateway ID', default=args_get('gw_id'))
-    mac = f.HiddenField('MAC', default=args_get('mac'))
-    url = f.HiddenField('URL', default=args_get('url'))
-
-    def validate_voucher(self, form, field):
-        voucher_code = field.data.upper()
-
-        voucher = Voucher.query.filter_by(code=voucher_code).first()
-
-        if voucher is None:
-            raise validators.ValidationError('Voucher does not exist')
-
-        if voucher.status != 'new':
-            raise validators.ValidationError('Voucher is %s' % voucher.status)
-
-
 class SelectCategoryForm(FlaskForm):
     category = QuerySelectField('Category', query_factory=instances('category'))
 
@@ -194,8 +172,8 @@ class TransactionFilterForm(FilterForm):
     gateway = QuerySelectField('Gateway', allow_blank=True, query_factory=instances('gateway'), blank_text='Select Gateway')
     user = QuerySelectField('User', allow_blank=True, query_factory=instances('user'), blank_text='Select User')
     status = f.SelectField('Status', default='', choices=[('', 'Select Status')] + [(status, status) for status in graphs['order']['states'].keys()])
-    created_from = f.TextField('Created From')
-    created_to = f.TextField('Created To')
+    created_from = f.StringField('Created From')
+    created_to = f.StringField('Created To')
 
     def filter_created_from(self, q, k, v):
         return q.filter(Transaction.created_at >= v)

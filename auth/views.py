@@ -5,7 +5,6 @@ Views for the app
 from __future__ import absolute_import
 from __future__ import division
 
-import datetime
 import os
 
 from auth import constants
@@ -16,7 +15,6 @@ from auth.forms import \
     CategoryForm, \
     CountryForm, \
     CurrencyForm, \
-    LoginVoucherForm, \
     ProductForm, \
     SelectCategoryForm, \
     SelectNetworkGatewayForm, \
@@ -30,7 +28,6 @@ from auth.models import \
     Network, \
     Product, \
     Transaction, \
-    Voucher, \
     db
 
 from auth.resources import \
@@ -39,10 +36,8 @@ from auth.resources import \
         RESOURCE_MODELS
 from auth.services import \
         environment_dump, \
-        healthcheck as healthcheck_service, \
-        logos
-from auth.utils import generate_uuid, has_role
-from auth.vouchers import process_auth
+        healthcheck as healthcheck_service
+from auth.utils import has_role, redirect_url
 
 from flask import \
     Blueprint, \
@@ -53,7 +48,6 @@ from flask import \
     request, \
     render_template, \
     send_from_directory, \
-    session, \
     url_for
 from flask_menu import register_menu
 from flask_security import \
@@ -61,7 +55,6 @@ from flask_security import \
     current_user, \
     login_required, \
     roles_accepted
-from sqlalchemy import func
 from wtforms import fields as f, validators
 
 
@@ -283,8 +276,8 @@ def product_new(network_id=None, gateway_id=None, category_id=None):
     if network_id is None and gateway_id is None:
         if current_user.has_role('gateway-admin'):
             url = url_for('.product_new',
-                        network_id=current_user.network.id,
-                        gateway_id=current_user.gateway.id)
+                          network_id=current_user.network.id,
+                          gateway_id=current_user.gateway.id)
             return redirect(url)
 
         form = SelectNetworkGatewayForm()
@@ -616,104 +609,6 @@ def adjustment_delete(id):
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
 def adjustment_edit(id):
     return resource_edit('adjustment', AdjustmentForm, id=id)
-
-
-@bp.route('/wifidog/login/', methods=['GET', 'POST'])
-def wifidog_login():
-    form = LoginVoucherForm(request.form)
-
-    if form.validate_on_submit():
-        voucher_code = form.voucher_code.data.upper()
-        voucher = Voucher.query.filter(func.upper(Voucher.code) == voucher_code, Voucher.status == 'new').first()
-
-        if voucher is None:
-            flash(
-                'Voucher not found, did you type the code correctly?',
-                'error'
-            )
-
-            return redirect(redirect_url())
-
-        form.populate_obj(voucher)
-        voucher.token = generate_uuid()
-        db.session.commit()
-
-        session['next_url'] = form.url.data
-        session['voucher_token'] = voucher.token
-
-        url = ('http://%s:%s/wifidog/auth?token=%s' %
-               (voucher.gw_address,
-                voucher.gw_port,
-                voucher.token))
-
-        return redirect(url)
-
-    if request.method == 'GET':
-        gw_id = request.args.get('gw_id')
-    else:
-        gw_id = form.gw_id.data
-
-    if gw_id is None:
-        abort(404)
-
-    gateway = Gateway.query.filter_by(id=gw_id).first_or_404()
-
-    return render_template('wifidog/login.html', form=form, gateway=gateway)
-
-
-@bp.route('/wifidog/ping/')
-def wifidog_ping():
-    gateway = Gateway.query.filter_by(id=request.args.get('gw_id')).first_or_404()
-
-    gateway.last_ping_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-    gateway.last_ping_at = datetime.datetime.utcnow()
-    gateway.last_ping_user_agent = request.user_agent.string
-    gateway.last_ping_sys_uptime = request.args.get('sys_uptime')
-    gateway.last_ping_wifidog_uptime = request.args.get('wifidog_uptime')
-    gateway.last_ping_sys_memfree = request.args.get('sys_memfree')
-    gateway.last_ping_sys_load = request.args.get('sys_load')
-
-    db.session.commit()
-
-    return ('Pong', 200)
-
-
-@bp.route('/wifidog/auth/')
-def wifidog_auth():
-    args = dict(
-        user_agent=request.user_agent.string,
-        stage=request.args.get('stage'),
-        ip=request.args.get('ip'),
-        mac=request.args.get('mac'),
-        token=request.args.get('token'),
-        incoming=int(request.args.get('incoming')),
-        outgoing=int(request.args.get('outgoing')),
-        gateway_id=request.args.get('gw_id'),
-    )
-    (status, messages) = process_auth(args)
-    return "Auth: %s\nMessages: %s\n" % (status, messages), 200
-
-
-@bp.route('/wifidog/portal/')
-def wifidog_portal():
-    voucher_token = session.get('voucher_token')
-    if voucher_token:
-        voucher = Voucher.query.filter_by(token=voucher_token).first()
-    else:
-        voucher = None
-    gw_id = request.args.get('gw_id')
-    if gw_id is None:
-        abort(404)
-    gateway = Gateway.query.filter_by(id=gw_id).first_or_404()
-    logo_url = None
-    if gateway.logo:
-        logo_url = logos.url(gateway.logo)
-    next_url = session.pop('next_url', None)
-    return render_template('wifidog/portal.html',
-                           gateway=gateway,
-                           logo_url=logo_url,
-                           next_url=next_url,
-                           voucher=voucher)
 
 
 @bp.route('/favicon.ico')

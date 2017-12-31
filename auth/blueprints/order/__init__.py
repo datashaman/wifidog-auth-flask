@@ -54,8 +54,8 @@ class OrderFilterForm(FilterForm):
                             query_factory=instances('user'),
                             blank_text='Select User')
     status = f.SelectField('Status', default='', choices=status_choices())
-    created_from = f.TextField('Created From')
-    created_to = f.TextField('Created To')
+    created_from = f.StringField('Created From')
+    created_to = f.StringField('Created To')
 
     def filter_created_from(self, q, k, v):
         return q.filter(Order.created_at >= v)

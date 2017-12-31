@@ -9,14 +9,20 @@ import os
 
 from auth import constants
 from auth.blueprints import \
-        gateway, \
-        network, \
-        order, \
-        user, \
-        voucher
+    gateway, \
+    network, \
+    order, \
+    user, \
+    voucher, \
+    wifidog
 from auth.models import db, Processor, users
 from auth.processors import init_processors
-from auth.services import login_manager, logos, mail, menu, security
+from auth.services import \
+    login_manager, \
+    logos, \
+    mail, \
+    menu, \
+    security
 from auth.views import bp
 from flask import Flask, render_template, request
 from flask_babelex import Babel
@@ -80,6 +86,7 @@ def create_app(config=None):
     app.register_blueprint(order, url_prefix='/orders')
     app.register_blueprint(user, url_prefix='/users')
     app.register_blueprint(voucher, url_prefix='/vouchers')
+    app.register_blueprint(wifidog, url_prefix='/wifidog')
 
     babel = Babel(app)
 
