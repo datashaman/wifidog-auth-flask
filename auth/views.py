@@ -43,12 +43,6 @@ def uploads(path):
                                conditional=True)
 
 
-@bp.route('/auth-token')
-@login_required
-def auth_token():
-    return current_user.get_auth_token()
-
-
 @bp.route('/healthcheck')
 @auth_token_required
 def healthcheck():

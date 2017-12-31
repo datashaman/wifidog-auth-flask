@@ -119,6 +119,12 @@ def mine():
                            instance=current_user)
 
 
+@user.route('/auth-token')
+@login_required
+def auth_token():
+    return current_user.get_auth_token()
+
+
 @user.route('/')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
