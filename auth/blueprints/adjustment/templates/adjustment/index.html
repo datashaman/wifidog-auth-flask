@@ -42,7 +42,7 @@
                                 {% endif %}
                             </td>
                             {% endif %}
-                            <td data-label="User"><a href="{{ url_for('.user_edit', id=instance.user_id) }}">{{ instance.user }}</a></td>
+                            <td data-label="User"><a href="{{ url_for('user.edit', id=instance.user_id) }}">{{ instance.user }}</a></td>
                             <td class="direction" data-label="Direction">{{ instance.direction }}</td>
                             <td class="amount" data-label="Amount">{{ instance.network.currency.render_amount(instance.amount) }}</td>
                             <td class="reason" data-label="Reason">{{ instance.reason }}</td>

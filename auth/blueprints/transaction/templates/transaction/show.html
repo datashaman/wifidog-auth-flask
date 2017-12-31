@@ -26,7 +26,7 @@
                 <th>User</th>
                 <td>
                     {% if transaction.user %}
-                    <a href="{{ url_for('.user_edit', id=transaction.user_id) }}">{{ transaction.user }}</a>
+                    <a href="{{ url_for('user.edit', id=transaction.user_id) }}">{{ transaction.user }}</a>
                     {% else %}
                     {{ transaction.user }}
                     {% endif %}
