@@ -43,8 +43,7 @@ resource_filters.update({
     'adjustment': lambda query: query.order_by(Adjustment.created_at.desc()),
     'cashup': lambda query: query.order_by(Cashup.created_at.desc()),
     'category': lambda query: query.order_by(Category.sequence),
-    'order': lambda query: query.filter(Order.status != 'archived')
-                                .order_by(Order.created_at.desc()),
+    'order': lambda query: query.filter(Order.status != 'archived'),
     'product': lambda query: query.join(Category)
                                   .order_by(Category.sequence,
                                             Product.sequence),
@@ -94,8 +93,16 @@ def clean_filters(filters):
     return clean
 
 
-def resource_instances(resource, form=None):
+def resource_instances(resource, grid=None, form=None):
+    model = RESOURCE_MODELS[resource]
     query = resource_filters[resource](resource_query(resource))
+
+    if grid is not None:
+        sort = grid.current_sort
+        if hasattr(grid, 'sort_%s' % sort[0]):
+            query = getattr(grid, 'sort_%s' % sort[0])(query, sort[1])
+        else:
+            query = query.order_by(getattr(getattr(model, sort[0]), sort[1])())
 
     if form is None:
         return query
@@ -113,7 +120,7 @@ def resource_url_for(resource, verb, **kwargs):
 
 def resource_grid(resource, grid=None, filter_form=None):
     """Handle a resource grid request"""
-    pagination = resource_instances(resource, filter_form).paginate()
+    pagination = resource_instances(resource, grid, filter_form).paginate()
     return render_template('shared/grid.html',
                            filter_form=filter_form,
                            grid=grid,

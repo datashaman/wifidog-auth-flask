@@ -6,12 +6,12 @@ from auth.models import \
     Network, \
     Order, \
     OrderItem, \
-    Product
+    Product, \
+    User
 from auth.resources import \
     resource_action, \
     resource_delete, \
     resource_grid, \
-    resource_index, \
     resource_instance
 from auth.services import db
 from auth.utils import has_admin_role, redirect_url
@@ -79,36 +79,50 @@ class OrderGrid(Grid):
     columns = {
         'id': {
             'title': 'ID',
+            'sortable': True,
         },
         'network_gateway': {
             'title': 'Network / Gateway',
+            'sortable': True,
         },
         'user': {
             'title': 'User',
+            'sortable': True,
         },
         'status': {
             'title': 'Status',
+            'sortable': True,
         },
-        'total': {
+        'total_amount': {
             'title': 'Total',
+            'sortable': True,
         },
         'created_at': {
             'title': 'Created At',
+            'sortable': True,
         },
         'actions': {
             'title': 'Actions',
         },
     }
 
+    default_sort = ('created_at', 'desc')
+
     def render_id(self, order):
         return '<a href="%s">%s</a><br/> %s' % \
                 (url_for('.edit', hash=order.hash), order, order.hash)
 
-    def render_total(self, order):
+    def render_total_amount(self, order):
         return order.network.currency.render_amount(order.total_amount)
 
     def show_network_gateway(self, order):
         return current_user.has_role('super-admin') or current_user.has_role('network-admin')
+
+    def sort_network_gateway(self, query, dir):
+        return query.join(Order.gateway, Gateway.network).order_by(getattr(Network.title, dir)(), getattr(Gateway.title, dir)())
+
+    def sort_user(self, query, dir):
+        return query.join(Order.user).order_by(getattr(User.email, dir)())
 
 
 @order.route('/')
@@ -123,7 +137,7 @@ class OrderGrid(Grid):
     new_url=lambda: url_for('order.new')
 )
 def index():
-    return resource_grid('order', OrderGrid(), OrderFilterForm(formdata=request.args))
+    return resource_grid('order', OrderGrid(request.args), OrderFilterForm(formdata=request.args))
 
 
 def _gateway_choices():

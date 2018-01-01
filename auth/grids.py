@@ -4,6 +4,9 @@ from flask_security import current_user
 
 
 class Grid(object):
+    def __init__(self, args):
+        self.args = args
+
     @property
     def show_network(self):
         return current_user.has_role('super-admin')
@@ -12,6 +15,12 @@ class Grid(object):
     def show_gateway(self):
         return current_user.has_role('super-admin') or \
                 current_user.has_role('network-admin')
+
+    @property
+    def current_sort(self):
+        default_sort = getattr(self, 'default_sort', (None, None))
+        return (self.args.get('sort', default_sort[0]),
+                self.args.get('dir', default_sort[1]))
 
     def render_network_gateway(self, instance):
         lines = []

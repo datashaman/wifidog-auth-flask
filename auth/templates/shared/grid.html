@@ -7,6 +7,7 @@
 
 {% set show_network = current_user.has_role('super-admin') %}
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
+{% set current_sort = grid.current_sort %}
 
 {% block content %}
     <div class="content">
@@ -32,7 +33,18 @@
                         {% for id, column in grid.columns.items() %}
                         {% set show = grid['show_%s' % id] %}
                         {% if not show or show and show(instance) %}
-                        <th class="{{ id }}">{{ column.get('title', id) }}</th>
+                        <th class="{{ id }}">
+                            {% if column.sortable %}
+                            <a href="{{ url_for('.index', sort=id, dir='desc' if current_sort[1] == 'asc' else 'asc') }}">
+                                {{ column.get('title', id) }}
+                                {% if current_sort[0] == id  %}
+                                <span class="oi" data-glyph="{{ 'caret-top' if current_sort[1] == 'asc' else 'caret-bottom' }}" aria-hidden="true"></span>
+                                {% endif %}
+                            </a>
+                            {% else %}
+                            {{ column.get('title', id) }}
+                            {% endif %}
+                        </th>
                         {% endif %}
                         {% endfor %}
                     </tr>
