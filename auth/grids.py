@@ -19,8 +19,13 @@ class Grid(object):
     @property
     def current_sort(self):
         default_sort = getattr(self, 'default_sort', (None, None))
-        return (self.args.get('sort', default_sort[0]),
+        sort = (self.args.get('sort', default_sort[0]),
                 self.args.get('dir', default_sort[1]))
+        if sort[0] not in self.columns.keys():
+            raise Exception('Invalid sort value')
+        if sort[1] not in ['asc', 'desc']:
+            raise Exception('Invalid dir value')
+        return sort
 
     def render_network_gateway(self, instance):
         lines = []
