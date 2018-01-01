@@ -35,7 +35,7 @@
                         {% if not show or show and show(instance) %}
                         <th class="{{ id }}">
                             {% if column.sortable %}
-                            <a href="{{ url_for('.index', sort=id, dir='desc' if current_sort[1] == 'asc' else 'asc') }}">
+                            <a href="{{ url_for('.index', sort=id, dir='desc' if current_sort[0] == id and current_sort[1] == 'asc' else 'asc') }}">
                                 {{ column.get('title', id) }}
                                 {% if current_sort[0] == id  %}
                                 <span class="oi" data-glyph="{{ 'caret-top' if current_sort[1] == 'asc' else 'caret-bottom' }}" aria-hidden="true"></span>
