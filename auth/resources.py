@@ -50,9 +50,7 @@ resource_filters.update({
     'transaction': lambda query: query.filter(Transaction.status != 'archived')
                                       .order_by(Transaction.created_at.desc()),
     'user': lambda query: query.order_by(User.email),
-    'voucher': lambda query: query.filter(Voucher.status != 'archived')
-                                  .order_by(Voucher.status,
-                                            Voucher.created_at.desc()),
+    'voucher': lambda query: query.filter(Voucher.status != 'archived'),
 })
 
 

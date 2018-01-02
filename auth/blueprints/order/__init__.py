@@ -75,6 +75,7 @@ class OrderForm(FlaskForm):
 class OrderGrid(Grid):
     page_title = 'Orders'
     new_title = 'New Order'
+    action_key = 'hash'
 
     columns = {
         'id': {

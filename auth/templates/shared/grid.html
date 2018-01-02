@@ -52,11 +52,11 @@
 
                 <tbody>
                     {% for instance in pagination.items %}
-                    <tr data-id={{ instance.id }} class="order table-{{ instance.class_hint }}">
+                    <tr data-id="{{ instance.id }}" class="order table-{{ instance.class_hint }}">
                         {% for id, column in grid.columns.items() %}
                         {% set show = grid['show_%s' % id] %}
                         {% if not show or show and show(instance) %}
-                        <td class="{{ id }}">
+                        <td class="{{ id }}" data-label="{{ column['title'] }}">
                             {% if grid['render_%s' % id] %}
                             {{ grid['render_%s' % id](instance) | safe }}
                             {% else %}

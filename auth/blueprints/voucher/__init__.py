@@ -1,5 +1,12 @@
-from auth.models import Network, Voucher
-from auth.resources import resource_action, resource_index
+from auth import constants
+from auth.grids import Grid
+from auth.models import \
+    Gateway, \
+    Network, \
+    Voucher
+from auth.resources import \
+        resource_action, \
+        resource_grid
 from auth.services import db
 from auth.utils import has_admin_role, redirect_url
 from flask import \
@@ -9,6 +16,7 @@ from flask import \
     render_template, \
     request, \
     url_for
+from flask_babelex import format_time
 from flask_menu import register_menu
 from flask_security import \
     current_user, \
@@ -37,6 +45,79 @@ class NewVoucherForm(FlaskForm):
     megabytes = f.IntegerField('Megabytes', [validators.Optional(), validators.NumberRange(min=0)], default=default_megabytes)
 
 
+class VoucherGrid(Grid):
+    page_title = 'Vouchers'
+    new_title = 'New Voucher'
+    action_key = 'id'
+
+    columns = {
+        'network_gateway': {
+            'title': 'Network / Gateway',
+            'sortable': True,
+        },
+        'code': {
+            'title': 'Code',
+            'sortable': True,
+        },
+        'name': {
+            'title': 'Name',
+            'sortable': True,
+        },
+        'status': {
+            'title': 'S',
+            'sortable': True,
+        },
+        'times': {
+            'title': 'Times',
+            'sortable': True,
+        },
+        'time_left': {
+            'title': 'Time Left',
+        },
+        'megabytes_used': {
+            'title': 'MB Used / Max',
+        },
+        'actions': {
+            'title': 'Actions',
+        },
+    }
+
+    default_sort = ('status', 'desc')
+
+    def render_name(self, order):
+        return order.name or '-'
+
+    def render_status(self, order):
+        return '<span class="oi" data-glyph="%s" title="%s" aria-hidden="true"></span></td>' \
+                % (constants.STATUS_ICONS[order.status], order.status)
+
+    def render_times(self, order):
+        result = format_time(order.created_at, 'short')
+        if order.started_at:
+            result += ' %s' % (format_time(order.started_at, 'short'),)
+            result += format_time(order.end_at, 'short')
+        return result
+
+    def render_time_left(self, order):
+        result = ''
+        if order.time_left:
+            result += order.time_left
+        result += ' %s' % (order.minutes or '-',)
+        return result
+
+    def render_megabytes_used(self, order):
+        return '%d / %s' % (int((order.incoming + order.outgoing) / 1024 / 1024), order.megabytes)
+
+    def show_network_gateway(self, order):
+        return current_user.has_role('super-admin') or current_user.has_role('network-admin')
+
+    def sort_network_gateway(self, query, dir):
+        return query.join(Voucher.gateway, Gateway.network).order_by(getattr(Network.title, dir)(), getattr(Gateway.title, dir)())
+
+    def sort_times(self, query, dir):
+        return query.order_by(getattr(Voucher.created_at, dir)())
+
+
 @voucher.route('/')
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
@@ -49,7 +130,7 @@ class NewVoucherForm(FlaskForm):
     new_url=lambda: url_for('voucher.new')
 )
 def index():
-    return resource_index('voucher')
+    return resource_grid('voucher', VoucherGrid(request.args))
 
 
 @voucher.route('/new', methods=['GET', 'POST'])

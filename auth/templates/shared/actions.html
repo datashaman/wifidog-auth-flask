@@ -19,7 +19,7 @@
             </li>
         {% else %}
             <li class="pure-menu-item">
-                <a href="{{ url_for('%s.action' % resource, hash=instance.hash, action=action) }}" class="pure-menu-link" title="{{ action }}">
+                <a href="{{ url_for('%s.action' % resource, **{action_key: instance[action_key], 'action': action }) }}" class="pure-menu-link" title="{{ action }}">
                     {% if defn.icon %}
                     <span class="oi" data-glyph={{ defn.icon }} aria-hidden="true"></span>
                     {% endif %}
