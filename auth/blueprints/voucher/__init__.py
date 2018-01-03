@@ -103,7 +103,7 @@ class VoucherGrid(Grid):
     def render_time_left(self, order):
         result = ''
         if order.time_left:
-            result += order.time_left
+            result += str(order.time_left)
         result += ' %s' % (order.minutes or '-',)
         return result
 
