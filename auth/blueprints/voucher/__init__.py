@@ -78,7 +78,10 @@ class VoucherGrid(Grid):
             'title': 'Actions',
         },
     }
-    default_sort = ('status', 'desc')
+    default_sort = (
+        ('status', 'asc'),
+        ('created_at', 'desc'),
+    )
     id = 'vouchers'
     new_title = 'New Voucher'
     page_title = 'Vouchers'

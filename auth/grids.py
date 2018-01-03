@@ -9,13 +9,16 @@ class Grid(object):
 
     @property
     def current_sort(self):
-        default_sort = getattr(self, 'default_sort', (None, None))
-        sort = (self.args.get('sort', default_sort[0]),
-                self.args.get('dir', default_sort[1]))
-        if sort[0] not in self.columns.keys():
-            raise Exception('Invalid sort value')
-        if sort[1] not in ['asc', 'desc']:
-            raise Exception('Invalid dir value')
+        if self.args.get('sort'):
+            sort = (
+                (self.args.get('sort'), self.args.get('dir')),
+            )
+            if sort[0][0] not in self.columns.keys():
+                raise Exception('Invalid sort value')
+            if sort[0][1] not in ['asc', 'desc']:
+                raise Exception('Invalid dir value')
+        else:
+            sort = getattr(self, 'default_sort', ())
         return sort
 
     def render_actions(self, instance):

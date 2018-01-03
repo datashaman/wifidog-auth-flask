@@ -103,7 +103,9 @@ class OrderGrid(Grid):
             'title': 'Actions',
         },
     }
-    default_sort = ('created_at', 'desc')
+    default_sort = (
+        ('created_at', 'desc'),
+    )
     id = 'orders'
     new_title = 'New Order'
     page_title = 'Orders'

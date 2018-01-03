@@ -97,10 +97,11 @@ def resource_instances(resource, grid=None, form=None):
 
     if grid is not None:
         sort = grid.current_sort
-        if hasattr(grid, 'sort_%s' % sort[0]):
-            query = getattr(grid, 'sort_%s' % sort[0])(query, sort[1])
+        if hasattr(grid, 'sort_%s' % sort[0][0]):
+            query = getattr(grid, 'sort_%s' % sort[0][0])(query, sort[0][1])
         else:
-            query = query.order_by(getattr(getattr(model, sort[0]), sort[1])())
+            for s in sort:
+                query = query.order_by(getattr(getattr(model, s[0]), s[1])())
 
     if form is None:
         return query
