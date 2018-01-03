@@ -129,7 +129,7 @@ def resource_grid(resource, grid=None, filter_form=None):
 
 def resource_index(resource, form=None):
     """Handle a resource index request"""
-    pagination = resource_instances(resource, form).paginate()
+    pagination = resource_instances(resource, None, form).paginate()
     return render_template('%s/index.html' % resource,
                            form=form,
                            pagination=pagination,
