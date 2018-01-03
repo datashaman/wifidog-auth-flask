@@ -73,10 +73,7 @@ class OrderForm(FlaskForm):
 
 
 class OrderGrid(Grid):
-    page_title = 'Orders'
-    new_title = 'New Order'
     action_key = 'hash'
-
     columns = {
         'id': {
             'title': 'ID',
@@ -106,8 +103,10 @@ class OrderGrid(Grid):
             'title': 'Actions',
         },
     }
-
     default_sort = ('created_at', 'desc')
+    id = 'orders'
+    new_title = 'New Order'
+    page_title = 'Orders'
 
     def render_id(self, order):
         return '<a href="%s">%s</a><br/> %s' % \

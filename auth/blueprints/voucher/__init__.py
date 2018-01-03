@@ -46,10 +46,7 @@ class NewVoucherForm(FlaskForm):
 
 
 class VoucherGrid(Grid):
-    page_title = 'Vouchers'
-    new_title = 'New Voucher'
     action_key = 'id'
-
     columns = {
         'network_gateway': {
             'title': 'Network / Gateway',
@@ -81,8 +78,10 @@ class VoucherGrid(Grid):
             'title': 'Actions',
         },
     }
-
     default_sort = ('status', 'desc')
+    id = 'vouchers'
+    new_title = 'New Voucher'
+    page_title = 'Vouchers'
 
     def render_name(self, order):
         return order.name or '-'
