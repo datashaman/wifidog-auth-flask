@@ -46,7 +46,7 @@ class NewVoucherForm(FlaskForm):
 
 
 class VoucherGrid(Grid):
-    action_key = 'id'
+    action_key = 'code'
     columns = {
         'network_gateway': {
             'title': 'Network / Gateway',
@@ -193,8 +193,8 @@ def new():
     return render_template('voucher/new.html', form=form, defaults=defaults)
 
 
-@voucher.route('/<int:id>/<action>', methods=['GET', 'POST'])
+@voucher.route('/<code>/<action>', methods=['GET', 'POST'])
 @login_required
 @roles_accepted('super-admin', 'network-admin', 'gateway-admin')
-def action(id, action):
-    return resource_action('voucher', action, id=id)
+def action(code, action):
+    return resource_action('voucher', action, code=code)

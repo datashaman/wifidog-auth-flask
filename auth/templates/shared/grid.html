@@ -34,16 +34,16 @@
                         {% set show = grid['show_%s' % id] %}
                         {% if not show or show and show(instance) %}
                         <th class="{{ id }}">
-                            {% if column.sortable %}
+                            {% if column.sortable -%}
                             <a href="{{ url_for('.index', sort=id, dir='desc' if current_sort[0] == id and current_sort[1] == 'asc' else 'asc') }}">
                                 {{ column.get('title', id) }}
-                                {% if current_sort[0] == id  %}
+                                {%- if current_sort[0] == id -%}
                                 <span class="oi" data-glyph="{{ 'caret-top' if current_sort[1] == 'asc' else 'caret-bottom' }}" aria-hidden="true"></span>
-                                {% endif %}
+                                {%- endif %}
                             </a>
-                            {% else %}
+                            {%- else -%}
                             {{ column.get('title', id) }}
-                            {% endif %}
+                            {%- endif -%}
                         </th>
                         {% endif %}
                         {% endfor %}
@@ -52,16 +52,16 @@
 
                 <tbody>
                     {% for instance in pagination.items %}
-                    <tr data-id="{{ instance.id }}" class="order table-{{ instance.class_hint }}">
+                    <tr data-id="{{ instance.id }}"{% if grid.action_key != 'id' %} data-{{ grid.action_key }}="{{ instance[grid.action_key] }}"{% endif %} class="order table-{{ instance.class_hint }}">
                         {% for id, column in grid.columns.items() %}
                         {% set show = grid['show_%s' % id] %}
                         {% if not show or show and show(instance) %}
                         <td class="{{ id }}" data-label="{{ column['title'] }}">
-                            {% if grid['render_%s' % id] %}
+                            {%- if grid['render_%s' % id] -%}
                             {{ grid['render_%s' % id](instance) | safe }}
-                            {% else %}
+                            {%- else -%}
                             {{ instance[id] }}
-                            {% endif %}
+                            {%- endif -%}
                         </td>
                         {% endif %}
                         {% endfor %}
