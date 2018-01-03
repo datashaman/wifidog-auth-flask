@@ -5,6 +5,7 @@
 {% set show_gateway = current_user.has_role('super-admin') or current_user.has_role('network-admin') %}
 
 {% block page_actions %}
+    {% set action_key = 'hash' %}
     {% include 'shared/actions.html' %}
 {% endblock %}
 
