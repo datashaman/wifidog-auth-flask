@@ -1,13 +1,15 @@
 var es = require('event-stream'),
     gulp = require('gulp'),
-    gutil = require('gulp-util'),
     browserSync = require('browser-sync'),
     reload = browserSync.reload,
-    plugins = require('gulp-load-plugins')();
+    plugins = require('gulp-load-plugins')(),
+    log = require('fancy-log'),
+    colors = require('ansi-colors'),
+    through2 = require('through2');
 
 function errorHandler(error) {
     // console.log(error);
-    gutil.log(gutil.colors.red(error.toString()));
+    log.error(error.toString());
     this.emit('end');
 }
 
@@ -19,6 +21,10 @@ function scripts(src, dest) {
 function sass(src) {
     return gulp.src(src)
         .pipe(plugins.sass().on('error', plugins.sass.logError));
+}
+
+function noop() {
+    return through2({objectMode: true }, function (chunk, enc, cb) { cb(null, chunk); });
 }
 
 var isProduction = true,
@@ -45,7 +51,7 @@ var isProduction = true,
         'auth/assets/scripts/**/*.js',
     ];
 
-if(gutil.env.dev === true) {
+if(process.env.FLASK_DEBUG === '1') {
     isProduction = false;
 }
 
@@ -53,8 +59,8 @@ gulp.task('styles', function() {
     return es.concat(gulp.src(vendorStyles), sass(siteStyles))
         .pipe(plugins.concat('screen.min.css'))
         .pipe(plugins.autoprefixer('last 2 versions', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4', 'Firefox >= 4'))
-        // .pipe(isProduction ? plugins.combineMediaQueries({ log: true }) : gutil.noop())
-        .pipe(isProduction ? plugins.cssnano() : gutil.noop())
+        // .pipe(isProduction ? plugins.combineMediaQueries({ log: true }) : noop())
+        .pipe(isProduction ? plugins.cssnano() : noop())
         .pipe(plugins.size())
         .pipe(gulp.dest('./auth/static/styles'))
         .pipe(browserSync.stream());
@@ -64,7 +70,7 @@ gulp.task('scripts', function() {
     return es.concat(
         scripts(ieScripts, 'ie.min.js'),
         scripts(siteScripts, 'site.min.js'))
-        .pipe(isProduction ? plugins.uglify() : gutil.noop()).on('error', errorHandler)
+        .pipe(isProduction ? plugins.uglify() : noop()).on('error', errorHandler)
         .pipe(plugins.size())
         .pipe(gulp.dest('./auth/static/scripts'));
 });
