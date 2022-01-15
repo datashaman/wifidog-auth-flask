@@ -20,7 +20,7 @@
     "gulp-uglify": "~1.4.1",
     "gulp-util": "~3.0.6",
     "html5shiv": "^3.7.3",
-    "marked": "^0.3.6",
+    "marked": "^4.0.10",
     "open-iconic": "^1.1.1",
     "promise": "~7.0.4",
     "purecss": "^1.0.0",
